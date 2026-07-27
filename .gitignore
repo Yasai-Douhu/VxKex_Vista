@@ -1,0 +1,11 @@
+.vs/
+*.obj
+*.lib
+*.exp
+*.pdb
+*.res
+*.log
+Win32/
+x64/
+!Win32DLLs/
+!VistaDLLs/
