@@ -1,0 +1,134 @@
+サブディレクトリまたはファイル C:\Users\YamaR\Desktop\AI_Datas\VxKex_Vista\VxKex_Vista\Win32\Release\KexDll は既に存在します。
+Compiling C files...
+apiset.c
+c:\users\yamar\desktop\ai_datas\vxkex_vista\vxkex_vista\kexdll\buildcfg.h : warning C4819: The file contains a character that cannot be represented in the current code page (932). Save the file in Unicode format to prevent data loss
+c:\users\yamar\desktop\ai_datas\vxkex_vista\vxkex_vista\kexdll\buildcfg.h : warning C4819: The file contains a character that cannot be represented in the current code page (932). Save the file in Unicode format to prevent data loss
+ash.c
+c:\users\yamar\desktop\ai_datas\vxkex_vista\vxkex_vista\kexdll\buildcfg.h : warning C4819: The file contains a character that cannot be represented in the current code page (932). Save the file in Unicode format to prevent data loss
+c:\users\yamar\desktop\ai_datas\vxkex_vista\vxkex_vista\kexdll\buildcfg.h : warning C4819: The file contains a character that cannot be represented in the current code page (932). Save the file in Unicode format to prevent data loss
+ashcrsup.c
+c:\users\yamar\desktop\ai_datas\vxkex_vista\vxkex_vista\kexdll\buildcfg.h : warning C4819: The file contains a character that cannot be represented in the current code page (932). Save the file in Unicode format to prevent data loss
+c:\users\yamar\desktop\ai_datas\vxkex_vista\vxkex_vista\kexdll\buildcfg.h : warning C4819: The file contains a character that cannot be represented in the current code page (932). Save the file in Unicode format to prevent data loss
+ashselec.c
+c:\users\yamar\desktop\ai_datas\vxkex_vista\vxkex_vista\kexdll\buildcfg.h : warning C4819: The file contains a character that cannot be represented in the current code page (932). Save the file in Unicode format to prevent data loss
+c:\users\yamar\desktop\ai_datas\vxkex_vista\vxkex_vista\kexdll\buildcfg.h : warning C4819: The file contains a character that cannot be represented in the current code page (932). Save the file in Unicode format to prevent data loss
+avrf.c
+c:\users\yamar\desktop\ai_datas\vxkex_vista\vxkex_vista\kexdll\buildcfg.h : warning C4819: The file contains a character that cannot be represented in the current code page (932). Save the file in Unicode format to prevent data loss
+c:\users\yamar\desktop\ai_datas\vxkex_vista\vxkex_vista\kexdll\buildcfg.h : warning C4819: The file contains a character that cannot be represented in the current code page (932). Save the file in Unicode format to prevent data loss
+cpiwbypa.c
+c:\users\yamar\desktop\ai_datas\vxkex_vista\vxkex_vista\kexdll\buildcfg.h : warning C4819: The file contains a character that cannot be represented in the current code page (932). Save the file in Unicode format to prevent data loss
+c:\users\yamar\desktop\ai_datas\vxkex_vista\vxkex_vista\kexdll\buildcfg.h : warning C4819: The file contains a character that cannot be represented in the current code page (932). Save the file in Unicode format to prevent data loss
+critsect.c
+c:\users\yamar\desktop\ai_datas\vxkex_vista\vxkex_vista\kexdll\buildcfg.h : warning C4819: The file contains a character that cannot be represented in the current code page (932). Save the file in Unicode format to prevent data loss
+c:\users\yamar\desktop\ai_datas\vxkex_vista\vxkex_vista\kexdll\buildcfg.h : warning C4819: The file contains a character that cannot be represented in the current code page (932). Save the file in Unicode format to prevent data loss
+dllmain.c
+c:\users\yamar\desktop\ai_datas\vxkex_vista\vxkex_vista\kexdll\buildcfg.h : warning C4819: The file contains a character that cannot be represented in the current code page (932). Save the file in Unicode format to prevent data loss
+c:\users\yamar\desktop\ai_datas\vxkex_vista\vxkex_vista\kexdll\buildcfg.h : warning C4819: The file contains a character that cannot be represented in the current code page (932). Save the file in Unicode format to prevent data loss
+dllnotif.c
+c:\users\yamar\desktop\ai_datas\vxkex_vista\vxkex_vista\kexdll\buildcfg.h : warning C4819: The file contains a character that cannot be represented in the current code page (932). Save the file in Unicode format to prevent data loss
+c:\users\yamar\desktop\ai_datas\vxkex_vista\vxkex_vista\kexdll\buildcfg.h : warning C4819: The file contains a character that cannot be represented in the current code page (932). Save the file in Unicode format to prevent data loss
+dllpath.c
+c:\users\yamar\desktop\ai_datas\vxkex_vista\vxkex_vista\kexdll\buildcfg.h : warning C4819: The file contains a character that cannot be represented in the current code page (932). Save the file in Unicode format to prevent data loss
+c:\users\yamar\desktop\ai_datas\vxkex_vista\vxkex_vista\kexdll\buildcfg.h : warning C4819: The file contains a character that cannot be represented in the current code page (932). Save the file in Unicode format to prevent data loss
+dllrewrt.c
+c:\users\yamar\desktop\ai_datas\vxkex_vista\vxkex_vista\kexdll\buildcfg.h : warning C4819: The file contains a character that cannot be represented in the current code page (932). Save the file in Unicode format to prevent data loss
+c:\users\yamar\desktop\ai_datas\vxkex_vista\vxkex_vista\kexdll\buildcfg.h : warning C4819: The file contains a character that cannot be represented in the current code page (932). Save the file in Unicode format to prevent data loss
+dload.c
+c:\users\yamar\desktop\ai_datas\vxkex_vista\vxkex_vista\kexdll\buildcfg.h : warning C4819: The file contains a character that cannot be represented in the current code page (932). Save the file in Unicode format to prevent data loss
+c:\users\yamar\desktop\ai_datas\vxkex_vista\vxkex_vista\kexdll\buildcfg.h : warning C4819: The file contains a character that cannot be represented in the current code page (932). Save the file in Unicode format to prevent data loss
+etw.c
+c:\users\yamar\desktop\ai_datas\vxkex_vista\vxkex_vista\kexdll\buildcfg.h : warning C4819: The file contains a character that cannot be represented in the current code page (932). Save the file in Unicode format to prevent data loss
+c:\users\yamar\desktop\ai_datas\vxkex_vista\vxkex_vista\kexdll\buildcfg.h : warning C4819: The file contains a character that cannot be represented in the current code page (932). Save the file in Unicode format to prevent data loss
+except.c
+c:\users\yamar\desktop\ai_datas\vxkex_vista\vxkex_vista\kexdll\buildcfg.h : warning C4819: The file contains a character that cannot be represented in the current code page (932). Save the file in Unicode format to prevent data loss
+c:\users\yamar\desktop\ai_datas\vxkex_vista\vxkex_vista\kexdll\buildcfg.h : warning C4819: The file contains a character that cannot be represented in the current code page (932). Save the file in Unicode format to prevent data loss
+kexdata.c
+c:\users\yamar\desktop\ai_datas\vxkex_vista\vxkex_vista\kexdll\buildcfg.h : warning C4819: The file contains a character that cannot be represented in the current code page (932). Save the file in Unicode format to prevent data loss
+c:\users\yamar\desktop\ai_datas\vxkex_vista\vxkex_vista\kexdll\buildcfg.h : warning C4819: The file contains a character that cannot be represented in the current code page (932). Save the file in Unicode format to prevent data loss
+kexhe.c
+c:\users\yamar\desktop\ai_datas\vxkex_vista\vxkex_vista\kexdll\buildcfg.h : warning C4819: The file contains a character that cannot be represented in the current code page (932). Save the file in Unicode format to prevent data loss
+c:\users\yamar\desktop\ai_datas\vxkex_vista\vxkex_vista\kexdll\buildcfg.h : warning C4819: The file contains a character that cannot be represented in the current code page (932). Save the file in Unicode format to prevent data loss
+kexhk.c
+c:\users\yamar\desktop\ai_datas\vxkex_vista\vxkex_vista\kexdll\buildcfg.h : warning C4819: The file contains a character that cannot be represented in the current code page (932). Save the file in Unicode format to prevent data loss
+c:\users\yamar\desktop\ai_datas\vxkex_vista\vxkex_vista\kexdll\buildcfg.h : warning C4819: The file contains a character that cannot be represented in the current code page (932). Save the file in Unicode format to prevent data loss
+kexldr.c
+c:\users\yamar\desktop\ai_datas\vxkex_vista\vxkex_vista\kexdll\buildcfg.h : warning C4819: The file contains a character that cannot be represented in the current code page (932). Save the file in Unicode format to prevent data loss
+c:\users\yamar\desktop\ai_datas\vxkex_vista\vxkex_vista\kexdll\buildcfg.h : warning C4819: The file contains a character that cannot be represented in the current code page (932). Save the file in Unicode format to prevent data loss
+kexrtl.c
+c:\users\yamar\desktop\ai_datas\vxkex_vista\vxkex_vista\kexdll\buildcfg.h : warning C4819: The file contains a character that cannot be represented in the current code page (932). Save the file in Unicode format to prevent data loss
+c:\users\yamar\desktop\ai_datas\vxkex_vista\vxkex_vista\kexdll\buildcfg.h : warning C4819: The file contains a character that cannot be represented in the current code page (932). Save the file in Unicode format to prevent data loss
+logging.c
+c:\users\yamar\desktop\ai_datas\vxkex_vista\vxkex_vista\kexdll\buildcfg.h : warning C4819: The file contains a character that cannot be represented in the current code page (932). Save the file in Unicode format to prevent data loss
+c:\users\yamar\desktop\ai_datas\vxkex_vista\vxkex_vista\kexdll\buildcfg.h : warning C4819: The file contains a character that cannot be represented in the current code page (932). Save the file in Unicode format to prevent data loss
+Compiling...
+ntjob.c
+c:\users\yamar\desktop\ai_datas\vxkex_vista\vxkex_vista\kexdll\buildcfg.h : warning C4819: The file contains a character that cannot be represented in the current code page (932). Save the file in Unicode format to prevent data loss
+c:\users\yamar\desktop\ai_datas\vxkex_vista\vxkex_vista\kexdll\buildcfg.h : warning C4819: The file contains a character that cannot be represented in the current code page (932). Save the file in Unicode format to prevent data loss
+ntobj.c
+c:\users\yamar\desktop\ai_datas\vxkex_vista\vxkex_vista\kexdll\buildcfg.h : warning C4819: The file contains a character that cannot be represented in the current code page (932). Save the file in Unicode format to prevent data loss
+c:\users\yamar\desktop\ai_datas\vxkex_vista\vxkex_vista\kexdll\buildcfg.h : warning C4819: The file contains a character that cannot be represented in the current code page (932). Save the file in Unicode format to prevent data loss
+ntpriv.c
+c:\users\yamar\desktop\ai_datas\vxkex_vista\vxkex_vista\kexdll\buildcfg.h : warning C4819: The file contains a character that cannot be represented in the current code page (932). Save the file in Unicode format to prevent data loss
+c:\users\yamar\desktop\ai_datas\vxkex_vista\vxkex_vista\kexdll\buildcfg.h : warning C4819: The file contains a character that cannot be represented in the current code page (932). Save the file in Unicode format to prevent data loss
+ntps.c
+c:\users\yamar\desktop\ai_datas\vxkex_vista\vxkex_vista\kexdll\buildcfg.h : warning C4819: The file contains a character that cannot be represented in the current code page (932). Save the file in Unicode format to prevent data loss
+c:\users\yamar\desktop\ai_datas\vxkex_vista\vxkex_vista\kexdll\buildcfg.h : warning C4819: The file contains a character that cannot be represented in the current code page (932). Save the file in Unicode format to prevent data loss
+ntreg.c
+c:\users\yamar\desktop\ai_datas\vxkex_vista\vxkex_vista\kexdll\buildcfg.h : warning C4819: The file contains a character that cannot be represented in the current code page (932). Save the file in Unicode format to prevent data loss
+c:\users\yamar\desktop\ai_datas\vxkex_vista\vxkex_vista\kexdll\buildcfg.h : warning C4819: The file contains a character that cannot be represented in the current code page (932). Save the file in Unicode format to prevent data loss
+ntsect.c
+c:\users\yamar\desktop\ai_datas\vxkex_vista\vxkex_vista\kexdll\buildcfg.h : warning C4819: The file contains a character that cannot be represented in the current code page (932). Save the file in Unicode format to prevent data loss
+c:\users\yamar\desktop\ai_datas\vxkex_vista\vxkex_vista\kexdll\buildcfg.h : warning C4819: The file contains a character that cannot be represented in the current code page (932). Save the file in Unicode format to prevent data loss
+ntthread.c
+c:\users\yamar\desktop\ai_datas\vxkex_vista\vxkex_vista\kexdll\buildcfg.h : warning C4819: The file contains a character that cannot be represented in the current code page (932). Save the file in Unicode format to prevent data loss
+c:\users\yamar\desktop\ai_datas\vxkex_vista\vxkex_vista\kexdll\buildcfg.h : warning C4819: The file contains a character that cannot be represented in the current code page (932). Save the file in Unicode format to prevent data loss
+ntwnf.c
+c:\users\yamar\desktop\ai_datas\vxkex_vista\vxkex_vista\kexdll\buildcfg.h : warning C4819: The file contains a character that cannot be represented in the current code page (932). Save the file in Unicode format to prevent data loss
+c:\users\yamar\desktop\ai_datas\vxkex_vista\vxkex_vista\kexdll\buildcfg.h : warning C4819: The file contains a character that cannot be represented in the current code page (932). Save the file in Unicode format to prevent data loss
+propagte.c
+c:\users\yamar\desktop\ai_datas\vxkex_vista\vxkex_vista\kexdll\buildcfg.h : warning C4819: The file contains a character that cannot be represented in the current code page (932). Save the file in Unicode format to prevent data loss
+c:\users\yamar\desktop\ai_datas\vxkex_vista\vxkex_vista\kexdll\buildcfg.h : warning C4819: The file contains a character that cannot be represented in the current code page (932). Save the file in Unicode format to prevent data loss
+rtlsec.c
+c:\users\yamar\desktop\ai_datas\vxkex_vista\vxkex_vista\kexdll\buildcfg.h : warning C4819: The file contains a character that cannot be represented in the current code page (932). Save the file in Unicode format to prevent data loss
+c:\users\yamar\desktop\ai_datas\vxkex_vista\vxkex_vista\kexdll\buildcfg.h : warning C4819: The file contains a character that cannot be represented in the current code page (932). Save the file in Unicode format to prevent data loss
+rtlwoa.c
+c:\users\yamar\desktop\ai_datas\vxkex_vista\vxkex_vista\kexdll\buildcfg.h : warning C4819: The file contains a character that cannot be represented in the current code page (932). Save the file in Unicode format to prevent data loss
+c:\users\yamar\desktop\ai_datas\vxkex_vista\vxkex_vista\kexdll\buildcfg.h : warning C4819: The file contains a character that cannot be represented in the current code page (932). Save the file in Unicode format to prevent data loss
+rtlwow64.c
+c:\users\yamar\desktop\ai_datas\vxkex_vista\vxkex_vista\kexdll\buildcfg.h : warning C4819: The file contains a character that cannot be represented in the current code page (932). Save the file in Unicode format to prevent data loss
+c:\users\yamar\desktop\ai_datas\vxkex_vista\vxkex_vista\kexdll\buildcfg.h : warning C4819: The file contains a character that cannot be represented in the current code page (932). Save the file in Unicode format to prevent data loss
+status.c
+c:\users\yamar\desktop\ai_datas\vxkex_vista\vxkex_vista\kexdll\buildcfg.h : warning C4819: The file contains a character that cannot be represented in the current code page (932). Save the file in Unicode format to prevent data loss
+c:\users\yamar\desktop\ai_datas\vxkex_vista\vxkex_vista\kexdll\buildcfg.h : warning C4819: The file contains a character that cannot be represented in the current code page (932). Save the file in Unicode format to prevent data loss
+syscal.c
+c:\users\yamar\desktop\ai_datas\vxkex_vista\vxkex_vista\kexdll\buildcfg.h : warning C4819: The file contains a character that cannot be represented in the current code page (932). Save the file in Unicode format to prevent data loss
+c:\users\yamar\desktop\ai_datas\vxkex_vista\vxkex_vista\kexdll\buildcfg.h : warning C4819: The file contains a character that cannot be represented in the current code page (932). Save the file in Unicode format to prevent data loss
+verspoof.c
+c:\users\yamar\desktop\ai_datas\vxkex_vista\vxkex_vista\kexdll\buildcfg.h : warning C4819: The file contains a character that cannot be represented in the current code page (932). Save the file in Unicode format to prevent data loss
+c:\users\yamar\desktop\ai_datas\vxkex_vista\vxkex_vista\kexdll\buildcfg.h : warning C4819: The file contains a character that cannot be represented in the current code page (932). Save the file in Unicode format to prevent data loss
+vxlopcl.c
+c:\users\yamar\desktop\ai_datas\vxkex_vista\vxkex_vista\kexdll\buildcfg.h : warning C4819: The file contains a character that cannot be represented in the current code page (932). Save the file in Unicode format to prevent data loss
+c:\users\yamar\desktop\ai_datas\vxkex_vista\vxkex_vista\kexdll\buildcfg.h : warning C4819: The file contains a character that cannot be represented in the current code page (932). Save the file in Unicode format to prevent data loss
+vxlpriv.c
+c:\users\yamar\desktop\ai_datas\vxkex_vista\vxkex_vista\kexdll\buildcfg.h : warning C4819: The file contains a character that cannot be represented in the current code page (932). Save the file in Unicode format to prevent data loss
+c:\users\yamar\desktop\ai_datas\vxkex_vista\vxkex_vista\kexdll\buildcfg.h : warning C4819: The file contains a character that cannot be represented in the current code page (932). Save the file in Unicode format to prevent data loss
+vxlquery.c
+c:\users\yamar\desktop\ai_datas\vxkex_vista\vxkex_vista\kexdll\buildcfg.h : warning C4819: The file contains a character that cannot be represented in the current code page (932). Save the file in Unicode format to prevent data loss
+c:\users\yamar\desktop\ai_datas\vxkex_vista\vxkex_vista\kexdll\buildcfg.h : warning C4819: The file contains a character that cannot be represented in the current code page (932). Save the file in Unicode format to prevent data loss
+vxlread.c
+c:\users\yamar\desktop\ai_datas\vxkex_vista\vxkex_vista\kexdll\buildcfg.h : warning C4819: The file contains a character that cannot be represented in the current code page (932). Save the file in Unicode format to prevent data loss
+c:\users\yamar\desktop\ai_datas\vxkex_vista\vxkex_vista\kexdll\buildcfg.h : warning C4819: The file contains a character that cannot be represented in the current code page (932). Save the file in Unicode format to prevent data loss
+vxlsever.c
+c:\users\yamar\desktop\ai_datas\vxkex_vista\vxkex_vista\kexdll\buildcfg.h : warning C4819: The file contains a character that cannot be represented in the current code page (932). Save the file in Unicode format to prevent data loss
+c:\users\yamar\desktop\ai_datas\vxkex_vista\vxkex_vista\kexdll\buildcfg.h : warning C4819: The file contains a character that cannot be represented in the current code page (932). Save the file in Unicode format to prevent data loss
+Compiling...
+vxlwrite.c
+c:\users\yamar\desktop\ai_datas\vxkex_vista\vxkex_vista\kexdll\buildcfg.h : warning C4819: The file contains a character that cannot be represented in the current code page (932). Save the file in Unicode format to prevent data loss
+c:\users\yamar\desktop\ai_datas\vxkex_vista\vxkex_vista\kexdll\buildcfg.h : warning C4819: The file contains a character that cannot be represented in the current code page (932). Save the file in Unicode format to prevent data loss
+Compiling RC files...
+Microsoft (R) Windows (R) Resource Compiler Version 6.1.7600.16385
+Copyright (C) Microsoft Corporation.  All rights reserved.
+
+Linking...
+LINK : fatal error LNK1181: cannot open input file 'ntdll.lib'
+Done!

@@ -1,0 +1,3 @@
+
+#define BaseSetLastNTError Ext_BaseSetLastNTError
+#define QueryUnbiasedInterruptTime Ext_QueryUnbiasedInterruptTime

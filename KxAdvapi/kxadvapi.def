@@ -1,0 +1,11 @@
+LIBRARY KxAdvapi
+EXPORTS
+	;; Forwarders to KexDll
+	EventSetInformation			= KexDll.KexEtwEventSetInformation
+
+	;; Forwarders to KxBase
+	CreateWellKnownSid			= KxBase.CreateWellKnownSid
+
+	;; time.c
+	EnumDynamicTimeZoneInformation
+	GetDynamicTimeZoneInformationEffectiveYears

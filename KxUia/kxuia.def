@@ -1,0 +1,4 @@
+LIBRARY KxUia
+EXPORTS
+	;; uiacore.c
+	UiaRaiseNotificationEvent
