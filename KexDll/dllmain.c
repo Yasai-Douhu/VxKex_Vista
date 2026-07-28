@@ -40,6 +40,37 @@ STATIC RTL_VERIFIER_DLL_DESCRIPTOR AVrfDllDescriptor[] = {
 	{NULL, 0, NULL, NULL}
 };
 
+STATIC KEX_BASIC_HOOK_CONTEXT NtContinueHookContext;
+
+NTSTATUS NTAPI Ext_NtContinue(
+	IN PCONTEXT ContextRecord,
+	IN BOOLEAN TestAlert)
+{
+	PVOID ApiPageAddress;
+	SIZE_T HookLength;
+	ULONG OldProtect;
+	NTSTATUS (NTAPI *OriginalNtContinue)(PCONTEXT, BOOLEAN);
+
+	ApiPageAddress = NtContinueHookContext.OriginalApiAddress;
+	HookLength = sizeof(NtContinueHookContext.OriginalInstructions);
+
+	KexNtProtectVirtualMemory(NtCurrentProcess(), &ApiPageAddress, &HookLength, PAGE_READWRITE, &OldProtect);
+	KexRtlCopyMemory(ApiPageAddress, NtContinueHookContext.OriginalInstructions, HookLength);
+
+	if (OldProtect == PAGE_EXECUTE_READWRITE) {
+		OldProtect = PAGE_EXECUTE_READ;
+	} else if (OldProtect == PAGE_WRITECOPY) {
+		OldProtect = PAGE_READWRITE;
+	}
+
+	KexNtProtectVirtualMemory(NtCurrentProcess(), &ApiPageAddress, &HookLength, OldProtect, &OldProtect);
+
+	KexDisableAVrf();
+
+	OriginalNtContinue = (NTSTATUS (NTAPI *)(PCONTEXT, BOOLEAN)) ApiPageAddress;
+	return OriginalNtContinue(ContextRecord, TestAlert);
+}
+
 STATIC RTL_VERIFIER_PROVIDER_DESCRIPTOR AVrfProviderDescriptor = {
 	sizeof(RTL_VERIFIER_PROVIDER_DESCRIPTOR),		// Length
 	AVrfDllDescriptor,								// ProviderDlls
@@ -84,7 +115,20 @@ BOOL WINAPI DllMain(
 		// at the moment, but if we don't do this the process will crash.
 		//
 
-		*Descriptor = &AVrfProviderDescriptor;
+		//
+		// On Vista x86 WOW64, skip KexDataInitialize during DLL_PROCESS_VERIFIER
+		// to avoid stack overflow before LdrInitShimEngineDynamic is called.
+		// Vista SP1 ntdll uses significantly more stack in LdrInitShimEngineDynamic
+		// than Win7, so we defer heavy initialization to DLL_PROCESS_ATTACH.
+		//
+		if (sizeof(PVOID) == 4 && NtCurrentPeb()->OSMajorVersion == 6 && NtCurrentPeb()->OSMinorVersion == 0) {
+			AVrfProviderDescriptor.Length = 44; // RTL_VERIFIER_PROVIDER_DESCRIPTOR_VISTA size
+			*Descriptor = &AVrfProviderDescriptor;
+			NtCurrentPeb()->NtGlobalFlag &= ~(FLG_APPLICATION_VERIFIER | FLG_HEAP_PAGE_ALLOCS);
+			return TRUE;
+		} else {
+			*Descriptor = &AVrfProviderDescriptor;
+		}
 	}
 
 	if (!KexData) {
@@ -111,7 +155,8 @@ BOOL WINAPI DllMain(
 		return TRUE;
 	}
 
-	if (Reason == DLL_PROCESS_VERIFIER) {
+	if ((Reason == DLL_PROCESS_VERIFIER && !(sizeof(PVOID) == 4 && OriginalMajorVersion == 6 && OriginalMinorVersion == 0)) ||
+		(Reason == DLL_PROCESS_ATTACH && Descriptor == NULL && sizeof(PVOID) == 4 && OriginalMajorVersion == 6 && OriginalMinorVersion == 0)) {
 		PPEB Peb;
 
 		ASSERT (KexData != NULL);
@@ -127,8 +172,7 @@ BOOL WINAPI DllMain(
 		//
 		// Hook hard errors so that we can log various kinds of loader failures.
 		//
-
-		KexHkInstallBasicHook(NtRaiseHardError, Ext_NtRaiseHardError, NULL);
+		// KexHkInstallBasicHook(NtRaiseHardError, KexNtRaiseHardError);
 
 		//
 		// Log some basic information such as command-line parameters to
@@ -154,7 +198,22 @@ BOOL WINAPI DllMain(
 		// possible.
 		//
 
-		if (OriginalMajorVersion == 6 && OriginalMinorVersion == 1) KexDisableAVrf();
+		if (OriginalMajorVersion == 6 && OriginalMinorVersion == 0) {
+			PVOID pNtContinue;
+			UNICODE_STRING NtdllName;
+			PVOID NtdllBase;
+
+			RtlInitConstantUnicodeString(&NtdllName, L"ntdll.dll");
+			if (NT_SUCCESS(LdrGetDllHandle(NULL, NULL, &NtdllName, &NtdllBase))) {
+				ANSI_STRING NtContinueName;
+				RtlInitString(&NtContinueName, "NtContinue");
+				if (NT_SUCCESS(LdrGetProcedureAddress(NtdllBase, &NtContinueName, 0, &pNtContinue))) {
+					KexHkInstallBasicHook(pNtContinue, Ext_NtContinue, &NtContinueHookContext);
+				}
+			}
+		} else if (OriginalMajorVersion == 6 && OriginalMinorVersion == 1) {
+			KexDisableAVrf();
+		}
 
 		//
 		// Initialize Propagation subsystem.
@@ -263,6 +322,11 @@ BOOL WINAPI DllMain(
 		ASSERT (NT_SUCCESS(Status));
 	} else if (Reason == DLL_PROCESS_DETACH) {
 		VxlCloseLog(&KexData->LogHandle);
+	}
+	
+	if (Reason == DLL_PROCESS_ATTACH && Descriptor == NULL && OriginalMajorVersion == 6 && OriginalMinorVersion == 0) {
+		Status = LdrDisableThreadCalloutsForDll(DllBase);
+		ASSERT (NT_SUCCESS(Status));
 	}
 
 	return TRUE;

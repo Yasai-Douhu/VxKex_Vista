@@ -1,154 +1,81 @@
-# VxKex_Vista - Windows Vista (NT 6.0) x64 Implementation
+# VxKex_Vista - Windows Vista (NT 6.0) x64 実装
 
-VxKex_Vista is a Windows Vista (NT 6.0) specific implementation of VxKex, designed for Windows Vista SP2 and Windows Server 2008 SP2.
+VxKex_Vista は Windows Vista (NT 6.0) に特化した VxKex の実装であり、Windows Vista SP2 および Windows Server 2008 SP2 向けに設計されています。
+Windows 7 以降を対象としたオリジナルの VxKex を Vista 環境でも動作するように移植・修正したプロジェクトです。
 
-## Features
+## 主な特徴
 
-- **Target OS**: Windows Vista SP2 / Windows Server 2008 SP2 (NT 6.0) x64
-- **Build Toolchain**: Visual Studio 2010 + Windows SDK 7.1A
-- **Architecture**: x64 only
+- **対象 OS**: Windows Vista SP2 / Windows Server 2008 SP2 (NT 6.0) x64
+- **ビルドツールチェーン**: Visual Studio 2010 + Windows SDK 7.1A
+- **アーキテクチャ**: x64 専用
 
-## Project Structure
+## プロジェクト構成
 
 ```
 VxKex_Vista/
-├── 00-Common-Headers/    # Shared header files
-├── 00-Import-Libraries/  # Import libraries for linking
-├── KxBase/               # KxBase.dll source (kernel32/kernelbase redirection)
-├── KxNt/                 # KxNt.dll source (NT API redirection)
-├── x64/Release/          # Build output
-├── build_all.ps1         # Unified build script
-├── build_kxnt.ps1        # KxNt.dll build script
-├── build_kxbase.ps1      # KxBase.dll build script
+├── 00-Common-Headers/    # 共通ヘッダーファイル
+├── 00-Import-Libraries/  # リンク用インポートライブラリ
+├── KxBase/               # KxBase.dll ソース (kernel32/kernelbase のリダイレクト)
+├── KxNt/                 # KxNt.dll ソース (NT API のリダイレクト)
+├── x64/Release/          # ビルド出力先
+├── build_all.ps1         # 統合ビルドスクリプト
+├── build_kxnt.ps1        # KxNt.dll 用ビルドスクリプト
+├── build_kxbase.ps1      # KxBase.dll 用ビルドスクリプト
+├── Installer/            # インストーラ構築用ファイル
 └── README.md
 ```
 
-## Built DLLs
+## ビルド要件
 
-| DLL | Size | Description |
-|-----|------|-------------|
-| KxNt.dll | 117 KB | NT API redirection (ntdll.dll functions) |
-| KxBase.dll | 147.5 KB | kernel32/kernelbase redirection |
-| KexDll.lib | - | Core VxKex functionality (from VxKex-NEXT) |
-| KexPathCch.lib | - | Path functions (from VxKex-NEXT) |
-| KexSmp.lib | - | Simple utilities (from VxKex-NEXT) |
-| KexMls.lib | - | MLS functionality (from VxKex-NEXT) |
-
-## Build Requirements
-
-- Visual Studio 2010 (with C++ tools)
+- Visual Studio 2010 (C++ 開発ツール含む)
 - Windows SDK 7.1A
 - PowerShell
 
-## Building
+## ビルド方法
 
-### Build All DLLs
+### すべての DLL をビルドする
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File build_all.ps1
 ```
 
-This will:
-1. Copy dependency DLLs from VxKex-NEXT
-2. Build KxNt.dll
-3. Build KxBase.dll
-4. Output all DLLs to `VistaDLLs/` directory
+このスクリプトは以下の処理を行います：
+1. 必要なファイルをコンパイル・ビルド
+2. KxNt.dll および KxBase.dll などの全コンポーネントのビルド
+3. 最終的なインストーラパッケージ (ZIP) の生成
 
-### Build Individual DLLs
+## Vista 互換性に関する技術詳細
 
-```powershell
-# Build KxNt.dll only
-powershell -ExecutionPolicy Bypass -File build_kxnt.ps1
+### kernelbase.dll の扱い
 
-# Build KxBase.dll only
-powershell -ExecutionPolicy Bypass -File build_kxbase.ps1
-```
+Windows Vista (NT 6.0) には `kernelbase.dll` が存在しません (Windows 7 で導入)。
+VxKex_Vista では以下の対応を行っています：
+- `kernelbase.dll` に転送されるはずのエクスポートを `kernel32.dll` や `advapi32.dll` に転送するよう修正
+- `forwards.c` にて Vista 互換のエクスポート転送定義を記述
 
-## Vista Compatibility
+### dllmain.c の初期化タイミング問題
 
-### kernelbase.dll Handling
+Windows Vista の 64ビット環境において、`sizeof(PVOID) == 8` による単純なアーキテクチャ判定では、WOW64プロセス初期化時の `LdrLoadDll` フック登録時に問題が発生し、クラッシュするバグがありました。本プロジェクトでは、より厳密な判定 (`KexRtlOperatingSystemBitness() == KexRtlCurrentProcessBitness()`) を用いるよう修正されています。
 
-Windows Vista (NT 6.0) does not have `kernelbase.dll`. This DLL was introduced in Windows 7 (NT 6.1).
+### 子プロセスへの伝播 (Propagation)
 
-In VxKex_Vista:
-- All exports that would forward to `kernelbase.dll` are redirected to `kernel32.dll` or `advapi32.dll`
-- The `forwards.c` file contains Vista-compatible export forwarding
+VxKex は子プロセスでも有効化されるよう、`NtCreateUserProcess` をフックして `NtOpenKey` 呼び出しをインターセプトします。
+Windows Vista においては、ローダーのパス解決の仕様の違いからネイティブの `LdrAddDllDirectory` が利用できないため、拡張 DLL (`Kx*.dll`) を `System32` フォルダに直接コピーするインストーラを採用しています。また、子プロセス伝播用のダミーレジストリキー (`{VxKexPropagationVirtualKey}`) をレジストリに作成することで、確実なフックを実現しています。
 
-### Vista-Compatible APIs
+## インストール方法
 
-The following APIs are available on Vista:
-- All functions in `kernel32.dll` (Vista version)
-- All functions in `advapi32.dll` (Vista version)
-- NT APIs via `ntdll.dll`
+`VxKex_Vista_x64_Installer.zip` を展開し、中にある `install.bat` を管理者権限で実行してください。
+UAC の昇格、各 DLL の `C:\VxKex` および `System32` へのコピー、レジストリの登録などをすべて自動で行います。
 
-### Vista-Incompatible APIs
+## 既知の問題
 
-The following APIs are NOT available on Vista and require fallback implementations:
-- `IsWow64Process2` (Windows 8+)
-- `WaitOnAddress` (Windows 8+)
-- `InitializeCriticalSectionEx` (Windows 8+)
-- SRWLock functions (`AcquireSRWLockExclusive`, etc.) (Windows 7+)
+1. Windows 7 以降でのみサポートされている一部の API (例: `IsWow64Process2`, `WaitOnAddress`, `InitializeCriticalSectionEx`) は Vista では完全には動作しない場合があります。
+2. SRWLock 系の関数は Vista SP1 以降が必須です。
 
-## Testing
+## 関連プロジェクト
 
-### Vista Test Environment
+- [VxKex-NEXT](https://github.com/vxiiduu/VxKex) - メインの VxKex プロジェクト (Windows 7+)
 
-To test on Windows Server 2008 SP2 or Windows Vista SP2:
+## ライセンス
 
-#### Option 1: Using VMware Shared Folders
-
-1. Build all DLLs using `build_all.ps1`
-2. Start the Vista VM in VMware
-3. Access the shared folder or use the deployment script:
-   ```cmd
-   deploy_to_vista.bat
-   ```
-4. Copy DLLs to the Vista VM via shared folder
-
-#### Option 2: Using USB/Network Transfer
-
-1. Build all DLLs using `build_all.ps1`
-2. Copy the entire `VistaDLLs/` folder to USB drive or network share
-3. Transfer to Vista VM
-
-### DLL Installation on Vista
-
-Copy the following DLLs to the target application directory or System32:
-
-```cmd
-copy KxNt.dll C:\Windows\System32\
-copy KxBase.dll C:\Windows\System32\
-copy KexDll.dll C:\Windows\System32\
-```
-
-Register DLLs if needed:
-
-```cmd
-regsvr32 C:\Windows\System32\KxNt.dll
-regsvr32 C:\Windows\System32\KxBase.dll
-regsvr32 C:\Windows\System32\KexDll.dll
-```
-
-### Verification
-
-Verify the DLLs are working correctly:
-1. Check that `KxNt.dll` and `KxBase.dll` load without errors
-2. Verify that kernel32.dll function redirection works
-3. Test NT API calls through KxNt.dll
-4. Use Dependency Walker to verify export resolution
-
-## Known Issues
-
-1. Some Windows 7+ APIs are not available on Vista and may cause loading errors
-2. SRWLock functions require Vista SP1 or later
-3. `InitializeCriticalSectionEx` requires Windows 8+ fallback implementation
-
-## Related Projects
-
-- [VxKex-NEXT](https://github.com/vxiiduu/VxKex) - Main VxKex project (Windows 7+)
-- [VISTA_PORT_ANALYSIS.md](VxKex-NEXT/VISTA_PORT_ANALYSIS.md) - Vista port analysis
-- [VISTA_DLL_DIFFERENTIAL_ANALYSIS.md](VxKex-NEXT/VISTA_DLL_DIFFERENTIAL_ANALYSIS.md) - Vista/Windows 7 DLL differences
-
-## License
-
-See the main VxKex project for license information.
+ライセンス情報はメインの VxKex プロジェクトに準拠します。
