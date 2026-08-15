@@ -52,6 +52,11 @@ EXPORTS
 	GetOsSafeBootMode
 	GetFirmwareType
 
+	;; system.c - Vista の kernel32 に存在しない API の互換実装
+	GetLogicalProcessorInformationEx
+	GetProcessGroupAffinity
+	K32GetProcessMemoryInfo
+
 	;; geoname.c
 	GetUserDefaultGeoName
 
@@ -238,6 +243,6 @@ EXPORTS
 	QueryUnbiasedInterruptTime				= Ext_QueryUnbiasedInterruptTime
 	BaseSetLastNTError						= Ext_BaseSetLastNTError
 
-	;; synch.c - Vista の kernel32/ntdll に存在しなぁE��め直接実裁E
+	;; synch.c - Vista 縺ｮ kernel32/ntdll 縺ｫ蟄伜惠縺励↑縺・◆繧∫峩謗･螳溯｣・
 	TryAcquireSRWLockExclusive
 	TryAcquireSRWLockShared

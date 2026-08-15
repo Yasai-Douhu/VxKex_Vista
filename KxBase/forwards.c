@@ -521,7 +521,8 @@
 #pragma comment(linker, "/EXPORT:GetLogicalDriveStringsW=kernel32.GetLogicalDriveStringsW")
 #pragma comment(linker, "/EXPORT:GetLogicalDrives=kernel32.GetLogicalDrives")
 #pragma comment(linker, "/EXPORT:GetLogicalProcessorInformation=kernel32.GetLogicalProcessorInformation")
-#pragma comment(linker, "/EXPORT:GetLogicalProcessorInformationEx=kernel32.GetLogicalProcessorInformationEx")
+// GetLogicalProcessorInformationEx は Vista の kernel32 に存在しないため
+// KxBase で独自実装する (system.c)。フォワーダーを削除済み。
 #pragma comment(linker, "/EXPORT:GetLongPathNameA=kernel32.GetLongPathNameA")
 #pragma comment(linker, "/EXPORT:GetLongPathNameTransactedA=kernel32.GetLongPathNameTransactedA")
 #pragma comment(linker, "/EXPORT:GetLongPathNameTransactedW=kernel32.GetLongPathNameTransactedW")
@@ -580,7 +581,8 @@
 //#pragma comment(linker, "/EXPORT:GetProcAddress=kernel32.GetProcAddress")
 #pragma comment(linker, "/EXPORT:GetProcessAffinityMask=kernel32.GetProcessAffinityMask")
 #pragma comment(linker, "/EXPORT:GetProcessDEPPolicy=kernel32.GetProcessDEPPolicy")
-#pragma comment(linker, "/EXPORT:GetProcessGroupAffinity=kernel32.GetProcessGroupAffinity")
+// GetProcessGroupAffinity は Vista の kernel32 に存在しないため
+// KxBase で独自実装する (system.c)。フォワーダーを削除済み。
 #pragma comment(linker, "/EXPORT:GetProcessHandleCount=kernel32.GetProcessHandleCount")
 #pragma comment(linker, "/EXPORT:GetProcessHeap=kernel32.GetProcessHeap")
 #pragma comment(linker, "/EXPORT:GetProcessHeaps=kernel32.GetProcessHeaps")
@@ -796,7 +798,8 @@
 #pragma comment(linker, "/EXPORT:K32GetPerformanceInfo=kernel32.K32GetPerformanceInfo")
 #pragma comment(linker, "/EXPORT:K32GetProcessImageFileNameA=kernel32.K32GetProcessImageFileNameA")
 #pragma comment(linker, "/EXPORT:K32GetProcessImageFileNameW=kernel32.K32GetProcessImageFileNameW")
-#pragma comment(linker, "/EXPORT:K32GetProcessMemoryInfo=kernel32.K32GetProcessMemoryInfo")
+// K32GetProcessMemoryInfo は Vista の kernel32 に存在しないため
+// KxBase で独自実装する (system.c)。psapi.dll へ委譲する。
 #pragma comment(linker, "/EXPORT:K32GetWsChanges=kernel32.K32GetWsChanges")
 #pragma comment(linker, "/EXPORT:K32GetWsChangesEx=kernel32.K32GetWsChangesEx")
 #pragma comment(linker, "/EXPORT:K32InitializeProcessForWsWatch=kernel32.K32InitializeProcessForWsWatch")

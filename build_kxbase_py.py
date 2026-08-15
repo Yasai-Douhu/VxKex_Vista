@@ -13,7 +13,7 @@ os.environ["PATH"] = f"{vs_bin};{sdk_bin};{os.environ.get('PATH', '')}"
 os.environ["INCLUDE"] = f"{sdk_inc};{vs_inc}"
 os.environ["LIB"] = f"{sdk_lib};{vs_lib}"
 
-base_dir = r"C:\Users\YamaR\Desktop\AI_Datas\VxKex_Vista\VxKex_Vista"
+base_dir = r"C:\Users\YamaR\Desktop\VxKex_Vista"
 kxbase_dir = os.path.join(base_dir, "KxBase")
 out_dir = os.path.join(base_dir, "x64", "Release", "KxBase")
 
@@ -38,8 +38,8 @@ for c_file in c_files:
     print(f"Compiling {os.path.basename(c_file)}...")
     subprocess.check_call(cmd)
 
-import_libs_dir = r"C:\Users\YamaR\Desktop\AI_Datas\VxKex_Vista\VxKex-NEXT\00-Import Libraries"
-prebuilt_libs_dir = r"C:\Users\YamaR\Desktop\AI_Datas\VxKex_Vista\VxKex-NEXT\x64\Release"
+import_libs_dir = r"C:\Users\YamaR\Desktop\VxKex_Vista\00-Import-Libraries"
+prebuilt_libs_dir = import_libs_dir
 
 link_cmd = [
     "link.exe", "/NOLOGO", "/DLL",
@@ -52,10 +52,10 @@ link_cmd = [
     f"/LIBPATH:{os.path.join(base_dir, 'VistaDLLs')}",
     "KexW32ML.lib"
 ] + obj_files + [
-    os.path.join(prebuilt_libs_dir, "KexDll", "KexDll.lib"),
-    os.path.join(prebuilt_libs_dir, "KexPathCch", "KexPathCch.lib"),
-    os.path.join(prebuilt_libs_dir, "KexSmp", "KexSmp.lib"),
-    os.path.join(prebuilt_libs_dir, "KexMLS", "KexMls.lib"),
+    os.path.join(prebuilt_libs_dir, "KexDll.lib"),
+    os.path.join(prebuilt_libs_dir, "KexPathCch.lib"),
+    os.path.join(prebuilt_libs_dir, "KexSmp.lib"),
+    os.path.join(prebuilt_libs_dir, "KexMls.lib"),
     os.path.join(import_libs_dir, "ntdll_x64.lib"),
     os.path.join(import_libs_dir, "msvcrt_x64.lib"),
     os.path.join(import_libs_dir, "kernel32_x64.lib"),

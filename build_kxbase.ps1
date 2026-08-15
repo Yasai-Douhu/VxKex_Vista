@@ -26,18 +26,18 @@ $KXBASE_DIR = Join-Path $ScriptDirAbs "KxBase"
 $OUT_DIR = Join-Path $ScriptDirAbs "x64\Release\KxBase"
 
 # Import libraries (from VxKex-NEXT\00-Import Libraries)
-$IMPORT_LIBS_DIR = "C:\Users\YamaR\Desktop\AI_Datas\VxKex_Vista\VxKex-NEXT\00-Import Libraries"
+$IMPORT_LIBS_DIR = Join-Path $ScriptDirAbs "00-Import-Libraries"
 $ntdllLib = Join-Path $IMPORT_LIBS_DIR "ntdll_x64.lib"
 $msvcrtLib = Join-Path $IMPORT_LIBS_DIR "msvcrt_x64.lib"
 $kernel32Lib = Join-Path $IMPORT_LIBS_DIR "kernel32_x64.lib"
 $user32Lib = Join-Path $IMPORT_LIBS_DIR "user32_x64.lib"
 
-# Prebuilt libraries (from VxKex-NEXT\x64\Release)
-$PREBUILT_LIBS_DIR = "C:\Users\YamaR\Desktop\AI_Datas\VxKex_Vista\VxKex-NEXT\x64\Release"
-$kexDllLib = Join-Path $PREBUILT_LIBS_DIR "KexDll\KexDll.lib"
-$kexPathCchLib = Join-Path $PREBUILT_LIBS_DIR "KexPathCch\KexPathCch.lib"
-$kexSmpLib = Join-Path $PREBUILT_LIBS_DIR "KexSmp\KexSmp.lib"
-$kexMlsLib = Join-Path $PREBUILT_LIBS_DIR "KexMLS\KexMls.lib"
+# Prebuilt libraries
+$PREBUILT_LIBS_DIR = $IMPORT_LIBS_DIR
+$kexDllLib = Join-Path $PREBUILT_LIBS_DIR "KexDll.lib"
+$kexPathCchLib = Join-Path $PREBUILT_LIBS_DIR "KexPathCch.lib"
+$kexSmpLib = Join-Path $PREBUILT_LIBS_DIR "KexSmp.lib"
+$kexMlsLib = Join-Path $PREBUILT_LIBS_DIR "KexMls.lib"
 
 # Create output directory
 if (-not (Test-Path $OUT_DIR)) { New-Item -ItemType Directory -Path $OUT_DIR | Out-Null }
@@ -92,6 +92,7 @@ $kxBaseSrc = @(
     (Join-Path $KXBASE_DIR "stubs.c"),
     (Join-Path $KXBASE_DIR "support.c"),
     (Join-Path $KXBASE_DIR "synch.c"),
+    (Join-Path $KXBASE_DIR "system.c"),
     (Join-Path $KXBASE_DIR "thread.c"),
     (Join-Path $KXBASE_DIR "time.c"),
     (Join-Path $KXBASE_DIR "token.c"),
