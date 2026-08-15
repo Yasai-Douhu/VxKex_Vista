@@ -7,7 +7,8 @@
 
 **VxKex_Vista** は、[YuZhouRen86 氏による VxKex-NEXT](https://github.com/YuZhouRen86/VxKex-NEXT) をベースとし、**Windows Vista SP2** および **Windows Server 2008 SP2 (NT 6.0)** 向けに特化移植・機能拡張を行った API 拡張・互換性レイヤー (Compatibility Layer) です。
 
-本来 Windows 7 / 8 / 8.1 / 10 / 11 専用となっているモダンなアプリケーションを、Windows Vista / Server 2008 環境上で動作可能にします。
+- 本来 Windows 7 / 8 / 8.1 / 10 / 11 専用となっているモダンなアプリケーションを、Windows Vista / Server 2008 環境上で動作可能にします。
+- 本プロジェクトは試験段階であるため、安定動作しない可能性があります。インストールは自己責任でお願いします。
 
 ---
 
