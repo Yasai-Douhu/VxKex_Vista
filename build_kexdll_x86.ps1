@@ -3,13 +3,13 @@ $ErrorActionPreference = "Stop"
 $ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 $VS10_BIN = "C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin"
 $VS10_BIN32 = "C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin"
-$SDK71_BIN = "C:\Program Files (x86)\Microsoft SDKs\Windows\v7.1A\Bin"
-$SDK71_INCLUDE = "C:\Program Files (x86)\Microsoft SDKs\Windows\v7.1A\Include"
-$SDK71_LIB = "C:\Program Files (x86)\Microsoft SDKs\Windows\v7.1A\Lib"
+$SDK70A_BIN = "C:\Program Files (x86)\Microsoft SDKs\Windows\v7.0A\Bin"
+$SDK70A_INCLUDE = "C:\Program Files (x86)\Microsoft SDKs\Windows\v7.0A\Include"
+$SDK70A_LIB = "C:\Program Files (x86)\Microsoft SDKs\Windows\v7.0A\Lib"
 
-$env:PATH = "$VS10_BIN;$VS10_BIN32;$SDK71_BIN;$env:PATH"
-$env:INCLUDE = "$SDK71_INCLUDE;C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\include;C:\Users\YamaR\Desktop\AI_Datas\VxKex_Vista\VxKex_Vista\00-Common-Headers"
-$env:LIB = "$SDK71_LIB;C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\lib"
+$env:PATH = "$VS10_BIN;$VS10_BIN32;C:\Program Files (x86)\Microsoft Visual Studio 10.0\Common7\IDE;$SDK70A_BIN;$env:PATH"
+$env:INCLUDE = "$SDK70A_INCLUDE;C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\include;C:\Users\YamaR\Desktop\AI_Datas\VxKex_Vista\00-Common-Headers"
+$env:LIB = "$SDK70A_LIB;C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\lib"
 
 $ScriptDirAbs = (Get-Item $ScriptDir).FullName
 $HDR_DIR = Join-Path $ScriptDirAbs "00-Common-Headers"
@@ -56,9 +56,9 @@ if (-not (Test-Path $kexPathCchLib)) {
     $kexPathCchLib = Join-Path $ScriptDirAbs "VxKex_Vista\Win32\Release\KexPathCch\KexPathCch.lib"
 }
 
-$libArgs = @("/LIBPATH:`"$($ScriptDirAbs)\00-Import-Libraries`"", "/LIBPATH:`"$SDK71_LIB`"", "/NOLOGO", "/DLL", "/INCREMENTAL:NO", "/SUBSYSTEM:WINDOWS", "/OPT:REF", "/OPT:ICF", "/DEBUG", "/RELEASE", "/MACHINE:X86", "/LTCG")
+$libArgs = @("/LIBPATH:`"$($ScriptDirAbs)\00-Import-Libraries`"", "/LIBPATH:`"$SDK70A_LIB`"", "/NOLOGO", "/DLL", "/INCREMENTAL:NO", "/SUBSYSTEM:WINDOWS", "/OPT:REF", "/OPT:ICF", "/DEBUG", "/RELEASE", "/MACHINE:X86", "/LTCG")
 $libArgs += @("/OUT:`"$dllPath`"", "/IMPLIB:`"$libPath`"", "/DEF:`"$defFile`"")
-$libArgs += @("/LIBPATH:`"$importLibsDir`"", "/LIBPATH:`"$SDK71_LIB`"")
+$libArgs += @("/LIBPATH:`"$importLibsDir`"", "/LIBPATH:`"$SDK70A_LIB`"")
 $libArgs += @("ntdll_x86.lib", "kernel32_x86.lib", "user32_x86.lib", "gdi32.lib", "shlwapi.lib")
 $libArgs += @("`"$kexSmpLib`"", "KexPathCch.lib", "`"$kexMlsLib`"")
 $libArgs += $objFiles

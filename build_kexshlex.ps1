@@ -8,11 +8,11 @@ Write-Host "========================================" -ForegroundColor Cyan
 $ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 $VS10_BIN = "C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\amd64"
 $VS10_BIN32 = "C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin"
-$SDK71_BIN = "C:\Program Files (x86)\Microsoft SDKs\Windows\v7.1A\Bin"
-$SDK71_INCLUDE = "C:\Program Files (x86)\Microsoft SDKs\Windows\v7.1A\Include"
-$SDK71_LIB = "C:\Program Files (x86)\Microsoft SDKs\Windows\v7.1A\Lib\x64"
+$SDK71_BIN = "C:\Program Files\Microsoft SDKs\Windows\v7.1\Bin"
+$SDK71_INCLUDE = "C:\Program Files\Microsoft SDKs\Windows\v7.1\Include"
+$SDK71_LIB = "C:\Program Files\Microsoft SDKs\Windows\v7.1\Lib\x64"
 
-$env:PATH = "$VS10_BIN;$VS10_BIN32;$SDK71_BIN;$env:PATH"
+$env:PATH = "$VS10_BIN;$VS10_BIN32;C:\Program Files (x86)\Microsoft Visual Studio 10.0\Common7\IDE;$SDK71_BIN;$env:PATH"
 $env:INCLUDE = "$SDK71_INCLUDE;C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\include"
 $env:LIB = "$SDK71_LIB;C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\lib\amd64"
 
@@ -113,7 +113,7 @@ Write-Host "[3/3] Linking KexShlEx.dll..." -ForegroundColor Yellow
 # Use libraries
 $kexGuiLib = Join-Path $ScriptDirAbs "x64\Release\KexGui\KexGui.lib"
 
-$PREBUILT_LIBS_DIR = "C:\Users\YamaR\Desktop\AI_Datas\VxKex_Vista\VxKex-NEXT\x64\Release"
+$PREBUILT_LIBS_DIR = "C:\Users\YamaR\Desktop\AI_Datas\VxKex_Vista\x64\Release"
 $kexDllLib = Join-Path $PREBUILT_LIBS_DIR "KexDll\KexDll.lib"
 $kexPathCchLib = Join-Path $PREBUILT_LIBS_DIR "KexPathCch\KexPathCch.lib"
 $kexSmpLib = Join-Path $PREBUILT_LIBS_DIR "KexSmp\KexSmp.lib"
@@ -121,7 +121,7 @@ $kexMlsLib = Join-Path $PREBUILT_LIBS_DIR "KexMLS\KexMls.lib"
 $kexCfgHlpLib = Join-Path $ScriptDirAbs "x64\Release\KxCfgHlp\KxCfgHlp.lib"
 $kexW32MlLib = Join-Path $ScriptDirAbs "x64\Release\KexW32ML\KexW32ML.lib"
 
-$IMPORT_LIBS_DIR = "C:\Users\YamaR\Desktop\AI_Datas\VxKex_Vista\VxKex-NEXT\00-Import Libraries"
+$IMPORT_LIBS_DIR = "C:\Users\YamaR\Desktop\AI_Datas\VxKex_Vista\00-Import-Libraries"
 $ntdllLib = Join-Path $IMPORT_LIBS_DIR "ntdll_x64.lib"
 $msvcrtLib = Join-Path $IMPORT_LIBS_DIR "msvcrt_x64.lib"
 $kernel32Lib = Join-Path $IMPORT_LIBS_DIR "kernel32_x64.lib"
@@ -185,6 +185,7 @@ if (Test-Path $dllPath) {
 }
 
 exit 0
+
 
 
 

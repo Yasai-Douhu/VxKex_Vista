@@ -29,7 +29,11 @@ function Copy-BuiltLib([string]$subDir, [string]$name) {
 }
 
 # Step 0: Dependency DLLs
-$PREBUILT_LIBS_DIR = "C:\Users\YamaR\Desktop\AI_Datas\VxKex_Vista\VxKex-NEXT\x64\Release"
+Run-BuildScript "build_kexpathcch.ps1" "KexPathCch"
+Run-BuildScript "build_kexsmp.ps1" "KexSmp"
+Run-BuildScript "build_kexmls.ps1" "KexMls"
+
+$PREBUILT_LIBS_DIR = "C:\Users\YamaR\Desktop\AI_Datas\VxKex_Vista\x64\Release"
 $depDLLs = @("KexPathCch\KexPathCch.lib", "KexSmp\KexSmp.lib", "KexMLS\KexMls.lib")
 foreach ($dep in $depDLLs) {
     $srcPath = Join-Path $PREBUILT_LIBS_DIR $dep
@@ -62,3 +66,5 @@ Copy-BuiltLib "KexShlEx" "KexShlEx"
 Run-BuildScript "build_extended.ps1" "Extended DLLs"
 
 Write-Host "`nBUILD COMPLETED SUCCESSFULLY" -ForegroundColor Green
+
+

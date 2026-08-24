@@ -7,11 +7,11 @@ Write-Host "========================================" -ForegroundColor Cyan
 
 $ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 $VS10_BIN = "C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\amd64"
-$SDK71_BIN = "C:\Program Files (x86)\Microsoft SDKs\Windows\v7.1A\Bin"
-$SDK71_INCLUDE = "C:\Program Files (x86)\Microsoft SDKs\Windows\v7.1A\Include"
-$SDK71_LIB = "C:\Program Files (x86)\Microsoft SDKs\Windows\v7.1A\Lib\x64"
+$SDK71_BIN = "C:\Program Files\Microsoft SDKs\Windows\v7.1\Bin"
+$SDK71_INCLUDE = "C:\Program Files\Microsoft SDKs\Windows\v7.1\Include"
+$SDK71_LIB = "C:\Program Files\Microsoft SDKs\Windows\v7.1\Lib\x64"
 
-$env:PATH = "$VS10_BIN;$SDK71_BIN;$env:PATH"
+$env:PATH = "$VS10_BIN;C:\Program Files (x86)\Microsoft Visual Studio 10.0\Common7\IDE;$SDK71_BIN;$env:PATH"
 $env:INCLUDE = "$SDK71_INCLUDE;C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\include"
 $env:LIB = "$SDK71_LIB;C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\lib\amd64"
 
@@ -25,7 +25,7 @@ $HDR_DIR = Join-Path $ScriptDirAbs "00-Common-Headers"
 $KXBASE_DIR = Join-Path $ScriptDirAbs "KxBase"
 $OUT_DIR = Join-Path $ScriptDirAbs "x64\Release\KxBase"
 
-# Import libraries (from VxKex-NEXT\00-Import Libraries)
+# Import libraries (from VxKex_Vista\00-Import-Libraries)
 $IMPORT_LIBS_DIR = Join-Path $ScriptDirAbs "00-Import-Libraries"
 $ntdllLib = Join-Path $IMPORT_LIBS_DIR "ntdll_x64.lib"
 $msvcrtLib = Join-Path $IMPORT_LIBS_DIR "msvcrt_x64.lib"
@@ -194,3 +194,4 @@ Write-Host "BUILD SUCCESSFUL" -ForegroundColor Green
 Write-Host "========================================" -ForegroundColor Cyan
 
 exit 0
+

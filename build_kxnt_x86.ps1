@@ -7,13 +7,13 @@ Write-Host "========================================" -ForegroundColor Cyan
 
 $ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 $VS10_BIN = "C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin"
-$SDK71_BIN = "C:\Program Files (x86)\Microsoft SDKs\Windows\v7.1A\Bin"
-$SDK71_INCLUDE = "C:\Program Files (x86)\Microsoft SDKs\Windows\v7.1A\Include"
-$SDK71_LIB = "C:\Program Files (x86)\Microsoft SDKs\Windows\v7.1A\Lib"
+$SDK70A_BIN = "C:\Program Files (x86)\Microsoft SDKs\Windows\v7.0A\Bin"
+$SDK70A_INCLUDE = "C:\Program Files (x86)\Microsoft SDKs\Windows\v7.0A\Include"
+$SDK70A_LIB = "C:\Program Files (x86)\Microsoft SDKs\Windows\v7.0A\Lib"
 
-$env:PATH = "$VS10_BIN;$SDK71_BIN;$env:PATH"
-$env:INCLUDE = "$SDK71_INCLUDE;C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\include"
-$env:LIB = "$SDK71_LIB;C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\lib"
+$env:PATH = "$VS10_BIN;C:\Program Files (x86)\Microsoft Visual Studio 10.0\Common7\IDE;$SDK70A_BIN;$env:PATH"
+$env:INCLUDE = "$SDK70A_INCLUDE;C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\include"
+$env:LIB = "$SDK70A_LIB;C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\lib"
 
 Write-Host "" -ForegroundColor Cyan
 Write-Host "  Tools:" -ForegroundColor Yellow
@@ -89,15 +89,15 @@ $dllPath = Join-Path $OUT_DIR "KxNt.dll"
 $libPath = Join-Path $OUT_DIR "KxNt.lib"
 $defPath = Join-Path $KXNT_DIR "KxNt.def"
 
-# Import libraries (from VxKex-NEXT\00-Import Libraries)
-$IMPORT_LIBS_DIR = "C:\Users\YamaR\Desktop\AI_Datas\VxKex_Vista\VxKex-NEXT\00-Import Libraries"
+# Import libraries (from VxKex_Vista\00-Import-Libraries)
+$IMPORT_LIBS_DIR = "C:\Users\YamaR\Desktop\AI_Datas\VxKex_Vista\00-Import-Libraries"
 $ntdllLib = Join-Path $IMPORT_LIBS_DIR "ntdll_x86.lib"
 $msvcrtLib = Join-Path $IMPORT_LIBS_DIR "msvcrt_x64.lib"
 $kernel32Lib = Join-Path $IMPORT_LIBS_DIR "kernel32_x86.lib"
 $user32Lib = Join-Path $IMPORT_LIBS_DIR "user32_x86.lib"
 
 # Prebuilt libraries (from VxKex_Vista\Win32\Release)
-$PREBUILT_LIBS_DIR = "C:\Users\YamaR\Desktop\AI_Datas\VxKex_Vista\VxKex_Vista\Win32\Release"
+$PREBUILT_LIBS_DIR = "C:\Users\YamaR\Desktop\AI_Datas\VxKex_Vista\Win32\Release"
 $kexDllLib = Join-Path $PREBUILT_LIBS_DIR "KexDll\KexDll.lib"
 $kexPathCchLib = Join-Path $PREBUILT_LIBS_DIR "KexPathCch\KexPathCch.lib"
 $kexSmpLib = Join-Path $PREBUILT_LIBS_DIR "KexSmp\KexSmp.lib"
@@ -107,7 +107,7 @@ $implibOut = "/IMPLIB:" + "`"$libPath`""
 $defOut = "/DEF:" + "`"$defPath`""
 
 $linkArgs = @(
-    "/LIBPATH:`"$($ScriptDirAbs)\00-Import-Libraries`"", "/LIBPATH:`"$SDK71_LIB`"", "/NOLOGO", "/DLL",
+    "/LIBPATH:`"$($ScriptDirAbs)\00-Import-Libraries`"", "/LIBPATH:`"$SDK70A_LIB`"", "/NOLOGO", "/DLL",
     $dllOut, $implibOut,
     "/SUBSYSTEM:WINDOWS",
     "/OPT:REF", "/OPT:ICF",

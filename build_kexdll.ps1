@@ -3,12 +3,12 @@ $ErrorActionPreference = "Stop"
 $ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 $VS10_BIN = "C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\amd64"
 $VS10_BIN32 = "C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin"
-$SDK71_BIN = "C:\Program Files (x86)\Microsoft SDKs\Windows\v7.1A\Bin"
-$SDK71_INCLUDE = "C:\Program Files (x86)\Microsoft SDKs\Windows\v7.1A\Include"
-$SDK71_LIB = "C:\Program Files (x86)\Microsoft SDKs\Windows\v7.1A\Lib\x64"
+$SDK71_BIN = "C:\Program Files\Microsoft SDKs\Windows\v7.1\Bin"
+$SDK71_INCLUDE = "C:\Program Files\Microsoft SDKs\Windows\v7.1\Include"
+$SDK71_LIB = "C:\Program Files\Microsoft SDKs\Windows\v7.1\Lib\x64"
 
-$env:PATH = "$VS10_BIN;$VS10_BIN32;$SDK71_BIN;$env:PATH"
-$env:INCLUDE = "$SDK71_INCLUDE;C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\include;C:\Users\YamaR\Desktop\AI_Datas\VxKex_Vista\VxKex_Vista\00-Common-Headers"
+$env:PATH = "$VS10_BIN;$VS10_BIN32;C:\Program Files (x86)\Microsoft Visual Studio 10.0\Common7\IDE;$SDK71_BIN;$env:PATH"
+$env:INCLUDE = "$SDK71_INCLUDE;C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\include;C:\Users\YamaR\Desktop\AI_Datas\VxKex_Vista\00-Common-Headers"
 $env:LIB = "$SDK71_LIB;C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\lib\amd64"
 
 $ScriptDirAbs = (Get-Item $ScriptDir).FullName
@@ -58,7 +58,7 @@ $kexSmpLib = Join-Path $ScriptDirAbs "x64\Release\KexSmp\KexSmp.lib"
 $kexPathCchLib = Join-Path $ScriptDirAbs "02-Prebuilt DLLs\x64\Release\KexPathCch\KexPathCch.lib"
 
 if (-not (Test-Path $kexPathCchLib)) {
-    $kexPathCchLib = Join-Path $ScriptDirAbs "VxKex-NEXT\x64\Release\KexPathCch\KexPathCch.lib"
+    $kexPathCchLib = Join-Path $ScriptDirAbs "VxKex_Vista\x64\Release\KexPathCch\KexPathCch.lib"
 }
 
 $libArgs = @("/NOLOGO", "/DLL", "/INCREMENTAL:NO", "/SUBSYSTEM:WINDOWS", "/OPT:REF", "/OPT:ICF", "/DEBUG", "/RELEASE", "/MACHINE:X64", "/LTCG")
@@ -74,3 +74,4 @@ Write-Host "Linking KexDll.dll..."
 if ($LASTEXITCODE -ne 0) { exit 1 }
 
 Write-Host "KexDll.dll built successfully!" -ForegroundColor Green
+

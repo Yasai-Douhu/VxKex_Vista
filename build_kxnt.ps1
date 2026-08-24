@@ -7,11 +7,11 @@ Write-Host "========================================" -ForegroundColor Cyan
 
 $ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 $VS10_BIN = "C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\amd64"
-$SDK71_BIN = "C:\Program Files (x86)\Microsoft SDKs\Windows\v7.1A\Bin"
-$SDK71_INCLUDE = "C:\Program Files (x86)\Microsoft SDKs\Windows\v7.1A\Include"
-$SDK71_LIB = "C:\Program Files (x86)\Microsoft SDKs\Windows\v7.1A\Lib\x64"
+$SDK71_BIN = "C:\Program Files\Microsoft SDKs\Windows\v7.1\Bin"
+$SDK71_INCLUDE = "C:\Program Files\Microsoft SDKs\Windows\v7.1\Include"
+$SDK71_LIB = "C:\Program Files\Microsoft SDKs\Windows\v7.1\Lib\x64"
 
-$env:PATH = "$VS10_BIN;$SDK71_BIN;$env:PATH"
+$env:PATH = "$VS10_BIN;C:\Program Files (x86)\Microsoft Visual Studio 10.0\Common7\IDE;$SDK71_BIN;$env:PATH"
 $env:INCLUDE = "$SDK71_INCLUDE;C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\include"
 $env:LIB = "$SDK71_LIB;C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\lib\amd64"
 
@@ -89,15 +89,15 @@ $dllPath = Join-Path $OUT_DIR "KxNt.dll"
 $libPath = Join-Path $OUT_DIR "KxNt.lib"
 $defPath = Join-Path $KXNT_DIR "KxNt.def"
 
-# Import libraries (from VxKex-NEXT\00-Import Libraries)
-$IMPORT_LIBS_DIR = "C:\Users\YamaR\Desktop\AI_Datas\VxKex_Vista\VxKex-NEXT\00-Import Libraries"
+# Import libraries (from VxKex_Vista\00-Import-Libraries)
+$IMPORT_LIBS_DIR = "C:\Users\YamaR\Desktop\AI_Datas\VxKex_Vista\00-Import-Libraries"
 $ntdllLib = Join-Path $IMPORT_LIBS_DIR "ntdll_x64.lib"
 $msvcrtLib = Join-Path $IMPORT_LIBS_DIR "msvcrt_x64.lib"
 $kernel32Lib = Join-Path $IMPORT_LIBS_DIR "kernel32_x64.lib"
 $user32Lib = Join-Path $IMPORT_LIBS_DIR "user32_x64.lib"
 
-# Prebuilt libraries (from VxKex-NEXT\x64\Release)
-$PREBUILT_LIBS_DIR = "C:\Users\YamaR\Desktop\AI_Datas\VxKex_Vista\VxKex-NEXT\x64\Release"
+# Prebuilt libraries (from VxKex_Vista\x64\Release)
+$PREBUILT_LIBS_DIR = "C:\Users\YamaR\Desktop\AI_Datas\VxKex_Vista\x64\Release"
 $kexDllLib = Join-Path $PREBUILT_LIBS_DIR "KexDll\KexDll.lib"
 $kexPathCchLib = Join-Path $PREBUILT_LIBS_DIR "KexPathCch\KexPathCch.lib"
 $kexSmpLib = Join-Path $PREBUILT_LIBS_DIR "KexSmp\KexSmp.lib"
@@ -162,3 +162,4 @@ Write-Host "BUILD SUCCESSFUL" -ForegroundColor Green
 Write-Host "========================================" -ForegroundColor Cyan
 
 exit 0
+

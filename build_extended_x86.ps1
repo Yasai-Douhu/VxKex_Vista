@@ -1,21 +1,21 @@
-# VxKex-NEXT Extended DLLs Build Script with VS2010 (cl.exe)
+# VxKex_Vista Extended DLLs Build Script with VS2010 (cl.exe)
 # Builds KxAdvapi, KxBase, KxCom, KxCrt, KxCryp, KxDw, KxDx, KxMi, KxNet, KxSChanl, KxUia, KxUser
 
 $ErrorActionPreference = "Stop"
 
 Write-Host "========================================" -ForegroundColor Cyan
-Write-Host "VxKex-NEXT Extended DLLs Build" -ForegroundColor Cyan
+Write-Host "VxKex_Vista Extended DLLs Build" -ForegroundColor Cyan
 Write-Host "========================================" -ForegroundColor Cyan
 
 $ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 $VS10_BIN = "C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin"
-$SDK71_BIN = "C:\Program Files (x86)\Microsoft SDKs\Windows\v7.1A\Bin"
-$SDK71_INCLUDE = "C:\Program Files (x86)\Microsoft SDKs\Windows\v7.1A\Include"
-$SDK71_LIB = "C:\Program Files (x86)\Microsoft SDKs\Windows\v7.1A\Lib"
+$SDK70A_BIN = "C:\Program Files (x86)\Microsoft SDKs\Windows\v7.0A\Bin"
+$SDK70A_INCLUDE = "C:\Program Files (x86)\Microsoft SDKs\Windows\v7.0A\Include"
+$SDK70A_LIB = "C:\Program Files (x86)\Microsoft SDKs\Windows\v7.0A\Lib"
 
-$env:PATH = "$VS10_BIN;$SDK71_BIN;$env:PATH"
-$env:INCLUDE = "$SDK71_INCLUDE;C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\include"
-$env:LIB = "$SDK71_LIB;C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\lib"
+$env:PATH = "$VS10_BIN;C:\Program Files (x86)\Microsoft Visual Studio 10.0\Common7\IDE;$SDK70A_BIN;$env:PATH"
+$env:INCLUDE = "$SDK70A_INCLUDE;C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\include"
+$env:LIB = "$SDK70A_LIB;C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\lib"
 
 $ScriptDirAbs = (Get-Item $ScriptDir).FullName
 $HDR_DIR = Join-Path $ScriptDirAbs "00-Common-Headers"
@@ -131,7 +131,7 @@ foreach ($dllName in $ExtendedDLLs) {
         $defPath = Join-Path $dllDir $defFiles[0].Name
     }
     
-    $linkArgs = @("/LIBPATH:`"$($ScriptDirAbs)\00-Import-Libraries`"", "/LIBPATH:`"$SDK71_LIB`"", "/NOLOGO", "/DLL", "/OUT:$dllPath", "/IMPLIB:$libPath",
+    $linkArgs = @("/LIBPATH:`"$($ScriptDirAbs)\00-Import-Libraries`"", "/LIBPATH:`"$SDK70A_LIB`"", "/NOLOGO", "/DLL", "/OUT:$dllPath", "/IMPLIB:$libPath",
                   "/SUBSYSTEM:WINDOWS", "/OPT:REF", "/OPT:ICF", "/MACHINE:X86", "/ENTRY:DllMain", "/LTCG",
                   "/SETCHECKSUM", "/LIBPATH:`"$IMPORT_LIBS_DIR`"", "/LIBPATH:`"$ScriptDirAbs\Win32DLLs`"")
     

@@ -1,19 +1,19 @@
-# VxKex-NEXT Extended DLLs Build Script with VS2010 (cl.exe)
+# VxKex_Vista Extended DLLs Build Script with VS2010 (cl.exe)
 # Builds KxAdvapi, KxBase, KxCom, KxCrt, KxCryp, KxDw, KxDx, KxMi, KxNet, KxSChanl, KxUia, KxUser
 
 $ErrorActionPreference = "Stop"
 
 Write-Host "========================================" -ForegroundColor Cyan
-Write-Host "VxKex-NEXT Extended DLLs Build" -ForegroundColor Cyan
+Write-Host "VxKex_Vista Extended DLLs Build" -ForegroundColor Cyan
 Write-Host "========================================" -ForegroundColor Cyan
 
 $ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 $VS10_BIN = "C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\amd64"
-$SDK71_BIN = "C:\Program Files (x86)\Microsoft SDKs\Windows\v7.1A\Bin"
-$SDK71_INCLUDE = "C:\Program Files (x86)\Microsoft SDKs\Windows\v7.1A\Include"
-$SDK71_LIB = "C:\Program Files (x86)\Microsoft SDKs\Windows\v7.1A\Lib\x64"
+$SDK71_BIN = "C:\Program Files\Microsoft SDKs\Windows\v7.1\Bin"
+$SDK71_INCLUDE = "C:\Program Files\Microsoft SDKs\Windows\v7.1\Include"
+$SDK71_LIB = "C:\Program Files\Microsoft SDKs\Windows\v7.1\Lib\x64"
 
-$env:PATH = "$VS10_BIN;$SDK71_BIN;$env:PATH"
+$env:PATH = "$VS10_BIN;C:\Program Files (x86)\Microsoft Visual Studio 10.0\Common7\IDE;$SDK71_BIN;$env:PATH"
 $env:INCLUDE = "$SDK71_INCLUDE;C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\include"
 $env:LIB = "$SDK71_LIB;C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\lib\amd64"
 
@@ -170,3 +170,4 @@ foreach ($dllName in $ExtendedDLLs) {
 Write-Host "`n========================================" -ForegroundColor Cyan
 Write-Host "Extended DLLs Build Complete!" -ForegroundColor Green
 Write-Host "========================================" -ForegroundColor Cyan
+

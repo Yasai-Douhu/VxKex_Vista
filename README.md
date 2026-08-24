@@ -142,7 +142,7 @@ VxKex_Vista/
 
 ### ビルド要件
 - **開発環境**: Visual Studio 2010 (C++ ツールチェーン / MSVC 10.0)
-- **SDK**: Windows SDK 7.1A
+- **SDK**: Windows SDK 7.0A
 - **シェル環境**: PowerShell (ExecutionPolicy Bypass)
 
 ### ビルド手順
