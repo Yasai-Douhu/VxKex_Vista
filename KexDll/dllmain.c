@@ -46,28 +46,25 @@ NTSTATUS NTAPI Ext_NtContinue(
 	IN PCONTEXT ContextRecord,
 	IN BOOLEAN TestAlert)
 {
-	PVOID ApiPageAddress;
-	SIZE_T HookLength;
-	ULONG OldProtect;
+	NTSTATUS Status;
 	NTSTATUS (NTAPI *OriginalNtContinue)(PCONTEXT, BOOLEAN);
 
-	ApiPageAddress = NtContinueHookContext.OriginalApiAddress;
-	HookLength = sizeof(NtContinueHookContext.OriginalInstructions);
-
-	KexNtProtectVirtualMemory(NtCurrentProcess(), &ApiPageAddress, &HookLength, PAGE_READWRITE, &OldProtect);
-	KexRtlCopyMemory(ApiPageAddress, NtContinueHookContext.OriginalInstructions, HookLength);
-
-	if (OldProtect == PAGE_EXECUTE_READWRITE) {
-		OldProtect = PAGE_EXECUTE_READ;
-	} else if (OldProtect == PAGE_WRITECOPY) {
-		OldProtect = PAGE_READWRITE;
+	// NtProtectVirtualMemory rounds both its address and size arguments to
+	// page boundaries. Never use those adjusted values to restore hook bytes.
+	Status = KexHkRemoveBasicHook(&NtContinueHookContext);
+	if (!NT_SUCCESS(Status)) {
+		return Status;
 	}
+	NtFlushInstructionCache(NtCurrentProcess(),
+		NtContinueHookContext.OriginalApiAddress,
+		sizeof(NtContinueHookContext.OriginalInstructions));
 
-	KexNtProtectVirtualMemory(NtCurrentProcess(), &ApiPageAddress, &HookLength, OldProtect, &OldProtect);
+	// Vista has already installed verifier callbacks by this point. Calling
+	// verifier's DLL_PROCESS_DETACH here frees state those callbacks still use
+	// (for example, RegOpenKeyEx subsequently enters verifier with freed state).
+	// Leave verifier initialized for the lifetime of the process on Vista.
 
-	KexDisableAVrf();
-
-	OriginalNtContinue = (NTSTATUS (NTAPI *)(PCONTEXT, BOOLEAN)) ApiPageAddress;
+	OriginalNtContinue = (NTSTATUS (NTAPI *)(PCONTEXT, BOOLEAN)) NtContinueHookContext.OriginalApiAddress;
 	return OriginalNtContinue(ContextRecord, TestAlert);
 }
 

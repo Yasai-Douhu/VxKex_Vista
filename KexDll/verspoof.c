@@ -73,6 +73,7 @@ STATIC NTSTATUS NTAPI Ext_RtlGetVersion(
 	}
 
 	if (AshModuleIsWindowsModule(ReturnAddress()) &&
+		!AshModuleBaseNameIs(ReturnAddress(), L"kernel32.dll") &&
 		!AshModuleBaseNameIs(ReturnAddress(), L"kernelbase.dll") &&
 		!AshModuleBaseNameIs(ReturnAddress(), L"ntdll.dll")) {
 
@@ -81,12 +82,13 @@ STATIC NTSTATUS NTAPI Ext_RtlGetVersion(
 		// don't return 6.1 then it will cause problems with connectivity.
 		//
 		// We'll return the real Windows version for all Windows DLLs except
-		// for kernelbase and ntdll, which call RtlGetVersion and can leak the
+		// for kernel32 (Vista), kernelbase and ntdll, which call RtlGetVersion and can leak the
 		// real version number to the target application.
 		//
 
 		Version->dwMajorVersion = OriginalMajorVersion ? OriginalMajorVersion : 6;
-		Version->dwMinorVersion	= OriginalMinorVersion ? OriginalMinorVersion : 1;
+		// Zero is the real minor version on Vista, not an uninitialized value.
+		Version->dwMinorVersion	= OriginalMinorVersion;
 		Version->dwBuildNumber	= OriginalBuildNumber ? LOWORD(OriginalBuildNumber) : 7601;
 
 	} else if (AshModuleBaseNameIs(ReturnAddress(), L"System.Private.CoreLib.dll")) {
@@ -173,7 +175,7 @@ STATIC VOID NTAPI Ext_RtlGetNtVersionNumbers(
 
 	if (AshModuleIsWindowsModule(ReturnAddress())) {
 		ReturnMajorVersion = OriginalMajorVersion ? OriginalMajorVersion : 6;
-		ReturnMinorVersion = OriginalMinorVersion ? OriginalMinorVersion : 1;
+		ReturnMinorVersion = OriginalMinorVersion;
 		ReturnBuildNumber = OriginalBuildNumber ? LOWORD(OriginalBuildNumber) : 7601;
 	}
 
@@ -356,6 +358,6 @@ VOID KexApplyVersionSpoof(
 	}
 	
 	//
-	// TODO: Implement registry strong spoofing.
+	// Registry strong spoofing is handled by KxAdvapi's RegQueryValueEx wrappers.
 	//
 }

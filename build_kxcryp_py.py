@@ -3,10 +3,10 @@ import subprocess
 import glob
 
 vs_bin = r"C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\amd64"
-sdk_bin = r"C:\Program Files (x86)\Microsoft SDKs\Windows\v7.1A\Bin"
-sdk_inc = r"C:\Program Files (x86)\Microsoft SDKs\Windows\v7.1A\Include"
+sdk_bin = r"C:\Program Files (x86)\Microsoft SDKs\Windows\v7.0A\Bin"
+sdk_inc = r"C:\Program Files (x86)\Microsoft SDKs\Windows\v7.0A\Include"
 vs_inc = r"C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\include"
-sdk_lib = r"C:\Program Files (x86)\Microsoft SDKs\Windows\v7.1A\Lib\x64"
+sdk_lib = r"C:\Program Files (x86)\Microsoft SDKs\Windows\v7.0A\Lib\x64"
 vs_lib = r"C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\lib\amd64"
 
 os.environ["PATH"] = f"{vs_bin};{sdk_bin};{os.environ.get('PATH', '')}"

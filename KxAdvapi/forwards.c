@@ -624,8 +624,7 @@
 #pragma comment(linker, "/EXPORT:RegQueryMultipleValuesW=advapi32.RegQueryMultipleValuesW")
 #pragma comment(linker, "/EXPORT:RegQueryReflectionKey=advapi32.RegQueryReflectionKey")
 #pragma comment(linker, "/EXPORT:RegQueryValueA=advapi32.RegQueryValueA")
-#pragma comment(linker, "/EXPORT:RegQueryValueExA=advapi32.RegQueryValueExA")
-#pragma comment(linker, "/EXPORT:RegQueryValueExW=advapi32.RegQueryValueExW")
+// RegQueryValueExA/W are implemented in verspoof.c.
 #pragma comment(linker, "/EXPORT:RegQueryValueW=advapi32.RegQueryValueW")
 #pragma comment(linker, "/EXPORT:RegRenameKey=advapi32.RegRenameKey")
 #pragma comment(linker, "/EXPORT:RegReplaceKeyA=advapi32.RegReplaceKeyA")

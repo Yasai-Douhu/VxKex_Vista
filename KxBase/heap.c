@@ -8,6 +8,13 @@ KXBASEAPI HANDLE WINAPI Ext_HeapCreate(
 {
 	HANDLE HeapHandle;
 
+	// Vista keeps Application Verifier initialized. Its heap allocation hooks
+	// require a heap created through the matching native/verifier path.
+	// HEAP_SKIP_VALIDATION_CHECKS produces an incompatible heap in this case.
+	if (OriginalMajorVersion == 6 && OriginalMinorVersion == 0) {
+		return HeapCreate(Flags, InitialSize, MaximumSize);
+	}
+
 	Flags &= HEAP_GENERATE_EXCEPTIONS | HEAP_NO_SERIALIZE | HEAP_CREATE_ENABLE_EXECUTE;
 	Flags |= HEAP_CLASS_1;
 

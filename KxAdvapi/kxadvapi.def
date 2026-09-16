@@ -1,5 +1,7 @@
 LIBRARY KxAdvapi
 EXPORTS
+	RegQueryValueExA = Ext_RegQueryValueExA
+	RegQueryValueExW = Ext_RegQueryValueExW
 	;; Forwarders to KexDll
 	EventSetInformation			= KexDll.KexEtwEventSetInformation
 

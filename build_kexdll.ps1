@@ -1,3 +1,4 @@
+param([string]$OutputDirectory)
 $ErrorActionPreference = "Stop"
 
 $ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
@@ -15,6 +16,7 @@ $ScriptDirAbs = (Get-Item $ScriptDir).FullName
 $HDR_DIR = Join-Path $ScriptDirAbs "00-Common-Headers"
 $SRC_DIR = Join-Path $ScriptDirAbs "KexDll"
 $OUT_DIR = Join-Path $ScriptDirAbs "x64\Release\KexDll"
+if ($OutputDirectory) { $OUT_DIR = [System.IO.Path]::GetFullPath($OutputDirectory) }
 
 if (-not (Test-Path $OUT_DIR)) { New-Item -ItemType Directory -Path $OUT_DIR | Out-Null }
 
