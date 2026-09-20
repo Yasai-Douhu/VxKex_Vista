@@ -99,3 +99,27 @@ KXBASEAPI DWORD WINAPI Ext_GetActiveProcessorCount(IN WORD GroupNumber) { SYSTEM
 KXBASEAPI WORD WINAPI Ext_GetActiveProcessorGroupCount(VOID) { return 1; }
 KXBASEAPI DWORD WINAPI Ext_GetMaximumProcessorCount(IN WORD GroupNumber) { SYSTEM_INFO si; GetSystemInfo(&si); return si.dwNumberOfProcessors; }
 KXBASEAPI WORD WINAPI Ext_GetMaximumProcessorGroupCount(VOID) { return 1; }
+
+// NT 6.0 rejects the Win7 directory-enumeration optimizations used by Chromium.
+// Preserve all other flags/search criteria, including errors for unknown flags.
+KXBASEAPI HANDLE WINAPI Ext_FindFirstFileExW(
+    LPCWSTR Path, FINDEX_INFO_LEVELS Level, LPVOID Data,
+    FINDEX_SEARCH_OPS Search, LPVOID Filter, DWORD Flags)
+{
+    if (OriginalMajorVersion == 6 && OriginalMinorVersion == 0) {
+        if (Level == FindExInfoBasic) Level = FindExInfoStandard;
+        Flags &= ~FIND_FIRST_EX_LARGE_FETCH;
+    }
+    return FindFirstFileExW(Path, Level, Data, Search, Filter, Flags);
+}
+
+KXBASEAPI HANDLE WINAPI Ext_FindFirstFileExA(
+    LPCSTR Path, FINDEX_INFO_LEVELS Level, LPVOID Data,
+    FINDEX_SEARCH_OPS Search, LPVOID Filter, DWORD Flags)
+{
+    if (OriginalMajorVersion == 6 && OriginalMinorVersion == 0) {
+        if (Level == FindExInfoBasic) Level = FindExInfoStandard;
+        Flags &= ~FIND_FIRST_EX_LARGE_FETCH;
+    }
+    return FindFirstFileExA(Path, Level, Data, Search, Filter, Flags);
+}

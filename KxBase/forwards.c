@@ -310,8 +310,8 @@
 #pragma comment(linker, "/EXPORT:FindFirstChangeNotificationA=kernel32.FindFirstChangeNotificationA")
 #pragma comment(linker, "/EXPORT:FindFirstChangeNotificationW=kernel32.FindFirstChangeNotificationW")
 #pragma comment(linker, "/EXPORT:FindFirstFileA=kernel32.FindFirstFileA")
-#pragma comment(linker, "/EXPORT:FindFirstFileExA=kernel32.FindFirstFileExA")
-#pragma comment(linker, "/EXPORT:FindFirstFileExW=kernel32.FindFirstFileExW")
+// FindFirstFileExA is implemented in misc.c for NT 6.0.
+// FindFirstFileExW is implemented in misc.c for NT 6.0.
 #pragma comment(linker, "/EXPORT:FindFirstFileNameTransactedW=kernel32.FindFirstFileNameTransactedW")
 #pragma comment(linker, "/EXPORT:FindFirstFileNameW=kernel32.FindFirstFileNameW")
 #pragma comment(linker, "/EXPORT:FindFirstFileTransactedA=kernel32.FindFirstFileTransactedA")

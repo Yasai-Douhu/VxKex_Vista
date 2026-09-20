@@ -252,3 +252,5 @@ EXPORTS
 	;; synch.c - Vista 縺ｮ kernel32/ntdll 縺ｫ蟄伜惠縺励↑縺・◆繧∫峩謗･螳溯｣・
 	TryAcquireSRWLockExclusive
 	TryAcquireSRWLockShared
+	FindFirstFileExA = Ext_FindFirstFileExA
+	FindFirstFileExW = Ext_FindFirstFileExW
