@@ -176,7 +176,7 @@
 #pragma comment(linker, "/EXPORT:DisableProcessWindowsGhosting=user32.DisableProcessWindowsGhosting")
 #pragma comment(linker, "/EXPORT:DispatchMessageA=user32.DispatchMessageA")
 #pragma comment(linker, "/EXPORT:DispatchMessageW=user32.DispatchMessageW")
-#pragma comment(linker, "/EXPORT:DisplayConfigGetDeviceInfo=user32.DisplayConfigGetDeviceInfo")
+// DisplayConfigGetDeviceInfo is implemented in misc.c.
 #pragma comment(linker, "/EXPORT:DisplayConfigSetDeviceInfo=user32.DisplayConfigSetDeviceInfo")
 #pragma comment(linker, "/EXPORT:DisplayExitWindowsWarnings=user32.DisplayExitWindowsWarnings")
 #pragma comment(linker, "/EXPORT:DlgDirListA=user32.DlgDirListA")
@@ -295,7 +295,7 @@
 #pragma comment(linker, "/EXPORT:GetDCEx=user32.GetDCEx")
 #pragma comment(linker, "/EXPORT:GetDesktopWindow=user32.GetDesktopWindow")
 #pragma comment(linker, "/EXPORT:GetDialogBaseUnits=user32.GetDialogBaseUnits")
-#pragma comment(linker, "/EXPORT:GetDisplayConfigBufferSizes=user32.GetDisplayConfigBufferSizes")
+// GetDisplayConfigBufferSizes is implemented in misc.c.
 #pragma comment(linker, "/EXPORT:GetDlgCtrlID=user32.GetDlgCtrlID")
 #pragma comment(linker, "/EXPORT:GetDlgItem=user32.GetDlgItem")
 #pragma comment(linker, "/EXPORT:GetDlgItemInt=user32.GetDlgItemInt")
@@ -581,7 +581,7 @@
 #pragma comment(linker, "/EXPORT:PrivateExtractIconsW=user32.PrivateExtractIconsW")
 #pragma comment(linker, "/EXPORT:PrivateRegisterICSProc=user32.PrivateRegisterICSProc")
 #pragma comment(linker, "/EXPORT:PtInRect=user32.PtInRect")
-#pragma comment(linker, "/EXPORT:QueryDisplayConfig=user32.QueryDisplayConfig")
+// QueryDisplayConfig is implemented in misc.c.
 #pragma comment(linker, "/EXPORT:QuerySendMessage=user32.QuerySendMessage")
 #pragma comment(linker, "/EXPORT:RealChildWindowFromPoint=user32.RealChildWindowFromPoint")
 #pragma comment(linker, "/EXPORT:RealGetWindowClass=user32.RealGetWindowClass")
@@ -1052,7 +1052,7 @@
 #pragma comment(linker, "/EXPORT:FindExecutableA=shell32.FindExecutableA")
 #pragma comment(linker, "/EXPORT:FindExecutableW=shell32.FindExecutableW")
 #pragma comment(linker, "/EXPORT:FreeIconList=shell32.FreeIconList")
-#pragma comment(linker, "/EXPORT:GetCurrentProcessExplicitAppUserModelID=shell32.GetCurrentProcessExplicitAppUserModelID")
+// GetCurrentProcessExplicitAppUserModelID is implemented in misc.c.
 #pragma comment(linker, "/EXPORT:GetFileNameFromBrowse=shell32.GetFileNameFromBrowse")
 #pragma comment(linker, "/EXPORT:ILAppendID=shell32.ILAppendID")
 #pragma comment(linker, "/EXPORT:ILClone=shell32.ILClone")
@@ -1281,7 +1281,7 @@
 #pragma comment(linker, "/EXPORT:SHUpdateImageW=shell32.SHUpdateImageW")
 #pragma comment(linker, "/EXPORT:SHUpdateRecycleBinIcon=shell32.SHUpdateRecycleBinIcon")
 #pragma comment(linker, "/EXPORT:SHValidateUNC=shell32.SHValidateUNC")
-#pragma comment(linker, "/EXPORT:SetCurrentProcessExplicitAppUserModelID=shell32.SetCurrentProcessExplicitAppUserModelID")
+// SetCurrentProcessExplicitAppUserModelID is implemented in misc.c.
 #pragma comment(linker, "/EXPORT:SheChangeDirA=shell32.SheChangeDirA")
 #pragma comment(linker, "/EXPORT:SheChangeDirExW=shell32.SheChangeDirExW")
 #pragma comment(linker, "/EXPORT:SheGetDirA=shell32.SheGetDirA")
@@ -2461,7 +2461,7 @@
 #pragma comment(linker, "/EXPORT:DisableProcessWindowsGhosting=user32.DisableProcessWindowsGhosting")
 #pragma comment(linker, "/EXPORT:DispatchMessageA=user32.DispatchMessageA")
 #pragma comment(linker, "/EXPORT:DispatchMessageW=user32.DispatchMessageW")
-#pragma comment(linker, "/EXPORT:DisplayConfigGetDeviceInfo=user32.DisplayConfigGetDeviceInfo")
+// DisplayConfigGetDeviceInfo is implemented in misc.c.
 #pragma comment(linker, "/EXPORT:DisplayConfigSetDeviceInfo=user32.DisplayConfigSetDeviceInfo")
 #pragma comment(linker, "/EXPORT:DisplayExitWindowsWarnings=user32.DisplayExitWindowsWarnings")
 #pragma comment(linker, "/EXPORT:DlgDirListA=user32.DlgDirListA")
@@ -2578,7 +2578,7 @@
 #pragma comment(linker, "/EXPORT:GetDCEx=user32.GetDCEx")
 #pragma comment(linker, "/EXPORT:GetDesktopWindow=user32.GetDesktopWindow")
 #pragma comment(linker, "/EXPORT:GetDialogBaseUnits=user32.GetDialogBaseUnits")
-#pragma comment(linker, "/EXPORT:GetDisplayConfigBufferSizes=user32.GetDisplayConfigBufferSizes")
+// GetDisplayConfigBufferSizes is implemented in misc.c.
 #pragma comment(linker, "/EXPORT:GetDlgCtrlID=user32.GetDlgCtrlID")
 #pragma comment(linker, "/EXPORT:GetDlgItem=user32.GetDlgItem")
 #pragma comment(linker, "/EXPORT:GetDlgItemInt=user32.GetDlgItemInt")
@@ -2862,7 +2862,7 @@
 #pragma comment(linker, "/EXPORT:PrivateExtractIconsW=user32.PrivateExtractIconsW")
 #pragma comment(linker, "/EXPORT:PrivateRegisterICSProc=user32.PrivateRegisterICSProc")
 #pragma comment(linker, "/EXPORT:PtInRect=user32.PtInRect")
-#pragma comment(linker, "/EXPORT:QueryDisplayConfig=user32.QueryDisplayConfig")
+// QueryDisplayConfig is implemented in misc.c.
 #pragma comment(linker, "/EXPORT:QuerySendMessage=user32.QuerySendMessage")
 #pragma comment(linker, "/EXPORT:RealChildWindowFromPoint=user32.RealChildWindowFromPoint")
 #pragma comment(linker, "/EXPORT:RealGetWindowClass=user32.RealGetWindowClass")
@@ -3338,7 +3338,7 @@
 #pragma comment(linker, "/EXPORT:FindExecutableA=shell32.FindExecutableA")
 #pragma comment(linker, "/EXPORT:FindExecutableW=shell32.FindExecutableW")
 #pragma comment(linker, "/EXPORT:FreeIconList=shell32.FreeIconList")
-#pragma comment(linker, "/EXPORT:GetCurrentProcessExplicitAppUserModelID=shell32.GetCurrentProcessExplicitAppUserModelID")
+// GetCurrentProcessExplicitAppUserModelID is implemented in misc.c.
 #pragma comment(linker, "/EXPORT:GetFileNameFromBrowse=shell32.GetFileNameFromBrowse")
 #pragma comment(linker, "/EXPORT:ILAppendID=shell32.ILAppendID")
 #pragma comment(linker, "/EXPORT:ILClone=shell32.ILClone")
@@ -3567,7 +3567,7 @@
 #pragma comment(linker, "/EXPORT:SHUpdateImageW=shell32.SHUpdateImageW")
 #pragma comment(linker, "/EXPORT:SHUpdateRecycleBinIcon=shell32.SHUpdateRecycleBinIcon")
 #pragma comment(linker, "/EXPORT:SHValidateUNC=shell32.SHValidateUNC")
-#pragma comment(linker, "/EXPORT:SetCurrentProcessExplicitAppUserModelID=shell32.SetCurrentProcessExplicitAppUserModelID")
+// SetCurrentProcessExplicitAppUserModelID is implemented in misc.c.
 #pragma comment(linker, "/EXPORT:SheChangeDirA=shell32.SheChangeDirA")
 #pragma comment(linker, "/EXPORT:SheChangeDirExW=shell32.SheChangeDirExW")
 #pragma comment(linker, "/EXPORT:SheGetDirA=shell32.SheGetDirA")

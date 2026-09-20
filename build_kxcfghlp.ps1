@@ -34,7 +34,7 @@ function Invoke-ClCompile {
     $includeFlags = @("/I", "`"$HDR_DIR`"")
     $foFlag = "/Fo" + $OutputFile
     $srcFlag = "`"$SourceFile`""
-    $flags = @("/c", "/O1", "/Os", "/Oy", "/GL", "/Gy", "/Gz", "/MD", "/Zi", "/W3", "/TC", "/GS-") + $Defines + $includeFlags + @($foFlag, $srcFlag)
+    $flags = @("/c", "/O1", "/Os", "/Oy", "/GL", "/Gy", "/Gz", "/MD", "/Zi", "/W3", "/TC", "/GS-") + $Defines + $includeFlags + @("/Fd$(Join-Path $OutputDir 'compile.pdb')", $foFlag, $srcFlag)
     $srcName = Split-Path $SourceFile -Leaf
     Write-Host "  Compiling: " $srcName -NoNewline
     & "cl.exe" @flags
@@ -99,5 +99,3 @@ if (Test-Path $libPath) {
 }
 
 exit 0
-
-

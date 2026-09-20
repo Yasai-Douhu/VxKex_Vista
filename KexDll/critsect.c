@@ -41,6 +41,13 @@ KEXAPI NTSTATUS NTAPI Ext_RtlInitializeCriticalSectionEx(
 		return STATUS_INVALID_PARAMETER_3;
 	}
 
+	// Vista's verifier rejects the NO_DEBUG_INFO sentinel.
+	// Use its legacy initializer with a real debug-info block.
+	if (OriginalMajorVersion == 6 && OriginalMinorVersion == 0) {
+		return RtlInitializeCriticalSectionAndSpinCount(CriticalSection,
+			SpinCount & 0xFFFFFF);
+	}
+
 	//
 	// Make critical sections not have debug info by default.
 	// Creating a debug info structure for a critical section requires a

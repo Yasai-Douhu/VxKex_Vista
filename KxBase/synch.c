@@ -59,15 +59,19 @@ KXBASEAPI BOOLEAN WINAPI TryAcquireSRWLockShared(
 	LONG_PTR NewValue;
 
 	do {
-		OldValue = (LONG_PTR)(volatile PVOID)SRWLock->Ptr;
+		OldValue = (LONG_PTR)InterlockedCompareExchangePointer(
+			(volatile PVOID*)&SRWLock->Ptr, NULL, NULL);
 
 		// bit 0 が立っていれば排他ロック中なので失敗
-		if (OldValue & 1) {
+		// Vista uses bit 0 for ownership, bit 1 for a waiter block,
+		// and bits 4+ for the shared-owner count. Do not modify a waiter
+		// pointer or admit readers while an exclusive owner holds the lock.
+		if ((OldValue & 0xE) || ((OldValue & 1) && !(OldValue & ~(LONG_PTR)0xF))) {
 			return FALSE;
 		}
 
-		// 共有カウントを +4 (共有カウントは bit 2 以上に格納)
-		NewValue = OldValue + 4;
+		// Increment the shared-owner count and set the ownership bit.
+		NewValue = (OldValue + 0x10) | 1;
 	} while (InterlockedCompareExchangePointer(
 		(volatile PVOID*)&SRWLock->Ptr,
 		(PVOID)NewValue,

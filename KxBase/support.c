@@ -54,10 +54,27 @@ HANDLE WINAPI BaseGetNamedObjectDirectory(
 	HANDLE DirectoryHandle;
 	UNICODE_STRING DirectoryName;
 	PPEB Peb;
+	WCHAR VistaDirectoryName[64];
 
 	if (KexData->BaseNamedObjects) {
 		ASSERT (VALID_HANDLE(KexData->BaseNamedObjects));
 		return KexData->BaseNamedObjects;
+	}
+
+	// Vista's BASE_STATIC_SERVER_DATA layout differs from Windows 7.
+	// Use its session namespace rather than dereferencing the Win7 layout.
+	if (OriginalMajorVersion == 6 && OriginalMinorVersion == 0) {
+		DWORD SessionId;
+		if (!ProcessIdToSessionId(GetCurrentProcessId(), &SessionId)) return NULL;
+		if (SessionId) {
+			StringCchPrintfW(VistaDirectoryName, ARRAYSIZE(VistaDirectoryName),
+				L"\\Sessions\\%lu\\BaseNamedObjects", SessionId);
+		} else {
+			StringCchCopyW(VistaDirectoryName, ARRAYSIZE(VistaDirectoryName),
+				L"\\BaseNamedObjects");
+		}
+		RtlInitUnicodeString(&DirectoryName, VistaDirectoryName);
+		goto OpenDirectory;
 	}
 
 	//
@@ -104,6 +121,7 @@ HANDLE WINAPI BaseGetNamedObjectDirectory(
 		DirectoryName				= BaseStaticServerData->NamedObjectDirectory;
 	}
 
+OpenDirectory:
 	ASSERT (NtCurrentPeb()->IsProtectedProcess == 0);
 	ASSERT (VALID_UNICODE_STRING(&DirectoryName));
 

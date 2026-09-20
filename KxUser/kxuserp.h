@@ -125,7 +125,7 @@ KXUSERAPI NTSTATUS NTAPI KxUser##SyscallName(__VA_ARGS__);
 
 #endif
 
-#ifndef HTOUCHINPUT
+#ifndef TOUCHEVENTF_MOVE
 DECLARE_HANDLE(HTOUCHINPUT);
 typedef struct tagTOUCHINPUT {
     LONG x;

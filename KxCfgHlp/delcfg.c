@@ -27,6 +27,7 @@
 #include <KexComm.h>
 #include <KxCfgHlp.h>
 #include <KexW32ML.h>
+#include <VistaLaunch.h>
 
 //
 // Delete VxKex configuration for a particular program.
@@ -133,6 +134,8 @@ KXCFGDECLSPEC BOOLEAN KxCfgDeleteConfiguration(
 	}
 
 	try {
+		ErrorCode = VistaRemoveManagedDebugger(IfeoKeyHandle);
+		if (ErrorCode) return FALSE;
 		//
 		// Step 2. Unconditionally delete all VxKex-specific values.
 		// In order to reduce the maintenance requirements for this code, we will

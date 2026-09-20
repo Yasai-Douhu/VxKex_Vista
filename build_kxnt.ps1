@@ -1,4 +1,5 @@
 # VxKex_Vista KxNt Build Script with VS2010 (cl.exe)
+param([string]$OutputDirectory)
 $ErrorActionPreference = "Stop"
 
 Write-Host "========================================" -ForegroundColor Cyan
@@ -24,6 +25,7 @@ $ScriptDirAbs = (Get-Item $ScriptDir).FullName
 $HDR_DIR = Join-Path $ScriptDirAbs "00-Common-Headers"
 $KXNT_DIR = Join-Path $ScriptDirAbs "KxNt"
 $OUT_DIR = Join-Path $ScriptDirAbs "x64\Release\KxNt"
+if ($OutputDirectory) { $OUT_DIR = [IO.Path]::GetFullPath($OutputDirectory) }
 $IMPORT_LIBS_DIR = Join-Path $ScriptDirAbs "00-Import-Libraries"
 
 # Create all output directories
@@ -41,11 +43,11 @@ function Invoke-ClCompile {
     $includeFlags = @("/I", "`"$HDR_DIR`"")
     $foFlag = "/Fo" + $OutputFile
     $srcFlag = "`"$SourceFile`""
-    $flags = @("/c", "/O1", "/Os", "/Oy", "/GL", "/Gy", "/Gz", "/MD", "/Zi", "/W3", "/TC", "/GS-") + $Defines + $includeFlags + @($foFlag, $srcFlag)
+    $flags = @("/c", "/O1", "/Os", "/Oy", "/GL", "/Gy", "/Gz", "/MD", "/Zi", "/W3", "/TC", "/GS-") + $Defines + $includeFlags + @($foFlag, ("/Fd" + (Join-Path $OutputDir "compile.pdb")), $srcFlag)
     $srcName = Split-Path $SourceFile -Leaf
     Write-Host "  Compiling: " $srcName -NoNewline
-    $proc = Start-Process -FilePath "cl.exe" -ArgumentList $flags -NoNewWindow -Wait -PassThru
-    if ($proc.ExitCode -ne 0) {
+    & cl.exe @flags | Out-Host
+    if ($LASTEXITCODE -ne 0) {
         Write-Host " FAILED" -ForegroundColor Red
         return $false
     }
@@ -137,8 +139,8 @@ $linkArgs += @(
 )
 
 Write-Host "  Linking KxNt.dll..." -NoNewline
-$proc = Start-Process -FilePath "link.exe" -ArgumentList $linkArgs -NoNewWindow -Wait -PassThru
-if ($proc.ExitCode -ne 0) {
+& link.exe @linkArgs | Out-Host
+if ($LASTEXITCODE -ne 0) {
     Write-Host " FAILED" -ForegroundColor Red
     Write-Host "" -ForegroundColor Red
     Write-Host "BUILD FAILED" -ForegroundColor Red

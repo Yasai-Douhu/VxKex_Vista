@@ -600,12 +600,18 @@ NTSTATUS KexRewriteImageImportDirectory(
 	if (RtlEqualUnicodeString(BaseImageName, &Kernel32, TRUE)) {
 		PSTR NtdllImport;
 
-		// On Windows 7, NTDLL is always the 2nd import of kernel32.
-		NtdllImport = (PSTR) RVA_TO_VA(ImageBase, ImportDescriptor[1].Name);
-		ASSERT (StringEqualA(NtdllImport, "ntdll.dll"));
-
-		RtlCopyMemory(NtdllImport, "kxnt.dll", sizeof("kxnt.dll"));
-		AtLeastOneImportWasRewritten = TRUE;
+		// Vista's kernel32 has a different import order from Windows 7.
+		// Locate ntdll by name; indexing the terminator gives an RVA of zero
+		// and would overwrite the image's DOS header.
+		while (ImportDescriptor->Name != 0) {
+			NtdllImport = (PSTR) RVA_TO_VA(ImageBase, ImportDescriptor->Name);
+			if (StringEqualIA(NtdllImport, "ntdll.dll")) {
+				RtlCopyMemory(NtdllImport, "kxnt.dll", sizeof("kxnt.dll"));
+				AtLeastOneImportWasRewritten = TRUE;
+				break;
+			}
+			++ImportDescriptor;
+		}
 		goto SkipNormalImportRewrite;
 	}
 

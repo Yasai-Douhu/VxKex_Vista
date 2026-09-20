@@ -107,7 +107,7 @@ BOOL WINAPI DllMain(
 		// Get base named object directories and put handles to them in KexData.
 		//
 
-		if (OriginalMajorVersion == 6 && OriginalMinorVersion == 1) {
+		if (OriginalMajorVersion == 6 && OriginalMinorVersion <= 1) {
 			KexData->BaseNamedObjects = BaseGetNamedObjectDirectory();
 			KexData->UntrustedNamedObjects = BaseGetUntrustedNamedObjectDirectory();
 		}

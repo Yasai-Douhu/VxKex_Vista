@@ -194,7 +194,14 @@ INT_PTR CALLBACK DialogProc(
 		//
 
 		if (PropSheetData) {
-			KxCfgSetConfiguration(PropSheetData->ExeFullPath, &ProgramConfiguration, NULL);
+			if (!KxCfgSetConfiguration(PropSheetData->ExeFullPath, &ProgramConfiguration, NULL)) {
+				WCHAR ErrorText[256];
+				StringCchPrintf(ErrorText, ARRAYSIZE(ErrorText),
+					L"Could not save VxKex settings (error %lu). Check the installation and any existing debugger configuration.", GetLastError());
+				MessageBox(Window, ErrorText, L"VxKex Vista", MB_OK | MB_ICONERROR);
+				SetWindowLongPtr(Window, DWLP_MSGRESULT, PSNRET_INVALID_NOCHANGEPAGE);
+				return TRUE;
+			}
 			PropSheetData->SettingsChanged = FALSE;
 		}
 	} else if (Message == WM_NOTIFY && WParam == IDREPORTBUG) {

@@ -27,6 +27,36 @@
 #include <KexComm.h>
 #include <KxCfgHlp.h>
 #include <KexW32ML.h>
+#include <VistaLaunch.h>
+
+STATIC ULONG KxCfgpConfigureVistaLauncher(HKEY Key, PCWSTR Exe, BOOLEAN Enable)
+{
+	WCHAR Directory[MAX_PATH], Command[512], Existing[512], Owner[512];
+	DWORD Type, Size;
+	LONG Error;
+	OSVERSIONINFOW Version = {sizeof(Version)};
+	RtlGetVersion(&Version);
+	if (!Enable || Version.dwMajorVersion != 6 || Version.dwMinorVersion != 0 || !VistaIsVSCode(Exe))
+		return VistaRemoveManagedDebugger(Key);
+	if (!KxCfgGetKexDir(Directory, ARRAYSIZE(Directory))) return GetLastError();
+	if (FAILED(StringCchCat(Directory, ARRAYSIZE(Directory), L"\\VistaRun.exe"))) return ERROR_FILENAME_EXCED_RANGE;
+	if (GetFileAttributes(Directory) == INVALID_FILE_ATTRIBUTES) return ERROR_FILE_NOT_FOUND;
+	StringCchPrintf(Command, ARRAYSIZE(Command), L"\"%s\" --ifeo", Directory);
+	Size = sizeof(Existing);
+	Error = RegQueryValueEx(Key, L"Debugger", NULL, &Type, (BYTE *)Existing, &Size);
+	if (Error != ERROR_FILE_NOT_FOUND) {
+		if (Error) return Error;
+		if (Type != REG_SZ || Size < 2 || Size > sizeof(Existing) || Size % 2 || Existing[Size / 2 - 1]) return ERROR_ALREADY_EXISTS;
+		Size = sizeof(Owner);
+		Error = RegQueryValueEx(Key, L"KEX_VistaDebugger", NULL, &Type, (BYTE *)Owner, &Size);
+		if (Error || Type != REG_SZ || Size < 2 || Size > sizeof(Owner) || Size % 2 || Owner[Size / 2 - 1] || lstrcmpW(Owner, Existing))
+			return ERROR_ALREADY_EXISTS;
+	}
+	// Record ownership before activating the command, so uninstall can recover.
+	Error = RegWriteString(Key, NULL, L"KEX_VistaDebugger", Command);
+	if (!Error) Error = RegWriteString(Key, NULL, L"Debugger", Command);
+	return Error;
+}
 
 //
 // Configure VxKex for a particular program according to the configuration data
@@ -167,6 +197,9 @@ KXCFGDECLSPEC BOOLEAN KXCFGAPI KxCfgSetConfiguration(
 	KEX_StrongVersionSpoof	= Configuration->StrongSpoofOptions;
 
 	try {
+		ErrorCode = KxCfgpConfigureVistaLauncher(KeyHandle, ExeFullPath,
+			Configuration->Enabled && !Configuration->DisableAppSpecificHacks);
+		if (ErrorCode) return FALSE;
 		ErrorCode = RegWriteI32(KeyHandle, NULL, L"KEX_DisableForChild", KEX_DisableForChild);
 		if (ErrorCode) {
 			return FALSE;

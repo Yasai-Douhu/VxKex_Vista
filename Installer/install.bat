@@ -59,7 +59,21 @@ echo.
 echo [*] Copying VxKex files to %TARGET_DIR%...
 if not exist "%TARGET_DIR%" mkdir "%TARGET_DIR%"
 copy /y "%SCRIPT_DIR%*.dll" "%TARGET_DIR%\" >nul
+:: DWrite replacement must remain under KexDir so its imports are rewritten.
+if not exist "%TARGET_DIR%\Kex64" mkdir "%TARGET_DIR%\Kex64"
+copy /y "%SCRIPT_DIR%Kex64\*.dll" "%TARGET_DIR%\Kex64\" >nul
+if errorlevel 1 (
+    echo Failed to copy Kex64 dependencies. Installation stopped.
+    pause
+    exit /b 1
+)
 if exist "%SCRIPT_DIR%VxKexLdr.exe" copy /y "%SCRIPT_DIR%VxKexLdr.exe" "%TARGET_DIR%\" >nul
+copy /y "%SCRIPT_DIR%VistaRun.exe" "%TARGET_DIR%\" >nul
+if errorlevel 1 (
+    echo Failed to install VistaRun.exe. Installation stopped.
+    pause
+    exit /b 1
+)
 if exist "%SCRIPT_DIR%KexCfg.exe" copy /y "%SCRIPT_DIR%KexCfg.exe" "%TARGET_DIR%\" >nul
 copy /y "%~f0" "%TARGET_DIR%\install.bat" >nul
 
@@ -75,6 +89,8 @@ echo [*] Registering VxKex paths and configuration...
 "%REG_CMD%" add "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\{VxKexPropagationVirtualKey}" /v VerifierDlls /t REG_SZ /d "KexDll.dll" /f /reg:64 >nul 2>&1 || "%REG_CMD%" add "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\{VxKexPropagationVirtualKey}" /v VerifierDlls /t REG_SZ /d "KexDll.dll" /f >nul
 "%REG_CMD%" add "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\{VxKexPropagationVirtualKey}" /v GlobalFlag /t REG_DWORD /d 256 /f /reg:64 >nul 2>&1 || "%REG_CMD%" add "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\{VxKexPropagationVirtualKey}" /v GlobalFlag /t REG_DWORD /d 256 /f >nul
 if not exist "%TARGET_DIR%\Logs" mkdir "%TARGET_DIR%\Logs"
+:: Custom verifier provider only; zero enables Vista's default verifier checks.
+"%REG_CMD%" add "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\{VxKexPropagationVirtualKey}" /v VerifierFlags /t REG_DWORD /d 2147483648 /f >nul
 
 :: 4. Register Shell Extension (KexShlEx.dll)
 echo [*] Registering Shell Extension...
@@ -105,6 +121,19 @@ echo ========================================================
 echo   Uninstalling VxKex...
 echo ========================================================
 echo.
+
+:: Remove owned IFEO launch commands before removing their executable.
+if not exist "%TARGET_DIR%\VistaRun.exe" (
+    echo VistaRun.exe is missing. Restore it before uninstalling.
+    pause
+    exit /b 1
+)
+"%TARGET_DIR%\VistaRun.exe" --remove-launchers
+if errorlevel 1 (
+    echo Could not remove VxKex launch commands. Uninstallation stopped.
+    pause
+    exit /b 1
+)
 
 :: 1. Unregister Shell Extension
 echo [*] Unregistering Shell Extension...

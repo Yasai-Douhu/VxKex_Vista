@@ -31,7 +31,7 @@ foreach ($src in $cFiles) {
     $objFile = Join-Path $OUT_DIR "$baseName.obj"
     $objFiles += "`"$objFile`""
     
-    $flags = @("/c", "/O1", "/Os", "/Oy", "/GL", "/Gy", "/Gz", "/MD", "/Zi", "/W3", "/TC", "/GS-") + $defines + $includeFlags + @("/Fo$objFile", "`"$src`"")
+    $flags = @("/c", "/O1", "/Os", "/Oy", "/GL", "/Gy", "/Gz", "/MD", "/Zi", "/W3", "/TC", "/GS-") + $defines + $includeFlags + @("/Fd$(Join-Path $OUT_DIR 'compile.pdb')", "/Fo$objFile", "`"$src`"")
     # Write-Host "Compiling $baseName.c..."
     & "cl.exe" @flags
     if ($LASTEXITCODE -ne 0) { exit 1 }

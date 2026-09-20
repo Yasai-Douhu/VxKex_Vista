@@ -45,6 +45,12 @@ EXPORTS
 	LoadPackagedLibrary
 
 	;; misc.c
+	GetThreadGroupAffinity = Ext_GetThreadGroupAffinity
+	PowerCreateRequest = Ext_PowerCreateRequest
+	PowerSetRequest = Ext_PowerSetRequest
+	PowerClearRequest = Ext_PowerClearRequest
+	RaiseFailFastException = Ext_RaiseFailFastException
+	ResolveLocaleName = Ext_ResolveLocaleName
 	GetActiveProcessorCount				= Ext_GetActiveProcessorCount
 	GetActiveProcessorGroupCount		= Ext_GetActiveProcessorGroupCount
 	GetMaximumProcessorCount			= Ext_GetMaximumProcessorCount

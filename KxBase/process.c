@@ -312,6 +312,15 @@ TryAgain:
 		// by accident.
 		LastError = GetLastError();
 
+		// Vista does not accept this attribute, even for an empty policy.
+		// After the existing supported-policy filtering, zero needs no action.
+		if (AlreadyTriedAgain && LastError == ERROR_NOT_SUPPORTED &&
+			OriginalMajorVersion == 6 && OriginalMinorVersion == 0 &&
+			Attribute == PROC_THREAD_ATTRIBUTE_MITIGATION_POLICY &&
+			MitigationPolicy == 0) {
+			return TRUE;
+		}
+
 		if (AlreadyTriedAgain) {
 			KexLogWarningEvent(
 				L"UpdateProcThreadAttribute failed despite modifying parameters.\r\n\r\n"

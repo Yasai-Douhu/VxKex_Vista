@@ -1,5 +1,10 @@
 LIBRARY KxUser
 EXPORTS
+	SetCurrentProcessExplicitAppUserModelID = Ext_SetCurrentProcessExplicitAppUserModelID
+	GetCurrentProcessExplicitAppUserModelID = Ext_GetCurrentProcessExplicitAppUserModelID
+	GetDisplayConfigBufferSizes = Ext_GetDisplayConfigBufferSizes
+	QueryDisplayConfig = Ext_QueryDisplayConfig
+	DisplayConfigGetDeviceInfo = Ext_DisplayConfigGetDeviceInfo
 	;;
 	;; autorot.c
 	;;

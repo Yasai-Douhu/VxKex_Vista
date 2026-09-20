@@ -36,6 +36,26 @@
 #include "buildcfg.h"
 #include "kexdllp.h"
 
+STATIC BOOLEAN KexpIsManagedVistaDebugger(HANDLE Key)
+{
+	struct { ULONG TitleIndex, Type, DataLength; WCHAR Data[512]; } Debugger, Owner;
+	UNICODE_STRING Name;
+	ULONG Returned;
+	NTSTATUS Status;
+	RtlInitUnicodeString(&Name, L"Debugger");
+	Status = NtQueryValueKey(Key, &Name, KeyValuePartialInformation,
+		&Debugger, sizeof(Debugger), &Returned);
+	if (!NT_SUCCESS(Status) || Debugger.Type != REG_SZ ||
+		Debugger.DataLength < sizeof(WCHAR) || Debugger.DataLength > sizeof(Debugger.Data) ||
+		Debugger.DataLength % sizeof(WCHAR) || Debugger.Data[Debugger.DataLength / sizeof(WCHAR) - 1]) return FALSE;
+	RtlInitUnicodeString(&Name, L"KEX_VistaDebugger");
+	Status = NtQueryValueKey(Key, &Name, KeyValuePartialInformation,
+		&Owner, sizeof(Owner), &Returned);
+	return NT_SUCCESS(Status) && Owner.Type == REG_SZ &&
+		Owner.DataLength == Debugger.DataLength &&
+		RtlCompareMemory(Owner.Data, Debugger.Data, Owner.DataLength) == Owner.DataLength;
+}
+
 STATIC NTSTATUS NTAPI Ext_NtCreateUserProcess(
     OUT		CONST PHANDLE						ProcessHandle,
     OUT		CONST PHANDLE						ThreadHandle,
@@ -601,6 +621,8 @@ STATIC NTSTATUS NTAPI Ext_NtCreateUserProcess(
 	ULONG ModifiedThreadFlags;
 	ULONG ModifiedProcessDesiredAccess;
 	ULONG ModifiedThreadDesiredAccess;
+	PS_CREATE_INFO OriginalCreateInfo;
+	BOOLEAN RetriedWithoutLauncher;
 	
 	ULONG ChildProcessBitness;
 
@@ -634,7 +656,10 @@ STATIC NTSTATUS NTAPI Ext_NtCreateUserProcess(
 	ModifiedProcessDesiredAccess |= PROCESS_VM_OPERATION | PROCESS_VM_READ | PROCESS_VM_WRITE;
 	ModifiedThreadDesiredAccess |= THREAD_SUSPEND_RESUME;
 	ModifiedThreadFlags |= THREAD_CREATE_FLAGS_CREATE_SUSPENDED;
+	OriginalCreateInfo = *CreateInfo;
+	RetriedWithoutLauncher = FALSE;
 	
+CreateNativeChild:
 	Status = KexNtCreateUserProcess(
 		ProcessHandle,
 		ThreadHandle,
@@ -647,6 +672,19 @@ STATIC NTSTATUS NTAPI Ext_NtCreateUserProcess(
 		ProcessParameters,
 		CreateInfo,
 		AttributeList);
+	// Preserve real child handles and unrelated debugger settings.
+	if (!RetriedWithoutLauncher && Status == STATUS_OBJECT_PATH_INVALID &&
+		CreateInfo->State == PsCreateFailExeName &&
+		KexpIsManagedVistaDebugger(CreateInfo->ExeName.IFEOKey)) {
+		NtClose(CreateInfo->ExeName.IFEOKey);
+		*CreateInfo = OriginalCreateInfo;
+		// Vista/Windows 7 encode PsSkipIFEODebugger in bits 8..9.
+		// The IFEOSkipDebugger bit (0x04) was introduced in Windows 8.
+		CreateInfo->InitState.InitFlags =
+			(CreateInfo->InitState.InitFlags & ~0x300UL) | 0x100;
+		RetriedWithoutLauncher = TRUE;
+		goto CreateNativeChild;
+	}
 
 	if (!NT_SUCCESS(Status)) {
 		return Status;
