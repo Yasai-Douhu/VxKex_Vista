@@ -240,8 +240,8 @@ KXCFGDECLSPEC BOOLEAN KXCFGAPI KxCfgSetConfiguration(
 			return FALSE;
 		}
 	} finally {
-		SetLastError(ErrorCode);
 		RegCloseKey(KeyHandle);
+		SetLastError(ErrorCode);
 	}
 
 	return TRUE;

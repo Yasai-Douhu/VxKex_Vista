@@ -1,52 +1,69 @@
-#include <windows.h>
-#include <shellapi.h>
-#include <wchar.h>
 #include "buildcfg.h"
 #include <KexComm.h>
 #include <KxCfgHlp.h>
+#include <ktmw32.h>
 
-int WINAPI wWinMain(
-	HINSTANCE hInstance,
-	HINSTANCE hPrevInstance,
-	PWSTR pCmdLine,
-	int nCmdShow)
+// Only this small, explicitly elevated process writes configuration from Explorer.
+static DWORD ApplyArguments(VOID)
 {
-	int argc = 0;
-	LPWSTR* argv = CommandLineToArgvW(GetCommandLineW(), &argc);
-	int i;
-	
-	KXCFG_PROGRAM_CONFIGURATION Config;
-	WCHAR ExeFullPath[MAX_PATH] = {0};
-	BOOLEAN ExeSet = FALSE;
-	
-	if (!argv) {
-		return 1;
-	}
+    int Count, Index;
+    PWSTR *Arguments = CommandLineToArgvW(GetCommandLineW(), &Count);
+    PCWSTR Exe = NULL;
+    KXCFG_PROGRAM_CONFIGURATION Config = {0};
+    DWORD Error = ERROR_INVALID_PARAMETER;
+    HANDLE Transaction;
+    if (!Arguments) return GetLastError();
+    for (Index = 1; Index < Count; ++Index) {
+        PCWSTR Arg = Arguments[Index];
+        PCWSTR Value;
+        PWSTR End;
+        ULONG Number;
+        ULONG Field;
+        if (!_wcsnicmp(Arg, L"/EXE:", 5)) {
+            Exe = Arg + 5;
+            if (!*Exe || wcslen(Exe) >= MAX_PATH || PathIsRelative(Exe)) goto Done;
+            continue;
+        }
+        if (!_wcsnicmp(Arg, L"/ENABLE:", 8)) { Field = 0; Value = Arg + 8; }
+        else if (!_wcsnicmp(Arg, L"/DISABLEFORCHILD:", 17)) { Field = 1; Value = Arg + 17; }
+        else if (!_wcsnicmp(Arg, L"/DISABLEAPPSPECIFIC:", 20)) { Field = 2; Value = Arg + 20; }
+        else if (!_wcsnicmp(Arg, L"/WINVERSPOOF:", 13)) { Field = 3; Value = Arg + 13; }
+        else if (!_wcsnicmp(Arg, L"/STRONGSPOOF:", 13)) { Field = 4; Value = Arg + 13; }
+        else goto Done;
+        Number = wcstoul(Value, &End, Field == 4 ? 16 : 10);
+        if (!*Value || *End || *Value == L'-') goto Done;
+        if (Field < 3 && Number > 1) goto Done;
+        if (Field == 3 && Number > WinVerSpoofWin11) goto Done;
+        if (Field == 4 && (Number & ~KEX_STRONGSPOOF_VALID_MASK)) goto Done;
+        switch (Field) {
+        case 0: Config.Enabled = Number; break;
+        case 1: Config.DisableForChild = Number; break;
+        case 2: Config.DisableAppSpecificHacks = Number; break;
+        case 3: Config.WinVerSpoof = Number; break;
+        case 4: Config.StrongSpoofOptions = Number; break;
+        }
+    }
+    if (!Exe) goto Done;
+    // Never recurse into another elevation attempt if launched without elevation.
+    if (KxCfgpElevationRequired()) { Error = ERROR_ACCESS_DENIED; goto Done; }
+    Transaction = CreateTransaction(NULL, NULL, 0, 0, 0, 0, NULL);
+    if (Transaction == INVALID_HANDLE_VALUE) { Error = GetLastError(); goto Done; }
+    if (!KxCfgSetConfiguration(Exe, &Config, Transaction)) {
+        Error = GetLastError();
+        if (!Error) Error = ERROR_GEN_FAILURE;
+        RollbackTransaction(Transaction);
+    } else if (!CommitTransaction(Transaction)) {
+        Error = GetLastError();
+    } else {
+        Error = ERROR_SUCCESS;
+    }
+    CloseHandle(Transaction);
+Done:
+    LocalFree(Arguments);
+    return Error;
+}
 
-	RtlZeroMemory(&Config, sizeof(Config));
-
-	for (i = 1; i < argc; i++) {
-		LPWSTR arg = argv[i];
-		if (_wcsnicmp(arg, L"/EXE:", 5) == 0) {
-			wcsncpy_s(ExeFullPath, MAX_PATH, arg + 5, _TRUNCATE);
-			ExeSet = TRUE;
-		} else if (_wcsnicmp(arg, L"/ENABLE:", 8) == 0) {
-			Config.Enabled = wcstoul(arg + 8, NULL, 10);
-		} else if (_wcsnicmp(arg, L"/DISABLEFORCHILD:", 17) == 0) {
-			Config.DisableForChild = wcstoul(arg + 17, NULL, 10);
-		} else if (_wcsnicmp(arg, L"/DISABLEAPPSPECIFIC:", 20) == 0) {
-			Config.DisableAppSpecificHacks = wcstoul(arg + 20, NULL, 10);
-		} else if (_wcsnicmp(arg, L"/WINVERSPOOF:", 13) == 0) {
-			Config.WinVerSpoof = wcstoul(arg + 13, NULL, 10);
-		} else if (_wcsnicmp(arg, L"/STRONGSPOOF:", 13) == 0) {
-			Config.StrongSpoofOptions = wcstoul(arg + 13, NULL, 16);
-		}
-	}
-
-	if (ExeSet) {
-		KxCfgSetConfiguration(ExeFullPath, &Config, NULL);
-	}
-
-	LocalFree(argv);
-	return 0;
+VOID WINAPI KexCfgEntry(VOID)
+{
+    ExitProcess(ApplyArguments());
 }

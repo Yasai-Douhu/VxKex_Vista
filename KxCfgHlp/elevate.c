@@ -9,14 +9,8 @@
 //     Functions related to elevation of privileges necessary to set VxKex
 //     settings as a non-elevated user.
 //
-//     We want users to be able to change VxKex configuration without accepting
-//     a UAC prompt every time. However, normal users and non-elevated admins
-//     cannot write to the IFEO key, which we need to do.
-//
-//     The solution we have chosen is to set up a scheduled task which runs
-//     as the local SYSTEM account. This scheduled task starts a helper
-//     process, KexCfg.exe, with command-line arguments which indicate which
-//     program to change VxKex configuration for and the configuration itself.
+//     Non-elevated callers launch KexCfg.exe with UAC consent and wait for
+//     its transaction to commit before reporting success.
 //
 // Author:
 //
@@ -67,7 +61,7 @@ BOOLEAN KxCfgpElevationRequired(
 	if (Status == STATUS_ACCESS_DENIED) {
 		return TRUE;
 	} else {
-		NtClose(KeyHandle);
+		if (NT_SUCCESS(Status)) NtClose(KeyHandle);
 		return FALSE;
 	}
 }
@@ -76,19 +70,8 @@ BOOLEAN KxCfgpElevationRequired(
 // This function is called when we are a NON elevated process which wants
 // to set VxKex configuration for a program.
 //
-// In this function we will try to run the "VxKex Configuration Elevation Task"
-// scheduled task. If that fails (for example: Task scheduler service not
-// running, or the user deleted the scheduled task for some reason), we'll
-// fall back to using ShellExecute and the UAC dialog might appear.
-//
-// The return value of this function is not a hard guarantee. If it returns
-// FALSE, it definitely means the configuration was not applied. But if it
-// returns TRUE that just means all the API calls succeeded. There is no
-// verification to check whether the configuration was ACTUALLY applied in
-// the registry.
-//
-// The KexCfg.exe helper program uses transactions to apply configuration,
-// so we do have a guarantee that configuration won't be partially applied.
+// KexCfg.exe applies the configuration in a registry transaction. Its exit
+// code reports the save result; cancellation and failures reach the caller.
 //
 BOOLEAN KxCfgpElevatedSetConfiguration(
 	IN	PCWSTR							ExeFullPath,
@@ -103,12 +86,9 @@ BOOLEAN KxCfgpElevatedSetConfiguration(
 	// make sure this function doesn't get called by accident
 	ASSERT (KxCfgpElevationRequired() == TRUE);
 
-	Success = KxCfgpElevatedSetConfigurationTaskScheduler(ExeFullPath, Configuration);
-
-	if (!Success) {
-		// fallback
-		Success = KxCfgpElevatedSetConfigurationShellExecute(ExeFullPath, Configuration);
-	}
+	// Obtain consent and wait for the helper's actual save result. The scheduled
+	// task only reports that it started, and is not installed by the Vista setup.
+	Success = KxCfgpElevatedSetConfigurationShellExecute(ExeFullPath, Configuration);
 
 	return Success;
 }
@@ -298,7 +278,8 @@ BOOLEAN KxCfgpElevatedSetConfigurationShellExecute(
 	BOOLEAN Success;
 	WCHAR KexCfgFullPath[MAX_PATH];
 	WCHAR Args[512];
-	HINSTANCE ShellExecuteError;
+	SHELLEXECUTEINFO ExecuteInfo;
+	DWORD ErrorCode;
 
 	//
 	// get full path to KexCfg.exe
@@ -332,19 +313,27 @@ BOOLEAN KxCfgpElevatedSetConfigurationShellExecute(
 	// call KexCfg elevated using ShellExecute
 	//
 
-	ShellExecuteError = ShellExecute(
-		NULL,
-		L"runas",
-		KexCfgFullPath,
-		Args,
-		NULL,
-		SW_SHOWNORMAL);
-
-	if ((ULONG) ShellExecuteError <= 32) {
+	ZeroMemory(&ExecuteInfo, sizeof(ExecuteInfo));
+	ExecuteInfo.cbSize = sizeof(ExecuteInfo);
+	ExecuteInfo.fMask = SEE_MASK_NOCLOSEPROCESS | SEE_MASK_NOASYNC | SEE_MASK_FLAG_NO_UI;
+	ExecuteInfo.lpVerb = L"runas";
+	ExecuteInfo.lpFile = KexCfgFullPath;
+	ExecuteInfo.lpParameters = Args;
+	ExecuteInfo.nShow = SW_HIDE;
+	if (!ShellExecuteEx(&ExecuteInfo)) {
 		return FALSE;
 	}
-
-	return TRUE;
+	if (!ExecuteInfo.hProcess) {
+		SetLastError(ERROR_INVALID_HANDLE);
+		return FALSE;
+	}
+	if (WaitForSingleObject(ExecuteInfo.hProcess, INFINITE) != WAIT_OBJECT_0 ||
+		!GetExitCodeProcess(ExecuteInfo.hProcess, &ErrorCode)) {
+		ErrorCode = GetLastError();
+	}
+	CloseHandle(ExecuteInfo.hProcess);
+	SetLastError(ErrorCode);
+	return ErrorCode == ERROR_SUCCESS;
 }
 
 BOOLEAN KxCfgpAssembleKexCfgCommandLine(

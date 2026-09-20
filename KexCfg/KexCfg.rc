@@ -1,0 +1,24 @@
+#include <windows.h>
+#include <KexVer.h>
+1 VERSIONINFO
+FILEVERSION KEX_VERSION_FV
+PRODUCTVERSION KEX_VERSION_FV
+FILEOS VOS_NT_WINDOWS32
+FILETYPE VFT_APP
+BEGIN
+ BLOCK "StringFileInfo"
+ BEGIN
+  BLOCK "040904B0"
+  BEGIN
+   VALUE "FileDescription", "VxKex Vista Configuration Helper"
+   VALUE "FileVersion", KEX_VERSION_STR
+   VALUE "ProductVersion", KEX_VERSION_STR
+   VALUE "OriginalFilename", "KexCfg.exe"
+  END
+ END
+ BLOCK "VarFileInfo"
+ BEGIN
+  VALUE "Translation", 0x0409, 1200
+ END
+END
+1 RT_MANIFEST "KexCfg.manifest"

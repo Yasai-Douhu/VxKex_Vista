@@ -196,9 +196,12 @@ INT_PTR CALLBACK DialogProc(
 		if (PropSheetData) {
 			if (!KxCfgSetConfiguration(PropSheetData->ExeFullPath, &ProgramConfiguration, NULL)) {
 				WCHAR ErrorText[256];
+				DWORD ErrorCode = GetLastError();
 				StringCchPrintf(ErrorText, ARRAYSIZE(ErrorText),
-					L"Could not save VxKex settings (error %lu). Check the installation and any existing debugger configuration.", GetLastError());
-				MessageBox(Window, ErrorText, L"VxKex Vista", MB_OK | MB_ICONERROR);
+					L"Could not save VxKex settings (error %lu). Check the installation and any existing debugger configuration.", ErrorCode);
+				// A cancelled UAC prompt leaves the edits available for another try.
+				if (ErrorCode != ERROR_CANCELLED)
+					MessageBox(Window, ErrorText, L"VxKex Vista", MB_OK | MB_ICONERROR);
 				SetWindowLongPtr(Window, DWLP_MSGRESULT, PSNRET_INVALID_NOCHANGEPAGE);
 				return TRUE;
 			}

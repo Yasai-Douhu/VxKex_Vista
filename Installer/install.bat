@@ -56,9 +56,30 @@ echo ========================================================
 echo.
 
 :: 1. Create Target Directory & Copy files
+if not exist "%SCRIPT_DIR%KexCfg.exe" (
+    echo KexCfg.exe is missing. Extract the complete release before installing.
+    pause
+    exit /b 1
+)
 echo [*] Copying VxKex files to %TARGET_DIR%...
 if not exist "%TARGET_DIR%" mkdir "%TARGET_DIR%"
+:: Explorer may still have the previous shell extension mapped. Rename it
+:: before copying, then the existing Explorer restart loads the new DLL.
+if exist "%TARGET_DIR%\KexShlEx.dll" (
+    if exist "%TARGET_DIR%\KexShlEx.previous.dll" del /q "%TARGET_DIR%\KexShlEx.previous.dll" >nul 2>&1
+    move /y "%TARGET_DIR%\KexShlEx.dll" "%TARGET_DIR%\KexShlEx.previous.dll" >nul
+    if errorlevel 1 (
+        echo Close open property dialogs and restart Explorer before retrying.
+        pause
+        exit /b 1
+    )
+)
 copy /y "%SCRIPT_DIR%*.dll" "%TARGET_DIR%\" >nul
+if errorlevel 1 (
+    echo Failed to copy compatibility libraries. Installation stopped.
+    pause
+    exit /b 1
+)
 :: DWrite replacement must remain under KexDir so its imports are rewritten.
 if not exist "%TARGET_DIR%\Kex64" mkdir "%TARGET_DIR%\Kex64"
 copy /y "%SCRIPT_DIR%Kex64\*.dll" "%TARGET_DIR%\Kex64\" >nul
@@ -74,7 +95,12 @@ if errorlevel 1 (
     pause
     exit /b 1
 )
-if exist "%SCRIPT_DIR%KexCfg.exe" copy /y "%SCRIPT_DIR%KexCfg.exe" "%TARGET_DIR%\" >nul
+copy /y "%SCRIPT_DIR%KexCfg.exe" "%TARGET_DIR%\" >nul
+if errorlevel 1 (
+    echo Failed to install KexCfg.exe. Installation stopped.
+    pause
+    exit /b 1
+)
 copy /y "%~f0" "%TARGET_DIR%\install.bat" >nul
 
 :: 2. Copy KexDll.dll and Kx*.dll to System32
@@ -84,6 +110,7 @@ copy /y "%TARGET_DIR%\Kx*.dll" "%SYS32_DIR%\" >nul
 
 :: 3. Configure VxKex Registry Entries
 echo [*] Registering VxKex paths and configuration...
+"%REG_CMD%" add "HKLM\SOFTWARE\VXsoft\VxKex" /v InstalledVersion /t REG_DWORD /d 2147485875 /f >nul
 "%REG_CMD%" add "HKLM\SOFTWARE\VXsoft\VxKex" /v KexDir /t REG_SZ /d "%TARGET_DIR%" /f /reg:64 >nul 2>&1 || "%REG_CMD%" add "HKLM\SOFTWARE\VXsoft\VxKex" /v KexDir /t REG_SZ /d "%TARGET_DIR%" /f >nul
 "%REG_CMD%" add "HKLM\SOFTWARE\VXsoft\VxKex" /v LogDir /t REG_SZ /d "%TARGET_DIR%\Logs" /f /reg:64 >nul 2>&1 || "%REG_CMD%" add "HKLM\SOFTWARE\VXsoft\VxKex" /v LogDir /t REG_SZ /d "%TARGET_DIR%\Logs" /f >nul
 "%REG_CMD%" add "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\{VxKexPropagationVirtualKey}" /v VerifierDlls /t REG_SZ /d "KexDll.dll" /f /reg:64 >nul 2>&1 || "%REG_CMD%" add "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\{VxKexPropagationVirtualKey}" /v VerifierDlls /t REG_SZ /d "KexDll.dll" /f >nul
