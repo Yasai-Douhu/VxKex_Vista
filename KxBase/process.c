@@ -293,6 +293,24 @@ KXBASEAPI BOOL WINAPI Ext_UpdateProcThreadAttribute(
 	BOOLEAN AlreadyTriedAgain;
 	ULONG MitigationPolicy;
 
+	// NT 6.0 console handles belong to CSRSS, not the kernel handle table.
+	// Accepting one in HANDLE_LIST can create a child with invalid standard
+	// pipe handles. Reject the unsupported list so callers can explicitly
+	// choose their normal CreateProcess fallback instead of losing stdin/out.
+	if (OriginalMajorVersion == 6 && OriginalMinorVersion == 0 &&
+		Attribute == PROC_THREAD_ATTRIBUTE_HANDLE_LIST && Value &&
+		Size % sizeof(HANDLE) == 0) {
+		SIZE_T Index;
+		for (Index = 0; Index < Size / sizeof(HANDLE); ++Index) {
+			HANDLE Handle = ((PHANDLE) Value)[Index];
+			if (Handle != INVALID_HANDLE_VALUE && ((ULONG_PTR) Handle & 3) == 3 &&
+				GetFileType(Handle) == FILE_TYPE_CHAR) {
+				SetLastError(ERROR_INVALID_PARAMETER);
+				return FALSE;
+			}
+		}
+	}
+
 	AlreadyTriedAgain = FALSE;
 
 TryAgain:

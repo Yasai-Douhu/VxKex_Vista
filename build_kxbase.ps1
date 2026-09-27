@@ -53,10 +53,10 @@ function Invoke-ClCompile {
     )
     if (-not (Test-Path $OutputDir)) { New-Item -ItemType Directory -Path $OutputDir | Out-Null }
     
-    $includeFlags = @("/I", "`"$HDR_DIR`"")
+    $includeFlags = @("/I", "$HDR_DIR")
     $foFlag = "/Fo" + $OutputFile
     $pdbFlag = "/Fd" + (Join-Path $OutputDir "compile.pdb")
-    $srcFlag = "`"$SourceFile`""
+    $srcFlag = "$SourceFile"
     $flags = @("/c", "/O1", "/Os", "/Oy", "/GL", "/Gy", "/Gz", "/MD", "/Zi", "/W3", "/TC", "/GS-") + $Defines + $includeFlags + @($foFlag, $pdbFlag, $srcFlag)
     $srcName = Split-Path $SourceFile -Leaf
     Write-Host "  Compiling: " $srcName -NoNewline
@@ -133,9 +133,9 @@ $dllPath = Join-Path $OUT_DIR "KxBase.dll"
 $libPath = Join-Path $OUT_DIR "KxBase.lib"
 $defPath = Join-Path $KXBASE_DIR "kxbase.def"
 
-$dllOut = "/OUT:" + "`"$dllPath`""
-$implibOut = "/IMPLIB:" + "`"$libPath`""
-$defOut = "/DEF:" + "`"$defPath`""
+$dllOut = "/OUT:" + "$dllPath"
+$implibOut = "/IMPLIB:" + "$libPath"
+$defOut = "/DEF:" + "$defPath"
 
 $linkArgs = @(
     "/NOLOGO", "/DLL",
@@ -146,26 +146,26 @@ $linkArgs = @(
     "/ENTRY:DllMain",
     "/LTCG",
     $defOut,
-    "/LIBPATH:`"$IMPORT_LIBS_DIR`"",
-    "/LIBPATH:`"$ScriptDirAbs\VistaDLLs`"",
+    "/LIBPATH:$IMPORT_LIBS_DIR",
+    "/LIBPATH:$ScriptDirAbs\VistaDLLs",
     "KexW32ML.lib"
 )
 
 # Add object files
 foreach ($obj in $kxBaseObj) {
-    $linkArgs += "`"$obj`""
+    $linkArgs += "$obj"
 }
 
 # Add libraries
 $linkArgs += @(
-    "`"$kexDllLib`"",
-    "`"$kexPathCchLib`"",
-    "`"$kexSmpLib`"",
-    "`"$kexMlsLib`"",
-    "`"$ntdllLib`"",
-    "`"$msvcrtLib`"",
-    "`"$kernel32Lib`"",
-    "`"$user32Lib`"",
+    "$kexDllLib",
+    "$kexPathCchLib",
+    "$kexSmpLib",
+    "$kexMlsLib",
+    "$ntdllLib",
+    "$msvcrtLib",
+    "$kernel32Lib",
+    "$user32Lib",
     "advapi32.lib",
     "shlwapi.lib",
     "psapi.lib",
