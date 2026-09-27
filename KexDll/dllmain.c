@@ -35,6 +35,12 @@
 
 INT WINAPI MessageBoxAHookProc(HWND, PCSTR, PCSTR, UINT);
 ULONG OriginalMajorVersion = 0, OriginalMinorVersion = 0, OriginalBuildNumber = 0;
+STATIC NTSTATUS PropagationInitializationStatus = STATUS_PENDING;
+
+KEXAPI NTSTATUS NTAPI KexGetPropagationStatus(VOID)
+{
+	return PropagationInitializationStatus;
+}
 
 STATIC RTL_VERIFIER_DLL_DESCRIPTOR AVrfDllDescriptor[] = {
 	{NULL, 0, NULL, NULL}
@@ -216,7 +222,7 @@ BOOL WINAPI DllMain(
 		// Initialize Propagation subsystem.
 		//
 
-		KexInitializePropagation();
+		PropagationInitializationStatus = KexInitializePropagation();
 
 		//
 		// After the propagation system is initialized, the IfeoParameters are
@@ -261,6 +267,7 @@ BOOL WINAPI DllMain(
 		//
 
 		unless (KexData->IfeoParameters.DisableAppSpecific) {
+			AshApplyGitInstallerAvxWorkaround();
 			// APPSPECIFICHACK: Environment variable hack for QBittorrent to fix
 			// bad kerning.
 			if (AshExeBaseNameIs(L"qbittorrent.exe")) {

@@ -94,6 +94,8 @@ VOID AshApplyQBittorrentEnvironmentVariableHacks(
 VOID AshApplyPythonEnvironmentVariableHacks(
 	VOID);
 
+VOID AshApplyGitInstallerAvxWorkaround(VOID);
+
 VOID AshApplyNodeJSEnvironmentVariableHacks(
 	VOID);
 

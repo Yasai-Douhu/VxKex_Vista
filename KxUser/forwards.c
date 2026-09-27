@@ -1210,7 +1210,7 @@
 #pragma comment(linker, "/EXPORT:SHGetItemFromObject=shell32.SHGetItemFromObject")
 #pragma comment(linker, "/EXPORT:SHGetKnownFolderIDList=shell32.SHGetKnownFolderIDList")
 #pragma comment(linker, "/EXPORT:SHGetKnownFolderItem=shell32.SHGetKnownFolderItem")
-#pragma comment(linker, "/EXPORT:SHGetKnownFolderPath=shell32.SHGetKnownFolderPath")
+// SHGetKnownFolderPath is implemented in knownfld.c.
 #pragma comment(linker, "/EXPORT:SHGetLocalizedName=shell32.SHGetLocalizedName")
 #pragma comment(linker, "/EXPORT:SHGetMalloc=shell32.SHGetMalloc")
 #pragma comment(linker, "/EXPORT:SHGetNameFromIDList=shell32.SHGetNameFromIDList")
@@ -3496,7 +3496,7 @@
 #pragma comment(linker, "/EXPORT:SHGetItemFromObject=shell32.SHGetItemFromObject")
 #pragma comment(linker, "/EXPORT:SHGetKnownFolderIDList=shell32.SHGetKnownFolderIDList")
 #pragma comment(linker, "/EXPORT:SHGetKnownFolderItem=shell32.SHGetKnownFolderItem")
-#pragma comment(linker, "/EXPORT:SHGetKnownFolderPath=shell32.SHGetKnownFolderPath")
+// SHGetKnownFolderPath is implemented in knownfld.c.
 #pragma comment(linker, "/EXPORT:SHGetLocalizedName=shell32.SHGetLocalizedName")
 #pragma comment(linker, "/EXPORT:SHGetMalloc=shell32.SHGetMalloc")
 #pragma comment(linker, "/EXPORT:SHGetNameFromIDList=shell32.SHGetNameFromIDList")

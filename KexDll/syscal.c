@@ -29,7 +29,11 @@ KEXNTSYSCALLAPI NTSTATUS NTAPI Kex##SyscallName##_Wow64(__VA_ARGS__) { asm { \
 	asm mov ecx, EcxValue \
 	asm lea edx, [esp+4] \
 	asm call fs:0xC0 \
+	/* NT 6.0 WOW64 returns without the extra stack DWORD used by Win7. */ \
+	asm cmp OriginalMinorVersion, 0 \
+	asm je VistaWow64Return \
 	asm add esp, 4 \
+	asm VistaWow64Return: \
 	asm ret Retn \
 }}
 

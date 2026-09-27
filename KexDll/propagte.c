@@ -265,7 +265,7 @@ STATIC VOID KexpCleanupPropagationRemains(
 			// We are 32 bit, WOW64
 			//
 
-			CONST BYTE SyscallTemplate[] = {
+			BYTE SyscallTemplate[] = {
 				0xB8, 0x0F, 0x00, 0x00, 0x00,				// mov eax, 0x0F
 				0x33, 0xC9,									// xor ecx, ecx
 				0x8D, 0x54, 0x24, 0x04,						// lea edx, [esp+4]
@@ -274,6 +274,11 @@ STATIC VOID KexpCleanupPropagationRemains(
 				0xC2, 0x0C, 0x00							// ret 12
 			};
 
+			// Vista's WOW64 transition does not leave the extra stack DWORD
+			// that Windows 7 removes with ADD ESP,4. Keep the return address.
+			if (OriginalMajorVersion == 6 && OriginalMinorVersion == 0) {
+				RtlFillMemory(&SyscallTemplate[sizeof(SyscallTemplate) - 6], 3, 0x90);
+			}
 			RtlCopyMemory(NtOpenKey, SyscallTemplate, sizeof(SyscallTemplate));
 		} else {
 			//
@@ -747,11 +752,18 @@ CreateNativeChild:
 			sizeof(KexpNtOpenKeyHook64_Win7),
 			NULL);
 	} else {
+		BYTE Hook32[sizeof(KexpNtOpenKeyHook32_Win7)];
+		RtlCopyMemory(Hook32, KexpNtOpenKeyHook32_Win7, sizeof(Hook32));
+		// The WOW64 syscall tail differs on NT 6.0. NOP the Win7-only
+		// ADD ESP,4 without changing any relative offsets in the hook.
+		if (OriginalMajorVersion == 6 && OriginalMinorVersion == 0) {
+			RtlFillMemory(&Hook32[sizeof(Hook32) - 6], 3, 0x90);
+		}
 		Status = NtWriteVirtualMemory(
 			*ProcessHandle,
 			RemoteHookBaseAddress,
-			KexpNtOpenKeyHook32_Win7,
-			sizeof(KexpNtOpenKeyHook32_Win7),
+			Hook32,
+			sizeof(Hook32),
 			NULL);
 	}
 
@@ -973,7 +985,8 @@ CreateNativeChild:
 		ULONG_PTR RemotePeb;
 		ULONG_PTR RemoteSubSystemData;
 
-		if (ChildProcessBitness == KexRtlOperatingSystemBitness()) {
+		if (ChildProcessBitness == KexRtlCurrentProcessBitness() ||
+			ChildProcessBitness == KexRtlOperatingSystemBitness()) {
 			PROCESS_BASIC_INFORMATION BasicInformation;
 
 			Status = NtQueryInformationProcess(
@@ -1039,11 +1052,11 @@ CreateNativeChild:
 			goto BailOut;
 		}
 
-		if (KexRtlOperatingSystemBitness() == 32) {
+		if (KexRtlOperatingSystemBitness() == 32 ||
+			(OriginalMajorVersion == 6 && OriginalMinorVersion == 0 && ChildProcessBitness == 32)) {
 			ULONG_PTR RemoteProcessParametersFlags;
 			ULONG ProcessParametersFlags;
 
-			ASSUME (KexRtlCurrentProcessBitness() == 32);
 			ASSUME (ChildProcessBitness == 32);
 
 			//
@@ -1070,7 +1083,9 @@ CreateNativeChild:
 			// builds).
 			//
 
-			RemoteProcessParametersFlags = RemotePeb + FIELD_OFFSET(PEB, ProcessParameters);
+			// Vista WOW64 may skip IFEO before our NtOpenKey hook is called.
+			// Use the target's 32-bit PEB layout even in a 64-bit parent.
+			RemoteProcessParametersFlags = RemotePeb + 0x10;
 
 			Status = NtReadVirtualMemory(
 				*ProcessHandle,
@@ -1094,7 +1109,7 @@ CreateNativeChild:
 			// RTL_USER_PROCESS_PARAMETERS structure within the child process.
 			//
 
-			RemoteProcessParametersFlags += FIELD_OFFSET(RTL_USER_PROCESS_PARAMETERS, Flags);
+			RemoteProcessParametersFlags += 0x08;
 
 			Status = NtReadVirtualMemory(
 				*ProcessHandle,

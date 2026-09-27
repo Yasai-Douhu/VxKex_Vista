@@ -20,6 +20,7 @@ if %errorLevel% neq 0 (
 cd /d "%~dp0"
 set "SCRIPT_DIR=%~dp0"
 set "TARGET_DIR=C:\VxKex"
+set "X86_DLLS=KexDll KxBase KxNt KxAdvapi KxCom KxCrt KxCryp KxDw KxDx KxMi KxNet KxUia KxUser"
 set "CLSID={9AACA888-A5F5-4C01-852E-8A2005C1D45F}"
 
 :: Determine 64-bit System32 directory and Reg command
@@ -56,6 +57,13 @@ echo ========================================================
 echo.
 
 :: 1. Create Target Directory & Copy files
+for %%D in (%X86_DLLS%) do (
+    if not exist "%SCRIPT_DIR%Kex32\%%D.dll" (
+        echo Missing x86 component: Kex32\%%D.dll. Extract the complete package.
+        pause
+        exit /b 1
+    )
+)
 if not exist "%SCRIPT_DIR%KexCfg.exe" (
     echo KexCfg.exe is missing. Extract the complete release before installing.
     pause
@@ -109,6 +117,22 @@ copy /y "%TARGET_DIR%\KexDll.dll" "%SYS32_DIR%\KexDll.dll" >nul
 copy /y "%TARGET_DIR%\Kx*.dll" "%SYS32_DIR%\" >nul
 
 :: 3. Configure VxKex Registry Entries
+:: A WOW64 verifier provider must be x86 and discoverable in SysWOW64.
+if not exist "%TARGET_DIR%\Kex32" mkdir "%TARGET_DIR%\Kex32"
+for %%D in (%X86_DLLS%) do (
+    copy /y "%SCRIPT_DIR%Kex32\%%D.dll" "%TARGET_DIR%\Kex32\%%D.dll" >nul
+    if errorlevel 1 (
+        echo Failed to install x86 %%D.dll. Close 32-bit applications and retry.
+        pause
+        exit /b 1
+    )
+    copy /y "%SCRIPT_DIR%Kex32\%%D.dll" "%windir%\SysWOW64\%%D.dll" >nul
+    if errorlevel 1 (
+        echo Failed to deploy x86 %%D.dll to SysWOW64.
+        pause
+        exit /b 1
+    )
+)
 echo [*] Registering VxKex paths and configuration...
 "%REG_CMD%" add "HKLM\SOFTWARE\VXsoft\VxKex" /v InstalledVersion /t REG_DWORD /d 2147485875 /f >nul
 "%REG_CMD%" add "HKLM\SOFTWARE\VXsoft\VxKex" /v KexDir /t REG_SZ /d "%TARGET_DIR%" /f /reg:64 >nul 2>&1 || "%REG_CMD%" add "HKLM\SOFTWARE\VXsoft\VxKex" /v KexDir /t REG_SZ /d "%TARGET_DIR%" /f >nul
@@ -118,6 +142,13 @@ echo [*] Registering VxKex paths and configuration...
 if not exist "%TARGET_DIR%\Logs" mkdir "%TARGET_DIR%\Logs"
 :: Custom verifier provider only; zero enables Vista's default verifier checks.
 "%REG_CMD%" add "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\{VxKexPropagationVirtualKey}" /v VerifierFlags /t REG_DWORD /d 2147483648 /f >nul
+
+"%windir%\SysWOW64\reg.exe" add "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\{VxKexPropagationVirtualKey}" /v VerifierDlls /t REG_SZ /d KexDll.dll /f >nul
+if errorlevel 1 exit /b 1
+"%windir%\SysWOW64\reg.exe" add "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\{VxKexPropagationVirtualKey}" /v GlobalFlag /t REG_DWORD /d 256 /f >nul
+if errorlevel 1 exit /b 1
+"%windir%\SysWOW64\reg.exe" add "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\{VxKexPropagationVirtualKey}" /v VerifierFlags /t REG_DWORD /d 2147483648 /f >nul
+if errorlevel 1 exit /b 1
 
 :: 4. Register Shell Extension (KexShlEx.dll)
 echo [*] Registering Shell Extension...
@@ -175,6 +206,7 @@ echo [*] Removing VxKex registry entries...
 "%REG_CMD%" delete "HKLM\SOFTWARE\VXsoft\VxKexLdr" /f /reg:64 >nul 2>&1 || "%REG_CMD%" delete "HKLM\SOFTWARE\VXsoft\VxKexLdr" /f >nul 2>&1
 "%REG_CMD%" delete "HKLM\SOFTWARE\VXsoft" /f /reg:64 >nul 2>&1 || "%REG_CMD%" delete "HKLM\SOFTWARE\VXsoft" /f >nul 2>&1
 "%REG_CMD%" delete "HKCU\Software\VXsoft" /f >nul 2>&1
+"%windir%\SysWOW64\reg.exe" delete "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\{VxKexPropagationVirtualKey}" /f >nul 2>&1
 "%REG_CMD%" delete "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\{VxKexPropagationVirtualKey}" /f /reg:64 >nul 2>&1 || "%REG_CMD%" delete "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\{VxKexPropagationVirtualKey}" /f >nul 2>&1
 
 :: 3. Stop explorer.exe to unlock files
@@ -188,6 +220,7 @@ del /f /q "%SYS32_DIR%\KexDll.dll" >nul 2>&1
 del /f /q "%SYS32_DIR%\Kx*.dll" >nul 2>&1
 
 :: 5. Remove Target Directory
+for %%D in (%X86_DLLS%) do del /f /q "%windir%\SysWOW64\%%D.dll" >nul 2>&1
 echo [*] Removing %TARGET_DIR%...
 if exist "%TARGET_DIR%" (
     rmdir /s /q "%TARGET_DIR%" >nul 2>&1

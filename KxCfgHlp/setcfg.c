@@ -36,7 +36,8 @@ STATIC ULONG KxCfgpConfigureVistaLauncher(HKEY Key, PCWSTR Exe, BOOLEAN Enable)
 	LONG Error;
 	OSVERSIONINFOW Version = {sizeof(Version)};
 	RtlGetVersion(&Version);
-	if (!Enable || Version.dwMajorVersion != 6 || Version.dwMinorVersion != 0 || !VistaIsVSCode(Exe))
+	if (!Enable || Version.dwMajorVersion != 6 || Version.dwMinorVersion != 0 ||
+		(!VistaIsVSCode(Exe) && !VistaRequiresSubsystemLauncher(Exe)))
 		return VistaRemoveManagedDebugger(Key);
 	if (!KxCfgGetKexDir(Directory, ARRAYSIZE(Directory))) return GetLastError();
 	if (FAILED(StringCchCat(Directory, ARRAYSIZE(Directory), L"\\VistaRun.exe"))) return ERROR_FILENAME_EXCED_RANGE;
@@ -120,10 +121,7 @@ KXCFGDECLSPEC BOOLEAN KXCFGAPI KxCfgSetConfiguration(
 
 	RtlInitUnicodeString(&ExeFullPathUS, ExeFullPath);
 
-	Status = LdrOpenImageFileOptionsKey(
-		&ExeFullPathUS,
-		FALSE,
-		(PHANDLE) &KeyHandle);
+	Status = KxCfgpOpenIfeoKey(ExeFullPath, &KeyHandle);
 
 	if (!NT_SUCCESS(Status)) {
 		// Probably there is simply no IFEO key for this program.

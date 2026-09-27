@@ -28,7 +28,7 @@ $OUT_DIR = Join-Path $ScriptDirAbs "Win32\Release\KxBase"
 # Import libraries (from VxKex_Vista\00-Import-Libraries)
 $IMPORT_LIBS_DIR = "C:\Users\YamaR\Desktop\AI_Datas\VxKex_Vista\00-Import-Libraries"
 $ntdllLib = Join-Path $IMPORT_LIBS_DIR "ntdll_x86.lib"
-$msvcrtLib = Join-Path $IMPORT_LIBS_DIR "msvcrt_x64.lib"
+$msvcrtLib = Join-Path $IMPORT_LIBS_DIR "msvcrt_x86.lib"
 $kernel32Lib = Join-Path $IMPORT_LIBS_DIR "kernel32_x86.lib"
 $user32Lib = Join-Path $IMPORT_LIBS_DIR "user32_x86.lib"
 
@@ -51,14 +51,14 @@ function Invoke-ClCompile {
     )
     if (-not (Test-Path $OutputDir)) { New-Item -ItemType Directory -Path $OutputDir | Out-Null }
     
-    $includeFlags = @("/I", "`"$HDR_DIR`"")
+    $includeFlags = @("/I", $HDR_DIR)
     $foFlag = "/Fo" + $OutputFile
-    $srcFlag = "`"$SourceFile`""
+    $srcFlag = $SourceFile
     $flags = @("/c", "/O1", "/Os", "/Oy", "/GL", "/Gy", "/Gz", "/MD", "/Zi", "/W3", "/TC", "/GS-") + $Defines + $includeFlags + @($foFlag, $srcFlag)
     $srcName = Split-Path $SourceFile -Leaf
     Write-Host "  Compiling: " $srcName -NoNewline
-    $proc = Start-Process -FilePath "cl.exe" -ArgumentList $flags -NoNewWindow -Wait -PassThru
-    if ($proc.ExitCode -ne 0) {
+    & cl.exe $flags
+    if ($LASTEXITCODE -ne 0) {
         Write-Host " FAILED" -ForegroundColor Red
         return $false
     }
@@ -92,6 +92,7 @@ $kxBaseSrc = @(
     (Join-Path $KXBASE_DIR "stubs.c"),
     (Join-Path $KXBASE_DIR "support.c"),
     (Join-Path $KXBASE_DIR "synch.c"),
+    (Join-Path $KXBASE_DIR "system.c"),
     (Join-Path $KXBASE_DIR "thread.c"),
     (Join-Path $KXBASE_DIR "time.c"),
     (Join-Path $KXBASE_DIR "token.c"),
@@ -128,13 +129,19 @@ Write-Host "[2/2] Linking KxBase.dll..." -ForegroundColor Yellow
 $dllPath = Join-Path $OUT_DIR "KxBase.dll"
 $libPath = Join-Path $OUT_DIR "KxBase.lib"
 $defPath = Join-Path $KXBASE_DIR "kxbase.def"
+$x86Def = [IO.File]::ReadAllText($defPath)
+foreach ($api in @('GetLogicalProcessorInformationEx', 'GetProcessGroupAffinity', 'K32GetProcessMemoryInfo')) {
+    $x86Def = $x86Def -replace "(?m)^\s*$api\s*`$", "`t$api=_${api}@12"
+}
+$defPath = Join-Path $OUT_DIR "kxbase-x86.def"
+[IO.File]::WriteAllText($defPath, $x86Def, [Text.Encoding]::ASCII)
 
-$dllOut = "/OUT:" + "`"$dllPath`""
-$implibOut = "/IMPLIB:" + "`"$libPath`""
-$defOut = "/DEF:" + "`"$defPath`""
+$dllOut = "/OUT:" + "$dllPath"
+$implibOut = "/IMPLIB:" + "$libPath"
+$defOut = "/DEF:" + "$defPath"
 
 $linkArgs = @(
-    "/LIBPATH:`"$($ScriptDirAbs)\00-Import-Libraries`"", "/LIBPATH:`"$SDK70A_LIB`"", "/NOLOGO", "/DLL",
+    "/LIBPATH:$($ScriptDirAbs)\00-Import-Libraries", "/LIBPATH:$SDK70A_LIB", "/NOLOGO", "/DLL",
     $dllOut, $implibOut,
     "/SUBSYSTEM:WINDOWS",
     "/OPT:REF", "/OPT:ICF",
@@ -142,26 +149,26 @@ $linkArgs = @(
     "/ENTRY:DllMain",
     "/LTCG",
     $defOut,
-    "/LIBPATH:`"$IMPORT_LIBS_DIR`"",
-    "/LIBPATH:`"$ScriptDirAbs\Win32DLLs`"",
+    "/LIBPATH:$IMPORT_LIBS_DIR",
+    "/LIBPATH:$ScriptDirAbs\Win32DLLs",
     "KexW32ML.lib"
 )
 
 # Add object files
 foreach ($obj in $kxBaseObj) {
-    $linkArgs += "`"$obj`""
+    $linkArgs += "$obj"
 }
 
 # Add libraries
 $linkArgs += @(
-    "`"$kexDllLib`"",
-    "`"$kexPathCchLib`"",
-    "`"$kexSmpLib`"",
-    "`"$kexMlsLib`"",
-    "`"$ntdllLib`"",
-    "`"$msvcrtLib`"",
-    "`"$kernel32Lib`"",
-    "`"$user32Lib`"",
+    "$kexDllLib",
+    "$kexPathCchLib",
+    "$kexSmpLib",
+    "$kexMlsLib",
+    "$ntdllLib",
+    "$msvcrtLib",
+    "$kernel32Lib",
+    "$user32Lib",
     "advapi32.lib",
     "shlwapi.lib",
     "psapi.lib",
@@ -169,8 +176,8 @@ $linkArgs += @(
 )
 
 Write-Host "  Linking KxBase.dll..." -NoNewline
-$proc = Start-Process -FilePath "link.exe" -ArgumentList $linkArgs -NoNewWindow -Wait -PassThru
-if ($proc.ExitCode -ne 0) {
+& link.exe $linkArgs
+if ($LASTEXITCODE -ne 0) {
     Write-Host " FAILED" -ForegroundColor Red
     Write-Host "" -ForegroundColor Red
     Write-Host "BUILD FAILED" -ForegroundColor Red
@@ -180,6 +187,16 @@ if ($proc.ExitCode -ne 0) {
 Write-Host " OK" -ForegroundColor Green
 
 # Verify output
+$imports = (& dumpbin.exe /imports $dllPath) -join "`n"
+if ($LASTEXITCODE -ne 0) { throw 'Cannot inspect KxBase imports' }
+if ($imports -match '\b(K32GetProcessMemoryInfo|GetProcessGroupAffinity|GetLogicalProcessorInformationEx)\b') {
+    throw 'Vista compatibility implementation was replaced by an OS import'
+}
+$exports = (& dumpbin.exe /exports $dllPath) -join "`n"
+if ($LASTEXITCODE -ne 0) { throw 'Cannot inspect KxBase exports' }
+foreach ($api in @('GetLogicalProcessorInformationEx', 'GetProcessGroupAffinity', 'K32GetProcessMemoryInfo')) {
+    if ($exports -notmatch "(?m)\s$api\s*`$") { throw "Missing undecorated export: $api" }
+}
 if (Test-Path $dllPath) {
     $dllItem = Get-Item $dllPath
     $dllSizeKB = [math]::Round($dllItem.Length / 1KB, 2)

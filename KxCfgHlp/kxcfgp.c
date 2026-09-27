@@ -97,6 +97,40 @@ BOOLEAN KxCfgpRemoveKexDllFromVerifierDlls(
 	return TRUE;
 }
 
+// Vista redirects IFEO for WOW64; select the target image's registry view.
+REGSAM KxCfgpIfeoView(PCWSTR ExeFullPath)
+{
+    OSVERSIONINFOW Version = {sizeof(Version)};
+    DWORD BinaryType;
+    RtlGetVersion(&Version);
+    if (Version.dwMajorVersion == 6 && Version.dwMinorVersion == 0 &&
+        GetBinaryTypeW(ExeFullPath, &BinaryType) && BinaryType == SCS_32BIT_BINARY)
+        return KEY_WOW64_32KEY;
+    return KEY_WOW64_64KEY;
+}
+
+NTSTATUS KxCfgpOpenIfeoKey(PCWSTR ExeFullPath, PHKEY KeyHandle)
+{
+    UNICODE_STRING Name;
+    HKEY Base;
+    LONG Error;
+    if (KxCfgpIfeoView(ExeFullPath) != KEY_WOW64_32KEY) {
+        RtlInitUnicodeString(&Name, ExeFullPath);
+        return LdrOpenImageFileOptionsKey(&Name, FALSE, (PHANDLE)KeyHandle);
+    }
+    Error = RegOpenKeyExW(HKEY_LOCAL_MACHINE,
+        L"Software\\Microsoft\\Windows NT\\CurrentVersion\\Image File Execution Options",
+        0, KEY_READ | KEY_WOW64_32KEY, &Base);
+    if (Error == ERROR_SUCCESS) {
+        Error = RegOpenKeyExW(Base, PathFindFileName(ExeFullPath), 0,
+            KEY_READ | KEY_WOW64_32KEY, KeyHandle);
+        RegCloseKey(Base);
+    }
+    if (Error == ERROR_SUCCESS) return STATUS_SUCCESS;
+    if (Error == ERROR_FILE_NOT_FOUND) return STATUS_OBJECT_NAME_NOT_FOUND;
+    return STATUS_ACCESS_DENIED;
+}
+
 BOOLEAN KxCfgpCreateIfeoKeyForProgram(
 	IN	PCWSTR	ExeFullPath,
 	OUT	PHKEY	KeyHandle,
@@ -129,7 +163,7 @@ BOOLEAN KxCfgpCreateIfeoKeyForProgram(
 		L"Software\\Microsoft\\Windows NT\\CurrentVersion\\"
 		L"Image File Execution Options",
 		0,
-		KEY_READ | KEY_WRITE | KEY_WOW64_64KEY,
+		KEY_READ | KEY_WRITE | KxCfgpIfeoView(ExeFullPath),
 		&IfeoBaseKey);
 
 	if (ErrorCode == ERROR_FILE_NOT_FOUND) {
@@ -140,7 +174,7 @@ BOOLEAN KxCfgpCreateIfeoKeyForProgram(
 			0,
 			NULL,
 			0,
-			KEY_READ | KEY_WRITE | KEY_WOW64_64KEY,
+			KEY_READ | KEY_WRITE | KxCfgpIfeoView(ExeFullPath),
 			NULL,
 			&IfeoBaseKey,
 			NULL);
@@ -171,7 +205,7 @@ BOOLEAN KxCfgpCreateIfeoKeyForProgram(
 			0,
 			NULL,
 			0,
-			KEY_READ | KEY_WRITE | KEY_WOW64_64KEY,
+			KEY_READ | KEY_WRITE | KxCfgpIfeoView(ExeFullPath),
 			NULL,
 			&IfeoExeKey,
 			NULL,
@@ -184,7 +218,7 @@ BOOLEAN KxCfgpCreateIfeoKeyForProgram(
 			0,
 			NULL,
 			0,
-			KEY_READ | KEY_WRITE | KEY_WOW64_64KEY,
+			KEY_READ | KEY_WRITE | KxCfgpIfeoView(ExeFullPath),
 			NULL,
 			&IfeoExeKey,
 			NULL);

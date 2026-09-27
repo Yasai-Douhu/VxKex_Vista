@@ -165,6 +165,9 @@ KXCFGDECLSPEC BOOLEAN KXCFGAPI KxCfgEnableLegacyKxSChanlSsp(
 BOOLEAN KxCfgpRemoveKexDllFromVerifierDlls(
 	IN	PWSTR	VerifierDlls);
 
+REGSAM KxCfgpIfeoView(PCWSTR ExeFullPath);
+NTSTATUS KxCfgpOpenIfeoKey(PCWSTR ExeFullPath, PHKEY KeyHandle);
+
 BOOLEAN KxCfgpCreateIfeoKeyForProgram(
 	IN	PCWSTR	ExeFullPath,
 	OUT	PHKEY	KeyHandle,

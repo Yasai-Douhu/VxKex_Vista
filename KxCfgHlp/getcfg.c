@@ -62,10 +62,7 @@ KXCFGDECLSPEC BOOLEAN KXCFGAPI KxCfgGetConfiguration(
 
 	RtlInitUnicodeString(&ExeFullPathUS, ExeFullPath);
 	
-	Status = LdrOpenImageFileOptionsKey(
-		&ExeFullPathUS,
-		FALSE,
-		(PHANDLE) &KeyHandle);
+	Status = KxCfgpOpenIfeoKey(ExeFullPath, &KeyHandle);
 
 	if (!NT_SUCCESS(Status)) {
 		SetLastError(RtlNtStatusToDosError(Status));

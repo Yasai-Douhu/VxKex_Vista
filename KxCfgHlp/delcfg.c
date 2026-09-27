@@ -96,7 +96,7 @@ KXCFGDECLSPEC BOOLEAN KxCfgDeleteConfiguration(
 			L"Software\\Microsoft\\Windows NT\\CurrentVersion\\"
 			L"Image File Execution Options",
 			0,
-			KEY_ENUMERATE_SUB_KEYS | KEY_WOW64_64KEY,
+			KEY_ENUMERATE_SUB_KEYS | KxCfgpIfeoView(ExeFullPath),
 			&IfeoBaseKey);
 		if (ErrorCode == ERROR_FILE_NOT_FOUND) {
 			return TRUE;
@@ -109,7 +109,7 @@ KXCFGDECLSPEC BOOLEAN KxCfgDeleteConfiguration(
 			IfeoBaseKey,
 			PathFindFileName(ExeFullPath),
 			0,
-			KEY_READ | KEY_WOW64_64KEY,
+			KEY_READ | KxCfgpIfeoView(ExeFullPath),
 			&IfeoKeyHandle);
 		if (ErrorCode == ERROR_FILE_NOT_FOUND) {
 			RegCloseKey(IfeoBaseKey);

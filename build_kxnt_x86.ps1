@@ -92,7 +92,7 @@ $defPath = Join-Path $KXNT_DIR "KxNt.def"
 # Import libraries (from VxKex_Vista\00-Import-Libraries)
 $IMPORT_LIBS_DIR = "C:\Users\YamaR\Desktop\AI_Datas\VxKex_Vista\00-Import-Libraries"
 $ntdllLib = Join-Path $IMPORT_LIBS_DIR "ntdll_x86.lib"
-$msvcrtLib = Join-Path $IMPORT_LIBS_DIR "msvcrt_x64.lib"
+$msvcrtLib = Join-Path $IMPORT_LIBS_DIR "msvcrt_x86.lib"
 $kernel32Lib = Join-Path $IMPORT_LIBS_DIR "kernel32_x86.lib"
 $user32Lib = Join-Path $IMPORT_LIBS_DIR "user32_x86.lib"
 

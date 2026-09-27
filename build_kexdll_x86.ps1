@@ -1,3 +1,4 @@
+param([string]$OutputDirectory = "Win32\Release\KexDll")
 $ErrorActionPreference = "Stop"
 
 $ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
@@ -14,7 +15,7 @@ $env:LIB = "$SDK70A_LIB;C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\l
 $ScriptDirAbs = (Get-Item $ScriptDir).FullName
 $HDR_DIR = Join-Path $ScriptDirAbs "00-Common-Headers"
 $SRC_DIR = Join-Path $ScriptDirAbs "KexDll"
-$OUT_DIR = Join-Path $ScriptDirAbs "Win32\Release\KexDll"
+$OUT_DIR = Join-Path $ScriptDirAbs $OutputDirectory
 
 if (-not (Test-Path $OUT_DIR)) { New-Item -ItemType Directory -Path $OUT_DIR | Out-Null }
 
@@ -29,7 +30,7 @@ foreach ($src in $cFiles) {
     $objFile = Join-Path $OUT_DIR "$baseName.obj"
     $objFiles += "`"$objFile`""
     
-    $flags = @("/c", "/O1", "/Os", "/Oy", "/GL", "/Gy", "/Gz", "/MD", "/Zi", "/W3", "/TC", "/GS-") + $defines + $includeFlags + @("/Fo$objFile", "`"$src`"")
+    $flags = @("/c", "/O1", "/Os", "/Oy", "/GL", "/Gy", "/Gz", "/MD", "/Z7", "/W3", "/TC", "/GS-") + $defines + $includeFlags + @("/Fo$objFile", "`"$src`"")
     # Write-Host "Compiling $baseName.c..."
     & "cl.exe" @flags
     if ($LASTEXITCODE -ne 0) { exit 1 }

@@ -2,6 +2,7 @@ LIBRARY "KexDll.dll"
 EXPORTS
 	KexDataInitialize
 	KexInitializePropagation
+	KexGetPropagationStatus
 	KexDllProtectedFunctionExceptionFilter
 	
 	KexRtlOperatingSystemBitness

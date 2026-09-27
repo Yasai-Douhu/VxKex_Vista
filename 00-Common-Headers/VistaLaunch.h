@@ -3,6 +3,34 @@
 // command-line switches to arbitrary executables with the same filename.
 #include <windows.h>
 #include <winver.h>
+// A newer PE subsystem requirement is checked before verifier injection.
+// These fields have identical offsets in PE32 and PE32+ optional headers.
+static BOOL VistaRequiresSubsystemLauncher(PCWSTR path) {
+    HANDLE file;
+    IMAGE_DOS_HEADER dos;
+    IMAGE_NT_HEADERS32 nt;
+    DWORD count;
+    BOOL match = FALSE;
+    file = CreateFileW(path, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_DELETE,
+        NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+    if (file == INVALID_HANDLE_VALUE) return FALSE;
+    if (ReadFile(file, &dos, sizeof(dos), &count, NULL) && count == sizeof(dos) &&
+        dos.e_magic == IMAGE_DOS_SIGNATURE && dos.e_lfanew > 0 && dos.e_lfanew <= 0x1000 &&
+        SetFilePointer(file, dos.e_lfanew, NULL, FILE_BEGIN) != INVALID_SET_FILE_POINTER &&
+        ReadFile(file, &nt, sizeof(nt), &count, NULL) && count == sizeof(nt)) {
+        match = nt.Signature == IMAGE_NT_SIGNATURE &&
+            ((nt.FileHeader.Machine == IMAGE_FILE_MACHINE_I386 &&
+              nt.OptionalHeader.Magic == IMAGE_NT_OPTIONAL_HDR32_MAGIC) ||
+             (nt.FileHeader.Machine == IMAGE_FILE_MACHINE_AMD64 &&
+              nt.OptionalHeader.Magic == IMAGE_NT_OPTIONAL_HDR64_MAGIC)) &&
+            nt.FileHeader.SizeOfOptionalHeader >= sizeof(IMAGE_OPTIONAL_HEADER32) &&
+            (nt.OptionalHeader.MajorSubsystemVersion > 6 ||
+             (nt.OptionalHeader.MajorSubsystemVersion == 6 &&
+              nt.OptionalHeader.MinorSubsystemVersion > 0));
+    }
+    CloseHandle(file);
+    return match;
+}
 static BOOL VistaIsVSCode(PCWSTR path) {
     DWORD ignored, size = GetFileVersionInfoSizeW(path, &ignored);
     void *data; WCHAR *name; UINT length, translationsSize, i;
