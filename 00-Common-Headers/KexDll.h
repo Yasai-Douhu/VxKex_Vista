@@ -90,6 +90,7 @@
 #define KEXDATA_FLAG_KB2533623_PRESENT		64	// Indicates the DllDirectory APIs are available
 #define KEXDATA_FLAG_FIREFOX				128	// This is a Firefox-based application (Firefox, Thunderbird, etc.)
 #define KEXDATA_FLAG_DOTNET					256	// Indicates a .NET application.
+#define KEXDATA_FLAG_INNO_SETUP			512	// Inno Setup resource attribution detected on NT 6.0.
 
 #define KEX_STRONGSPOOF_SHAREDUSERDATA	1
 #define KEX_STRONGSPOOF_REGISTRY		2

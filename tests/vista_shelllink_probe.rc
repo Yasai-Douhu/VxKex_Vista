@@ -1,0 +1,6 @@
+// Synthetic fixture for the Inno resource-attribution detector.
+// This deliberately has no COMCTL32 imports: detection must not depend on them.
+1 RCDATA
+BEGIN
+    L"This installation was built with Inno Setup.\0"
+END

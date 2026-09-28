@@ -1,5 +1,6 @@
 LIBRARY KxBase	
 EXPORTS
+	SetWaitableTimerEx = Ext_SetWaitableTimerEx
 	;;
 	;; VxKex New Functions
 	;;

@@ -1,6 +1,31 @@
 #include "buildcfg.h"
 #include "kxbasep.h"
 
+// Windows 7 added wake reasons and timer coalescing. Vista can still deliver
+// the timer/APC through SetWaitableTimer; not coalescing stays within the
+// caller's permitted delay. Preserve the full API on systems which have it.
+KXBASEAPI BOOL WINAPI Ext_SetWaitableTimerEx(
+	IN HANDLE Timer,
+	IN CONST LARGE_INTEGER *DueTime,
+	IN LONG Period,
+	IN PTIMERAPCROUTINE CompletionRoutine OPTIONAL,
+	IN PVOID CompletionArgument OPTIONAL,
+	IN PVOID WakeContext OPTIONAL,
+	IN ULONG TolerableDelay)
+{
+	typedef BOOL (WINAPI *PSET_TIMER_EX)(HANDLE, CONST LARGE_INTEGER *, LONG,
+		PTIMERAPCROUTINE, PVOID, PVOID, ULONG);
+	PSET_TIMER_EX Native;
+	Native = (PSET_TIMER_EX) GetProcAddress(GetModuleHandleW(L"kernel32.dll"),
+		"SetWaitableTimerEx");
+	if (Native) {
+		return Native(Timer, DueTime, Period, CompletionRoutine,
+			CompletionArgument, WakeContext, TolerableDelay);
+	}
+	return SetWaitableTimer(Timer, DueTime, Period, CompletionRoutine,
+		CompletionArgument, WakeContext != NULL);
+}
+
 //
 // If strong SharedUserData spoofing is enabled, this function
 // supersedes KernelBase!GetSystemTimeAsFileTime because the original

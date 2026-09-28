@@ -336,8 +336,7 @@
 #pragma comment(linker, "/EXPORT:WSASetLastError=ws2_32.WSASetLastError,@112")
 #pragma comment(linker, "/EXPORT:WSASetServiceA=ws2_32.WSASetServiceA,@97")
 #pragma comment(linker, "/EXPORT:WSASetServiceW=ws2_32.WSASetServiceW,@98")
-#pragma comment(linker, "/EXPORT:WSASocketA=ws2_32.WSASocketA,@99")
-#pragma comment(linker, "/EXPORT:WSASocketW=ws2_32.WSASocketW,@100")
+// WSASocketA/W are implemented in winsock.c for Vista's missing no-inherit flag.
 #pragma comment(linker, "/EXPORT:WSAStartup=ws2_32.WSAStartup,@115")
 #pragma comment(linker, "/EXPORT:WSAStringToAddressA=ws2_32.WSAStringToAddressA,@117")
 #pragma comment(linker, "/EXPORT:WSAStringToAddressW=ws2_32.WSAStringToAddressW,@118")

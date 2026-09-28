@@ -453,6 +453,43 @@ KXBASEAPI BOOL WINAPI Ext_SetDefaultDllDirectories(
 {
 	STATIC BOOL (WINAPI *SetDefaultDllDirectories) (ULONG) = NULL;
 
+	// Inno's SafeDLLPath skips this API on Vista: enabling it breaks native
+	// CoCreateInstance(CLSID_ShellLink) with E_INVALIDARG. Version spoofing
+	// bypasses that check. Restore its legacy SetDllDirectory("") + absolute
+	// system-DLL preload fallback here: newer Inno versions removed it.
+	// Do not weaken DLL-search policy for unrelated applications.
+	if (OriginalMajorVersion == 6 && OriginalMinorVersion == 0 &&
+		(KexData->Flags & KEXDATA_FLAG_INNO_SETUP) &&
+		!KexData->IfeoParameters.DisableAppSpecific &&
+		DirectoryFlags == LOAD_LIBRARY_SEARCH_SYSTEM32) {
+		static const PCWSTR Preload[] = {
+			L"uxtheme.dll", L"userenv.dll", L"setupapi.dll", L"apphelp.dll",
+			L"propsys.dll", L"dwmapi.dll", L"cryptbase.dll", L"oleacc.dll",
+			L"version.dll", L"profapi.dll", L"comres.dll", L"clbcatq.dll", L"ntmarta.dll"
+		};
+		WCHAR SystemDirectory[MAX_PATH], Path[MAX_PATH];
+		ULONG Length, Index;
+
+		if (!SetDllDirectoryW(L"")) return FALSE;
+		Length = GetSystemDirectoryW(SystemDirectory, ARRAYSIZE(SystemDirectory));
+		if (!Length || Length >= ARRAYSIZE(SystemDirectory)) {
+			SetLastError(ERROR_INSUFFICIENT_BUFFER);
+			return FALSE;
+		}
+		for (Index = 0; Index < ARRAYSIZE(Preload); ++Index) {
+			if (SUCCEEDED(StringCchPrintfW(Path, ARRAYSIZE(Path), L"%s\\%s",
+				SystemDirectory, Preload[Index]))) {
+				// Optional DLLs may not exist on every servicing level. Match
+				// Inno's best-effort preloads and keep successful loads resident.
+				LoadLibraryW(Path);
+			}
+		}
+		// The requested search policy was not installed. Older Inno builds
+		// also run their own fallback when they receive this honest failure.
+		SetLastError(ERROR_NOT_SUPPORTED);
+		return FALSE;
+	}
+
 	BasepGetDllDirectoryProcedure("SetDefaultDllDirectories", (PPVOID) &SetDefaultDllDirectories);
 
 	DirectoryFlags |= LOAD_LIBRARY_SEARCH_USER_DIRS;

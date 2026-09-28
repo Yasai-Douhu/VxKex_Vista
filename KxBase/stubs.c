@@ -50,6 +50,17 @@ KXBASEAPI FARPROC WINAPI Stub_GetProcAddress(
 	IN	HMODULE		ModuleHandle,
 	IN	PCSTR		ProcedureName)
 {
+	// Inno's SafeDLLPath can obtain the native kernel32 handle on Vista.
+	// Route this dynamic lookup through the same profile as a static import.
+	if (OriginalMajorVersion == 6 && OriginalMinorVersion == 0 && KexData &&
+		(KexData->Flags & KEXDATA_FLAG_INNO_SETUP) &&
+		!KexData->IfeoParameters.DisableAppSpecific &&
+		ModuleHandle && ModuleHandle == KexData->BaseDllBase &&
+		(ULONG_PTR) ProcedureName > 0xffff &&
+		!strcmp(ProcedureName, "SetDefaultDllDirectories")) {
+		return (FARPROC) Ext_SetDefaultDllDirectories;
+	}
+
 	// Vista exposes this API, but lacks the per-user Programs folder IDs.
 	// Some applications obtain the native shell handle without DLL rewriting.
 	if (OriginalMajorVersion == 6 && OriginalMinorVersion == 0 &&

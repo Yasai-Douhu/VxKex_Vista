@@ -91,6 +91,9 @@ STATIC VOID AshpApplyInnoControlsProfile(VOID)
 		if (!memcmp(Image+Rva+Offset,Marker,sizeof(Marker))) { Found=TRUE; break; }
 	}
 	if (!Found) return;
+	// Record detection independently of the controls import/thunk layout.
+	// KxBase uses this to preserve Inno's Vista DLL-search fallback.
+	KexData->Flags |= KEXDATA_FLAG_INNO_SETUP;
 	Rva = Nt->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_IMPORT].VirtualAddress;
 	Length = Nt->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_IMPORT].Size;
 	if (!Rva || Rva>=Size || Length>Size-Rva) return;

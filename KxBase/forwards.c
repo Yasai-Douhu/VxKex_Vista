@@ -1193,7 +1193,7 @@
 #pragma comment(linker, "/EXPORT:SetVolumeMountPointA=kernel32.SetVolumeMountPointA")
 #pragma comment(linker, "/EXPORT:SetVolumeMountPointW=kernel32.SetVolumeMountPointW")
 #pragma comment(linker, "/EXPORT:SetWaitableTimer=kernel32.SetWaitableTimer")
-#pragma comment(linker, "/EXPORT:SetWaitableTimerEx=kernel32.SetWaitableTimerEx")
+// SetWaitableTimerEx is implemented in time.c for NT 6.0.
 #pragma comment(linker, "/EXPORT:SetXStateFeaturesMask=kernel32.SetXStateFeaturesMask")
 #pragma comment(linker, "/EXPORT:SetupComm=kernel32.SetupComm")
 #pragma comment(linker, "/EXPORT:ShowConsoleCursor=kernel32.ShowConsoleCursor")

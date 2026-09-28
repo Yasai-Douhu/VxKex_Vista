@@ -16,6 +16,8 @@ EXPORTS
 	WinHttpFreeProxyResult
 
 	;; winsock.c
+	WSASocketA = Ext_WSASocketA @99
+	WSASocketW = Ext_WSASocketW @100
 	GetHostNameW
 	getaddrinfo = Ext_getaddrinfo
 	GetAddrInfoExCancel

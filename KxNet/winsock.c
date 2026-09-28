@@ -2,6 +2,51 @@
 #include "kxnetp.h"
 #include <WS2tcpip.h>
 
+#ifndef WSA_FLAG_NO_HANDLE_INHERIT
+#define WSA_FLAG_NO_HANDLE_INHERIT 0x80
+#endif
+
+STATIC BOOL NetpEmulateNoInherit(IN DWORD Flags)
+{
+	ULONG Major, Minor, Build;
+	if (!(Flags & WSA_FLAG_NO_HANDLE_INHERIT)) return FALSE;
+	KexRtlGetNtVersionNumbers(&Major, &Minor, &Build);
+	return Major == 6 && Minor == 0;
+}
+
+STATIC SOCKET NetpSetSocketNoInherit(IN SOCKET Socket)
+{
+	if (Socket != INVALID_SOCKET &&
+		!SetHandleInformation((HANDLE) Socket, HANDLE_FLAG_INHERIT, 0)) {
+		DWORD Error = GetLastError();
+		// Never return an inheritable socket when the caller prohibited it.
+		closesocket(Socket);
+		WSASetLastError(Error);
+		return INVALID_SOCKET;
+	}
+	return Socket;
+}
+
+KXNETAPI SOCKET WSAAPI Ext_WSASocketW(
+	IN INT Family, IN INT Type, IN INT Protocol,
+	IN LPWSAPROTOCOL_INFOW ProtocolInfo OPTIONAL, IN GROUP Group, IN DWORD Flags)
+{
+	BOOL Emulate = NetpEmulateNoInherit(Flags);
+	SOCKET Socket = WSASocketW(Family, Type, Protocol, ProtocolInfo, Group,
+		Emulate ? (Flags & ~WSA_FLAG_NO_HANDLE_INHERIT) : Flags);
+	return Emulate ? NetpSetSocketNoInherit(Socket) : Socket;
+}
+
+KXNETAPI SOCKET WSAAPI Ext_WSASocketA(
+	IN INT Family, IN INT Type, IN INT Protocol,
+	IN LPWSAPROTOCOL_INFOA ProtocolInfo OPTIONAL, IN GROUP Group, IN DWORD Flags)
+{
+	BOOL Emulate = NetpEmulateNoInherit(Flags);
+	SOCKET Socket = WSASocketA(Family, Type, Protocol, ProtocolInfo, Group,
+		Emulate ? (Flags & ~WSA_FLAG_NO_HANDLE_INHERIT) : Flags);
+	return Emulate ? NetpSetSocketNoInherit(Socket) : Socket;
+}
+
 //
 // libuv (which is used by some random node.js package that a lot of electron
 // apps, such as VSCode, Signal, etc.) depends on GetHostNameW and will shit
