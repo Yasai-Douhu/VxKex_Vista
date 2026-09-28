@@ -1,19 +1,12 @@
-# VxKex Vista 1.2.0.2230
+更新内容
 
-Compatibility milestone for Windows Vista and Windows Server 2008.
+- Windows Vista の強いバージョン偽装時に `GetTickCount` / `GetTickCount64` が停止し、Inno Setup のUAC起動が待機し続ける問題を修正しました。QPCを利用した互換タイマーを追加しています。
+- `VistaRun.exe` が対象プロセス終了前に終了し、Inno Setup のSpawnServer通信が切れる問題を修正しました。
+- x86/x64 Installer バイナリを再ビルド・更新しました。
 
-### Key Changes in this Release:
+検証
 
-- **Obsidian & Electron Application Support**:
-  - Implemented `ChangeWindowMessageFilterEx` in `KxUser`, safely mapping to process-wide UIPI message filters on NT 6.0.
-  - Extended `VistaLaunch` and `VistaRun` with Electron launch profile detection to support Obsidian alongside VS Code.
+- Vista VMでGit 2.55.0.5を通常起動し、UAC承認後にセットアップ画面が表示されることを確認しました。
+- x86/x64の強いバージョン偽装タイマープローブが成功しています。
 
-- **Inno Setup Shortcut Creation**:
-  - Fixed `IShellLink` COM interface interception on Vista for modern Inno Setup installers, resolving shortcut generation issues.
-
-- **Sublime Text 4 & Python 3.14 Networking**:
-  - Implemented missing timer APIs (`QueryInterruptTime` / unbiased time) in `KxBase`.
-  - Added `WSARecvMsg` compatibility shims in `KxNet` for Python 3.14 socket operations used by Package Control.
-
-- **Installer Enhancement**:
-  - Added `[2] Update VxKex` option in `install.bat` to allow seamless in-place updating of existing VxKex installations while preserving custom application compatibility configurations.
+SHA-256は同梱の `VxKex_Vista-1.2.0.2230-SHA256.txt` を参照してください。
