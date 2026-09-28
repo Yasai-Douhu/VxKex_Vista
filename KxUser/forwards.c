@@ -42,7 +42,7 @@
 #pragma comment(linker, "/EXPORT:ChangeMenuA=user32.ChangeMenuA")
 #pragma comment(linker, "/EXPORT:ChangeMenuW=user32.ChangeMenuW")
 #pragma comment(linker, "/EXPORT:ChangeWindowMessageFilter=user32.ChangeWindowMessageFilter")
-#pragma comment(linker, "/EXPORT:ChangeWindowMessageFilterEx=user32.ChangeWindowMessageFilterEx")
+// ChangeWindowMessageFilterEx is implemented in window.c.
 #pragma comment(linker, "/EXPORT:CharLowerA=user32.CharLowerA")
 #pragma comment(linker, "/EXPORT:CharLowerBuffA=user32.CharLowerBuffA")
 #pragma comment(linker, "/EXPORT:CharLowerBuffW=user32.CharLowerBuffW")
@@ -2327,7 +2327,7 @@
 #pragma comment(linker, "/EXPORT:ChangeMenuA=user32.ChangeMenuA")
 #pragma comment(linker, "/EXPORT:ChangeMenuW=user32.ChangeMenuW")
 #pragma comment(linker, "/EXPORT:ChangeWindowMessageFilter=user32.ChangeWindowMessageFilter")
-#pragma comment(linker, "/EXPORT:ChangeWindowMessageFilterEx=user32.ChangeWindowMessageFilterEx")
+// ChangeWindowMessageFilterEx is implemented in window.c.
 #pragma comment(linker, "/EXPORT:CharLowerA=user32.CharLowerA")
 #pragma comment(linker, "/EXPORT:CharLowerBuffA=user32.CharLowerBuffA")
 #pragma comment(linker, "/EXPORT:CharLowerBuffW=user32.CharLowerBuffW")

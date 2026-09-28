@@ -56,7 +56,7 @@ void mainCRTStartup(void) {
     if (*args == L'"') { if (n < 2) fail(L"Application path", ERROR_INVALID_PARAMETER); n -= 2; }
     if (n >= MAX_PATH) fail(L"Application path", ERROR_FILENAME_EXCED_RANGE);
     { UINT i; WCHAR *start = args + (*args == L'"'); for(i = 0; i < n; ++i) target[i] = start[i]; target[n] = 0; }
-    code = ifeo && VistaIsVSCode(target);
+    code = ifeo && VistaUsesElectronLaunchProfile(target);
     length = GetSystemDirectoryW(dllPath, MAX_PATH);
     if (!length || length + 12 >= MAX_PATH) fail(L"GetSystemDirectory", GetLastError());
     lstrcatW(dllPath, L"\\KexDll.dll");

@@ -31,7 +31,7 @@ static BOOL VistaRequiresSubsystemLauncher(PCWSTR path) {
     CloseHandle(file);
     return match;
 }
-static BOOL VistaIsVSCode(PCWSTR path) {
+static BOOL VistaHasProductName(PCWSTR path, PCWSTR productName) {
     DWORD ignored, size = GetFileVersionInfoSizeW(path, &ignored);
     void *data; WCHAR *name; UINT length, translationsSize, i;
     struct TRANSLATION { WORD language, codepage; } *translations;
@@ -45,11 +45,19 @@ static BOOL VistaIsVSCode(PCWSTR path) {
             wsprintfW(query, L"\\StringFileInfo\\%04x%04x\\ProductName",
                 translations[i].language, translations[i].codepage);
             if (VerQueryValueW(data, query, (void **)&name, &length) && length &&
-                !lstrcmpW(name, L"Visual Studio Code")) { match = TRUE; break; }
+                !lstrcmpW(name, productName)) { match = TRUE; break; }
         }
     }
     HeapFree(GetProcessHeap(), 0, data);
     return match;
+}
+
+static BOOL VistaIsVSCode(PCWSTR path) {
+    return VistaHasProductName(path, L"Visual Studio Code");
+}
+
+static BOOL VistaUsesElectronLaunchProfile(PCWSTR path) {
+    return VistaIsVSCode(path) || VistaHasProductName(path, L"Obsidian");
 }
 
 // Delete only the exact launch command that we own. A replacement debugger
