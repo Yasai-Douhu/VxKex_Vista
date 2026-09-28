@@ -8,7 +8,7 @@
 **VxKex_Vista** は、[YuZhouRen86 氏による VxKex-NEXT](https://github.com/YuZhouRen86/VxKex-NEXT) をベースとし、**Windows Vista SP2** および **Windows Server 2008 SP2 (NT 6.0)** 向けに特化移植・機能拡張を行った API 拡張・互換性レイヤー (Compatibility Layer) です。
 
 - 本来 Windows 7 / 8 / 8.1 / 10 / 11 専用となっているモダンなアプリケーションを、Windows Vista / Server 2008 環境上で動作可能にします。
-- 本プロジェクトは試験段階であるため、安定動作しない可能性があります。インストールは自己責任でお願いします。
+- **本プロジェクトは試験段階であるため、安定動作しない可能性があります。インストールは自己責任でお願いします。**
 - 現在のリリースでは x64版のファイルのみが同梱されています。
 
 ---
@@ -17,7 +17,7 @@
 
 ### 1. 🚀 モダンアプリケーションの実行サポート
 - Windows 7 以降で追加された Win32 API / NT Native API をエミュレート・スタブ実装・安全に転送。
-- 新しいランタイム（Visual C++ 再頒布可能パッケージ等）や Chromium ベースのアプリ、最新のユーティリティなどの動作を可能にします。
+- 特定のモダンアプリケーション や Chromium ベースのアプリ、最新のユーティリティなどの動作を可能にします。
 
 ### 2. 🎭 柔軟な OS バージョン偽装 (OS Version Spoofing)
 - アプリケーションが `GetVersion`, `GetVersionEx`, `RtlGetVersion` を呼び出した際に、任意の OS バージョンとして応答させることができます。
@@ -31,17 +31,13 @@
 
 ### 3. 🖱️ エクスプローラー右クリック「プロパティ」統合 (KexShlEx)
 - 実行ファイル (`.exe`) やショートカット (`.lnk`) の右クリックメニューから「プロパティ」を開くと、専用の **「VxKex」タブ** が追加されます。
-- GUI から直感的に「VxKex の有効化」「偽装する OS バージョンの選択」「拡張オプションの切り替え」が可能です。
+- GUI から「VxKex の有効化」「偽装する OS バージョンの選択」「拡張オプションの切り替え」が可能です。
 
-### 4. 🎯 スタンドアロン・ローダー (VxKexLdr)(開発中)
-- レジストリ (IFEO) を変更することなく、手軽に VxKex 互換レイヤーを適用して起動できる `VxKexLdr.exe` を提供。
-- 実行ファイルを `VxKexLdr.exe` にドラッグ＆ドロップするか、コマンドラインから指定するだけで即座にテスト起動できます。
-
-### 5. 🔄 子プロセスへの自動伝播 (Process Propagation)
+### 4. 🔄 子プロセスへの自動伝播 (Process Propagation)
 - 親プロセスから起動された子プロセス（インストーラから起動される本体、ランチャーから起動されるゲーム、ブラウザのマルチプロセスなど）に対しても、自動的に VxKex のフックと互換レイヤーが引き継がれます。
 - `NtCreateUserProcess` および `NtOpenKey` のインテリジェントなインターセプトにより、シームレスなマルチプロセス動作を実現しています。
 
-### 6. ⚙️ Windows Vista (NT 6.0) 特化のアーキテクチャ最適化
+### 5. ⚙️ Windows Vista (NT 6.0) 特化のアーキテクチャ最適化
 - **`kernelbase.dll` 不在への完全対応**: Windows 7 以降で導入された `kernelbase.dll` は Vista には存在しません。VxKex_Vista ではエクスポート転送定義を Vista ネイティブの `kernel32.dll` / `advapi32.dll` へ再ルーティングし、クラッシュを防ぎます。
 - **x64 / x86 (WOW64) の安定動作**: 64-bit OS 上の 64-bit ネイティブアプリおよび 32-bit (WOW64) アプリの双方で正確なローダーフックと初期化判定を行います。
 - **多岐にわたる拡張レイヤー**:
@@ -59,16 +55,21 @@
   - `KxSChanl` (Schannel 拡張)
   - `KxUia` (UI Automation 拡張)
 
-### 7. 🌐 多言語 UI サポート
-- 日本語をはじめとする多言語リソースに対応しています。
+### 6. 現在動作が確認されているアプリケーション (2026/09/28 時点)
+- Sublime Text Build 4213
+- Notepad++ (Version 8.9.7)
+- Visual Studio Code (Version 1.139.1)
+- Obsidian (Version 1.13.7)
+- Git (Version version 2.55.0.windows.5)
+
 
 ---
 
 ## 💻 動作要件 (System Requirements)
 
 - **対応 OS**:
-  - Windows Vista SP2 (x64 / x86)
-  - Windows Server 2008 SP2 (x64 / x86)
+  - Windows Vista SP2 (x64)
+  - Windows Server 2008 SP2 (x64)
 - **推奨環境**:
   - Windows Update で提供された最新のサービスパックおよびセキュリティ更新プログラムが適用されていること
   - 管理者権限 (インストールおよび IFEO 設定の変更に必要)
@@ -85,23 +86,16 @@
 
 ### 基本的な使い方
 
-#### 方法 1: プロパティダイアログから設定する（推奨）
+#### プロパティダイアログから設定する
 1. 起動させたいアプリケーションの実行ファイル (`.exe`) またはショートカットを右クリックし、**「プロパティ」** を選択します。
 2. **「VxKex」タブ** を開きます。
-3. **「VxKex をこのプログラムで有効にする」** にチェックを入れます。
-4. **「OS バージョン偽装」** ドロップダウンから、アプリケーションが要求するバージョン（例: Windows 10）を選択します。
+3. **「Enable VxKex NEXT for this program」** にチェックを入れます。
+4. **「Report a different version of Windows」** ドロップダウンから、アプリケーションが要求するバージョン（例: Windows 10）を選択します。
 5. 「適用」をクリックしてプロパティを閉じ、アプリケーションを通常通り起動します。
-
-#### 方法 2: VxKexLdr で手軽に実行する
-- レジストリを変更せずに一時的にテストしたい場合、対象の `.exe` ファイルを `C:\VxKex\VxKexLdr.exe` にドラッグ＆ドロップします。
-- または、コマンドプロンプトから以下のように実行します:
-  ```cmd
-  C:\VxKex\VxKexLdr.exe "C:\Path\To\YourApp.exe"
-  ```
 
 ### アンインストール方法
 1. インストーラフォルダまたは `C:\VxKex` 内の **`install.bat`** を管理者として実行します。
-2. メニュー画面で `2` (Uninstall) を選択します。
+2. メニュー画面で `3` (Uninstall) を選択します。
 3. レジストリ設定および配置されたファイルが安全に削除・復元されます。
 
 ---
@@ -142,8 +136,7 @@ VxKex_Vista/
 
 ### ビルド要件
 - **開発環境**: Visual Studio 2010 (C++ ツールチェーン / MSVC 10.0)
-- **SDK**: Windows SDK 7.0A
-- **シェル環境**: PowerShell (ExecutionPolicy Bypass)
+- **SDK**: Windows SDK 7.1
 
 ### ビルド手順
 PowerShell を管理者権限で起動し、リポジトリルートで以下のスクリプトを実行します:
