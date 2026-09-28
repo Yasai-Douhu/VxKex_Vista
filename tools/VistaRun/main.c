@@ -87,6 +87,17 @@ void mainCRTStartup(void) {
             DWORD error = GetLastError(); TerminateProcess(process.hProcess, error); fail(L"Resume", error);
         }
     }
-    CloseHandle(process.hThread); CloseHandle(process.hProcess);
-    HeapFree(GetProcessHeap(), 0, command); ExitProcess(0);
+    CloseHandle(process.hThread);
+    HeapFree(GetProcessHeap(), 0, command);
+    // IFEO callers such as Inno Setup may wait on our process handle.  Keep
+    // the launcher alive until the actual application exits, so their parent
+    // does not tear down IPC windows while the application is still using them.
+    if (WaitForSingleObject(process.hProcess, INFINITE) != WAIT_OBJECT_0)
+        fail(L"Wait for application", GetLastError());
+    { DWORD exitCode;
+        if (!GetExitCodeProcess(process.hProcess, &exitCode))
+            fail(L"Read application exit code", GetLastError());
+        CloseHandle(process.hProcess);
+        ExitProcess(exitCode);
+    }
 }

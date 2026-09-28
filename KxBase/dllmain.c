@@ -93,6 +93,7 @@ BOOL WINAPI DllMain(
 		//
 
 		if (KexData->IfeoParameters.StrongVersionSpoof & KEX_STRONGSPOOF_SHAREDUSERDATA) {
+			KxBasepInitializeTickCountHooks();
 			KexHkInstallBasicHook(GetSystemTime, KxBasepGetSystemTimeHook, NULL);
 			KexHkInstallBasicHook(GetSystemTimeAsFileTime, KxBasepGetSystemTimeAsFileTimeHook, NULL);
 		}

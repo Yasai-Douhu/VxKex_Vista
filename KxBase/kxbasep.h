@@ -101,6 +101,8 @@ KXBASEAPI HMODULE WINAPI Ext_LoadLibraryExW(
 KXBASEAPI VOID WINAPI KxBasepGetSystemTimeAsFileTimeHook(
 	OUT	PFILETIME	SystemTimeAsFileTime);
 
+VOID KxBasepInitializeTickCountHooks(VOID);
+
 KXBASEAPI VOID WINAPI KxBasepGetSystemTimeHook(
 	OUT	PSYSTEMTIME	SystemTime);
 

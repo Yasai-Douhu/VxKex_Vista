@@ -34,6 +34,45 @@ PCWSTR HumanReadableWinVerSpoof[] = {
 
 UNICODE_STRING CSDVersionUnicodeString;
 
+typedef NTSTATUS (NTAPI *PKEX_QUERY_COUNTER)(PLARGE_INTEGER, PLARGE_INTEGER);
+STATIC PKEX_QUERY_COUNTER KexpQueryCounter;
+STATIC LARGE_INTEGER KexpTickCounterOrigin;
+STATIC LARGE_INTEGER KexpTickCounterFrequency;
+STATIC ULONGLONG KexpTickOrigin;
+
+// Read the live kernel tick before making SharedUserData private. Reading the
+// two high halves also works on x86 when the low half wraps during the read.
+STATIC ULONGLONG KexpReadSharedTickCount(VOID)
+{
+	ULONG High, Low;
+	do {
+		High = SharedUserData->TickCount.High1Time;
+		Low = SharedUserData->TickCount.LowPart;
+	} while (High != (ULONG) SharedUserData->TickCount.High2Time);
+	return (((ULONGLONG) Low * SharedUserData->TickCountMultiplier) >> 24) +
+		(((ULONGLONG) High * SharedUserData->TickCountMultiplier) << 8);
+}
+
+// SharedUserData's tick count stops advancing after version spoofing writes
+// to its copy-on-write page. Keep the boot-time offset and advance it using
+// the native performance-counter syscall (independent of the private page).
+ULONGLONG NTAPI KexQueryTickCount64(VOID)
+{
+	LARGE_INTEGER Counter;
+	ULONGLONG Delta, Frequency;
+	if (!KexpTickCounterFrequency.QuadPart) {
+		return KexpReadSharedTickCount();
+	}
+	if (!NT_SUCCESS(KexpQueryCounter(&Counter, NULL))) {
+		return KexpTickOrigin;
+	}
+	Delta = (ULONGLONG) (Counter.QuadPart - KexpTickCounterOrigin.QuadPart);
+	Frequency = (ULONGLONG) KexpTickCounterFrequency.QuadPart;
+	// Divide before multiplying so long uptimes do not overflow.
+	return KexpTickOrigin + (Delta / Frequency) * 1000 +
+		((Delta % Frequency) * 1000) / Frequency;
+}
+
 STATIC NTSTATUS NTAPI Ext_RtlGetVersion(
 	OUT	PRTL_OSVERSIONINFOEXW	Version)
 {
@@ -308,6 +347,19 @@ VOID KexApplyVersionSpoof(
 		PVOID SharedUserDataPageAddress;
 		SIZE_T SharedUserDataSize;
 		ULONG OldProtect;
+		ANSI_STRING CounterName = RTL_CONSTANT_STRING("NtQueryPerformanceCounter");
+		LARGE_INTEGER Counter, Frequency;
+
+		Status = LdrGetProcedureAddress(KexData->SystemDllBase, &CounterName,
+			0, (PVOID *) &KexpQueryCounter);
+		if (!NT_SUCCESS(Status) ||
+			!NT_SUCCESS(KexpQueryCounter(&Counter, &Frequency)) ||
+			Frequency.QuadPart <= 0) {
+			KexLogWarningEvent(L"Skipping SharedUserData spoofing: no live performance counter.");
+			return;
+		}
+		KexpTickOrigin = KexpReadSharedTickCount();
+		KexpTickCounterOrigin = Counter;
 
 		//
 		// SharedUserData spoofing requires additional support from BASE dlls
@@ -329,6 +381,7 @@ VOID KexApplyVersionSpoof(
 			&OldProtect);
 
 		if (NT_SUCCESS(Status)) {
+			KexpTickCounterFrequency = Frequency;
 			SharedUserData->NtMajorVersion = MajorVersion;
 			SharedUserData->NtMinorVersion = MinorVersion;
 

@@ -1,6 +1,29 @@
 #include "buildcfg.h"
 #include "kxbasep.h"
 
+STATIC ULONGLONG (NTAPI *KxBasepQueryTickCount64)(VOID);
+
+STATIC ULONGLONG WINAPI KxBasepGetTickCount64Hook(VOID)
+{
+	return KxBasepQueryTickCount64();
+}
+
+STATIC DWORD WINAPI KxBasepGetTickCountHook(VOID)
+{
+	return (DWORD) KxBasepQueryTickCount64();
+}
+
+VOID KxBasepInitializeTickCountHooks(VOID)
+{
+	// Resolve dynamically so this DLL can still load with an older KexDll.
+	KxBasepQueryTickCount64 = (ULONGLONG (NTAPI *)(VOID))
+		GetProcAddress((HMODULE) KexData->KexDllBase, "KexQueryTickCount64");
+	if (KxBasepQueryTickCount64) {
+		KexHkInstallBasicHook(GetTickCount, KxBasepGetTickCountHook, NULL);
+		KexHkInstallBasicHook(GetTickCount64, KxBasepGetTickCount64Hook, NULL);
+	}
+}
+
 // Windows 7 added wake reasons and timer coalescing. Vista can still deliver
 // the timer/APC through SetWaitableTimer; not coalescing stays within the
 // caller's permitted delay. Preserve the full API on systems which have it.
