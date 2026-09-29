@@ -26,8 +26,9 @@
 #include "kexdllp.h"
 
 #ifndef _WIN64
+#include <InnoProfile.h>
 STATIC ULONG AshpControlsIatRva;
-STATIC VOID WINAPI AshpGitInitCommonControls(VOID)
+STATIC VOID WINAPI AshpInnoInitCommonControls(VOID)
 {
 	PBYTE Image = (PBYTE) NtCurrentPeb()->ImageBaseAddress;
 	ACTCTX_SECTION_KEYED_DATA Data;
@@ -76,21 +77,13 @@ STATIC VOID AshpApplyInnoControlsProfile(VOID)
 	PIMAGE_IMPORT_DESCRIPTOR Import;
 	PIMAGE_SECTION_HEADER Section;
 	ULONG Size, Rva, Length, Offset, Index, Slot, Thunk, Iat, Count, CodeSize;
-	static const WCHAR Marker[] = L"This installation was built with Inno Setup.";
-	BOOLEAN Found = FALSE;
 	if (Dos->e_magic != IMAGE_DOS_SIGNATURE || Dos->e_lfanew <= 0 || Dos->e_lfanew > 0x1000) return;
 	Nt = (PIMAGE_NT_HEADERS32)(Image + Dos->e_lfanew);
 	if (Nt->Signature != IMAGE_NT_SIGNATURE || Nt->FileHeader.Machine != IMAGE_FILE_MACHINE_I386 ||
 		Nt->OptionalHeader.Magic != IMAGE_NT_OPTIONAL_HDR32_MAGIC ||
 		Nt->OptionalHeader.NumberOfRvaAndSizes <= IMAGE_DIRECTORY_ENTRY_RESOURCE) return;
 	Size = Nt->OptionalHeader.SizeOfImage;
-	Rva = Nt->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_RESOURCE].VirtualAddress;
-	Length = Nt->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_RESOURCE].Size;
-	if (!Rva || Rva >= Size || Length > Size-Rva || Length < sizeof(Marker)) return;
-	for (Offset=0; Offset<=Length-sizeof(Marker); ++Offset) {
-		if (!memcmp(Image+Rva+Offset,Marker,sizeof(Marker))) { Found=TRUE; break; }
-	}
-	if (!Found) return;
+	if (!InnoHasAttribution(Image, Size)) return;
 	// Record detection independently of the controls import/thunk layout.
 	// KxBase uses this to preserve Inno's Vista DLL-search fallback.
 	KexData->Flags |= KEXDATA_FLAG_INNO_SETUP;
@@ -119,7 +112,7 @@ STATIC VOID AshpApplyInnoControlsProfile(VOID)
 					PBYTE Code=Image+Section->VirtualAddress+Length;
 					if (Code[0]==0xff && Code[1]==0x25 && *(PULONG)(Code+2)==(ULONG)(Image+Iat)) {
 						AshpControlsIatRva=Iat;
-						KexHkInstallBasicHook(Code,AshpGitInitCommonControls,NULL);
+						KexHkInstallBasicHook(Code,AshpInnoInitCommonControls,NULL);
 						Length+=5;
 					}
 				}
@@ -130,10 +123,48 @@ STATIC VOID AshpApplyInnoControlsProfile(VOID)
 }
 #endif
 
-// This Delphi runtime uses spoofable OS version information to enable AVX.
-// Keep its existing SSE copy path on NT 6.0. Match only the inspected build;
-// never scan/patch unrelated executables or change the on-disk installer.
-VOID AshApplyGitInstallerAvxWorkaround(VOID)
+// Delphi delay loading uses PE delay descriptors, independently of regular
+// import rewriting. Discover the USER32 name through that table, not a RVA.
+STATIC VOID AshpRedirectInnoDelayImports(PBYTE Image, ULONG ImageSize)
+{
+#ifndef _WIN64
+	PIMAGE_NT_HEADERS32 Nt = InnoImageHeaders(Image, ImageSize);
+	ULONG Rva, Length, Offset, Name, OldProtection, Ignored;
+	PULONG Descriptor;
+	PVOID Region;
+	SIZE_T Size;
+	NTSTATUS Status;
+	if (!Nt || Nt->OptionalHeader.NumberOfRvaAndSizes <= IMAGE_DIRECTORY_ENTRY_DELAY_IMPORT) return;
+	Rva = Nt->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_DELAY_IMPORT].VirtualAddress;
+	Length = Nt->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_DELAY_IMPORT].Size;
+	if (!Rva || !InnoRange(ImageSize, Rva, Length)) return;
+	for (Offset = 0; Length >= 32 && Offset <= Length-32; Offset += 32) {
+		Descriptor = (PULONG)(Image + Rva + Offset);
+		if (!Descriptor[1]) break;
+		// Both old VA descriptors and current RVA descriptors are defined by PE.
+		if (Descriptor[0] & ~1UL) continue;
+		Name = Descriptor[1];
+		if (!(Descriptor[0] & 1)) {
+			if (Name < (ULONG)Image) continue;
+			Name -= (ULONG)Image;
+		}
+		if (!InnoRange(ImageSize, Name, sizeof("user32.dll")) ||
+			_strnicmp((PCSTR)(Image+Name), "user32.dll", sizeof("user32.dll"))) continue;
+		Region = Image + Name;
+		Size = sizeof("user32.dll");
+		Status = NtProtectVirtualMemory(NtCurrentProcess(), &Region, &Size,
+			PAGE_READWRITE, &OldProtection);
+		if (!NT_SUCCESS(Status)) continue;
+		RtlCopyMemory(Image+Name, "kxuser.dll", sizeof("kxuser.dll"));
+		NtProtectVirtualMemory(NtCurrentProcess(), &Region, &Size, OldProtection, &Ignored);
+		KexLogInformationEvent(L"Inno profile: redirected USER32 delay imports at RVA %08lx", Name);
+	}
+#endif
+}
+
+// Inno attribution + linked code/data patterns identify the Delphi runtime.
+// Keep its SSE path on NT 6.0 regardless of product, version or filename.
+VOID AshApplyInnoSetupWorkarounds(VOID)
 {
 #ifndef _WIN64
 	PBYTE Image;
@@ -143,46 +174,20 @@ VOID AshApplyGitInstallerAvxWorkaround(VOID)
 	SIZE_T Size;
 	ULONG OldProtection, Ignored;
 	NTSTATUS Status;
-	ULONG PatchRva, AvxRva, FlagRva, TimeStamp, ImageSize, EntryPoint, User32NameRva, ControlsThunkRva, ControlsIatRva;
-	static const BYTE Original[] = {0x0f,0x95,0xc0,0x83,0xe0,0x7f,0xa3};
-	static const BYTE Avx[] = {0xc5,0xfc,0x10,0x08};
+	ULONG PatchRva, ImageSize;
 
 	if (OriginalMajorVersion != 6 || OriginalMinorVersion != 0) return;
 	AshpApplyInnoControlsProfile();
-	if (AshExeBaseNameIs(L"Git-2.55.0.5-64-bit.exe")) {
-		PatchRva=0x5734; AvxRva=0x58b7; FlagRva=0xb6060;
-		TimeStamp=0x6a5222db; ImageSize=0xf0000; EntryPoint=0xb0e60;
-	} else if (AshExeBaseNameIs(L"Git-2.55.0.5-64-bit.tmp")) {
-		PatchRva=0x7438; AvxRva=0x75b7; FlagRva=0x3bc064;
-		TimeStamp=0x6a5222df; ImageSize=0x44e000; EntryPoint=0x3af908;
-	} else if (AshExeBaseNameIs(L"sublime_text_build_4213_x64_setup.exe")) {
-		PatchRva=0x5734; AvxRva=0x58b7; FlagRva=0xb7060;
-		TimeStamp=0x698c6aab; ImageSize=0xf6000; EntryPoint=0xb1e60;
-	} else if (AshExeBaseNameIs(L"sublime_text_build_4213_x64_setup.tmp")) {
-		PatchRva=0x7438; AvxRva=0x75b7; FlagRva=0x3b8064;
-		TimeStamp=0x698c6aae; ImageSize=0x44b000; EntryPoint=0x3ab668;
-	} else if (AshExeBaseNameIs(L"VSCodeUserSetup-x64-1.139.1.exe")) {
-		PatchRva=0x72e0; AvxRva=0x7467; FlagRva=0xafb98;
-		TimeStamp=0x67ac374c; ImageSize=0xdc000; EntryPoint=0xa7f98;
-	} else if (AshExeBaseNameIs(L"VSCodeUserSetup-x64-1.139.1.tmp")) {
-		PatchRva=0x7500; AvxRva=0x7687; FlagRva=0x2dcb9c;
-		TimeStamp=0x67ac374c; ImageSize=0x363000; EntryPoint=0x2cf9a8;
-	} else return;
 	Image = (PBYTE) NtCurrentPeb()->ImageBaseAddress;
 	Dos = (PIMAGE_DOS_HEADER) Image;
 	if (Dos->e_magic != IMAGE_DOS_SIGNATURE || Dos->e_lfanew <= 0 ||
 		Dos->e_lfanew > 0x1000) return;
 	Nt = (PIMAGE_NT_HEADERS32) (Image + Dos->e_lfanew);
-	if (Nt->Signature != IMAGE_NT_SIGNATURE ||
-		Nt->FileHeader.Machine != IMAGE_FILE_MACHINE_I386 ||
-		Nt->FileHeader.TimeDateStamp != TimeStamp ||
-		Nt->OptionalHeader.Magic != IMAGE_NT_OPTIONAL_HDR32_MAGIC ||
-		Nt->OptionalHeader.SizeOfImage != ImageSize ||
-		Nt->OptionalHeader.AddressOfEntryPoint != EntryPoint ||
-		memcmp(Image + PatchRva, Original, sizeof(Original)) ||
-		memcmp(Image + AvxRva, Avx, sizeof(Avx))) return;
-	// Also validate the relocated destination of the AVX dispatch flag store.
-	if (*(PULONG)(Image + PatchRva + 7) != (ULONG)(Image + FlagRva)) return;
+	ImageSize = Nt->OptionalHeader.SizeOfImage;
+	if (!InnoHasAttribution(Image, ImageSize)) return;
+	AshpRedirectInnoDelayImports(Image, ImageSize);
+	PatchRva = InnoFindAvxInitialization(Image, ImageSize, (ULONG)Image);
+	if (!PatchRva) return;
 	Region = Image + PatchRva;
 	Size = 3;
 	Status = NtProtectVirtualMemory(NtCurrentProcess(), &Region, &Size,
@@ -195,23 +200,6 @@ VOID AshApplyGitInstallerAvxWorkaround(VOID)
 	Status = NtProtectVirtualMemory(NtCurrentProcess(), &Region, &Size,
 		OldProtection, &Ignored);
 	KexLogInformationEvent(L"Inno installer profile: disabled AVX copy dispatch on NT 6.0 (protection restore: %08lx)", Status);
-	// Delphi's delay loader bypasses the rewritten regular import table.
-	// Route this build's shared USER32 delay-import name to our DPI adapters.
-	User32NameRva = ImageSize == 0x44e000 ? 0x3cd7d6 :
-		(ImageSize == 0x44b000 ? 0x3c97d6 : (ImageSize == 0x363000 ? 0x2e979e : 0));
-	if (User32NameRva &&
-		!memcmp(Image + User32NameRva, "user32.dll", sizeof("user32.dll"))) {
-		Region = Image + User32NameRva;
-		Size = sizeof("user32.dll");
-		Status = NtProtectVirtualMemory(NtCurrentProcess(), &Region, &Size,
-			PAGE_READWRITE, &OldProtection);
-		if (NT_SUCCESS(Status)) {
-			RtlCopyMemory(Image + User32NameRva, "kxuser.dll", sizeof("kxuser.dll"));
-			NtProtectVirtualMemory(NtCurrentProcess(), &Region, &Size,
-				OldProtection, &Ignored);
-			KexLogInformationEvent(L"Inno installer profile: redirected USER32 delay imports to KxUser");
-		}
-	}
 #endif
 }
 

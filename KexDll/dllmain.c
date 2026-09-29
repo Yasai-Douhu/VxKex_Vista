@@ -267,7 +267,7 @@ BOOL WINAPI DllMain(
 		//
 
 		unless (KexData->IfeoParameters.DisableAppSpecific) {
-			AshApplyGitInstallerAvxWorkaround();
+			AshApplyInnoSetupWorkarounds();
 			// APPSPECIFICHACK: Environment variable hack for QBittorrent to fix
 			// bad kerning.
 			if (AshExeBaseNameIs(L"qbittorrent.exe")) {

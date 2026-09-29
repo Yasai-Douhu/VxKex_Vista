@@ -127,3 +127,12 @@ UrlLibDownloader and retrieved/parsed the channel (271273 bytes, schema 4.0.0).
 The failed upgrade had left Package Control in ignored_packages; removed only
 that entry after backing up Preferences.sublime-settings with suffix
 `.pre-vxkex-pc-enable-20260928`. Other ignored packages were preserved.
+
+### Verification on Windows Vista VM (Standard User Profile)
+
+The same WinINet `error 12029` was observed on Windows Vista VM (standard user `Vista`)
+when Package Control attempted to query repository metadata:
+- Setting `"downloader_precedence": { "windows": ["urllib"] }` in `%APPDATA%\Sublime Text\Packages\User\Package Control.sublime-settings` forces Package Control to use Python's built-in `urllib` / OpenSSL stack, bypassing Vista's outdated WinINet TLS limitations.
+- If Package Control was previously disabled during a failed upgrade, removing `"Package Control"` from `"ignored_packages"` in `Preferences.sublime-settings` restores functionality.
+- Package Control successfully upgraded to 4.2.8 and package installation/discovery operates properly.
+

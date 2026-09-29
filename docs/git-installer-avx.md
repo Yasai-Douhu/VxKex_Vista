@@ -1,5 +1,8 @@
 # Git 2.55.0.5 installer compatibility profile
 
+The historical per-filename/RVA profile below was replaced on 2026-09-29 by
+the [content-based Inno profile](inno-content-profile.md).
+
 ## Current result (2026-09-26)
 
 The original installer now reaches its visible, enabled `Git 2.55.0.5 Setup`

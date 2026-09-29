@@ -63,6 +63,9 @@
     <ClCompile Include="firefoxpatch.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="shelllink.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="kxcom.def">

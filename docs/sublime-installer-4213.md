@@ -1,5 +1,9 @@
 # Sublime Text build 4213 installer on Server 2008
 
+The historical per-filename/RVA profile below was replaced on 2026-09-29 by
+the [content-based Inno profile](inno-content-profile.md), verified with 4215
+and arbitrary installer filenames as well.
+
 ## Drawing fix verified by screenshot (2026-09-27)
 
 The user subsequently confirmed missing labels and blank controls. Window

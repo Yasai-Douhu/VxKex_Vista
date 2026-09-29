@@ -1,0 +1,72 @@
+Windows Registry Editor Version 5.00
+
+; ==============================================================================
+; VxKex Configuration Reset Script for Windows Vista / Server 2008 (x64)
+; ==============================================================================
+; This script resets all VxKex global settings and known application IFEO entries
+; to their default clean post-installation state.
+; ==============================================================================
+
+; ------------------------------------------------------------------------------
+; 1. Delete all user & machine VxKex configuration keys
+; ------------------------------------------------------------------------------
+[-HKEY_CURRENT_USER\Software\VXsoft\VxKex]
+[-HKEY_CURRENT_USER\Software\VXsoft\VxKexLdr]
+[-HKEY_CURRENT_USER\Software\VXsoft]
+
+[-HKEY_LOCAL_MACHINE\SOFTWARE\VXsoft\VxKex]
+[-HKEY_LOCAL_MACHINE\SOFTWARE\VXsoft\VxKexLdr]
+[-HKEY_LOCAL_MACHINE\SOFTWARE\VXsoft]
+
+[-HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\VXsoft\VxKex]
+[-HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\VXsoft\VxKexLdr]
+[-HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\VXsoft]
+
+; ------------------------------------------------------------------------------
+; 2. Restore default clean VxKex configuration (Default: C:\VxKex)
+; ------------------------------------------------------------------------------
+[HKEY_LOCAL_MACHINE\SOFTWARE\VXsoft\VxKex]
+"InstalledVersion"=dword:800008b3
+"KexDir"="C:\\VxKex"
+"LogDir"="C:\\VxKex\\Logs"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\VXsoft\VxKex]
+"InstalledVersion"=dword:800008b3
+"KexDir"="C:\\VxKex"
+"LogDir"="C:\\VxKex\\Logs"
+
+; ------------------------------------------------------------------------------
+; 3. Reset VxKex propagation virtual keys (IFEO)
+; ------------------------------------------------------------------------------
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\{VxKexPropagationVirtualKey}]
+"VerifierDlls"="KexDll.dll"
+"GlobalFlag"=dword:00000100
+"VerifierFlags"=dword:80000000
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\{VxKexPropagationVirtualKey}]
+"VerifierDlls"="KexDll.dll"
+"GlobalFlag"=dword:00000100
+"VerifierFlags"=dword:80000000
+
+; ------------------------------------------------------------------------------
+; 4. Clear VxKex IFEO settings for known target applications (64-bit and WOW64)
+; ------------------------------------------------------------------------------
+[-HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\Code.exe]
+[-HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\Code - Insiders.exe]
+[-HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\Obsidian.exe]
+[-HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\sublime_text.exe]
+[-HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\git.exe]
+[-HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\firefox.exe]
+[-HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\rufus-4.15.exe]
+[-HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\CrystalMarkRetro64.exe]
+[-HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\VSCodeUserSetup-x64-1.70.2.exe]
+
+[-HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\Code.exe]
+[-HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\Code - Insiders.exe]
+[-HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\Obsidian.exe]
+[-HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\sublime_text.exe]
+[-HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\git.exe]
+[-HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\firefox.exe]
+[-HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\rufus-4.15.exe]
+[-HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\CrystalMarkRetro64.exe]
+[-HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\VSCodeUserSetup-x64-1.70.2.exe]

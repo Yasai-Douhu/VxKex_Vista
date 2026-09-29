@@ -1,0 +1,1 @@
+{"name":"vistapty-validation","publisher":"vxkex-local","version":"0.0.1","engines":{"vscode":"^1.90.0"},"activationEvents":["*"],"main":"extension.js"}

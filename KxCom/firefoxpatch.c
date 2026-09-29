@@ -110,6 +110,8 @@ KXCOMAPI HRESULT WINAPI Ext_CoCreateInstance(
 		RefIID,
 		Instance);
 
+	if (SUCCEEDED(Result) && Instance) ComConfigureInnoShellLink(RefCLSID, (IUnknown *)*Instance);
+
 	if (KexIsDebugBuild) {
 		LPOLESTR RefCLSIDAsString;
 		LPOLESTR RefIIDAsString;
@@ -157,6 +159,13 @@ KXCOMAPI HRESULT WINAPI Ext_CoCreateInstanceEx(
 		ServerInfo,
 		NumberOfInterfaces,
 		Interfaces);
+
+	if (SUCCEEDED(Result) && Interfaces) {
+		ULONG Index;
+		for (Index = 0; Index < NumberOfInterfaces; ++Index) {
+			if (SUCCEEDED(Interfaces[Index].hr)) ComConfigureInnoShellLink(RefCLSID, Interfaces[Index].pItf);
+		}
+	}
 
 	return Result;
 }

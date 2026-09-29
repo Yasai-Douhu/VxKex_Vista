@@ -622,6 +622,8 @@ STATIC NTSTATUS NTAPI Ext_NtCreateUserProcess(
     IN		CONST PPS_ATTRIBUTE_LIST			AttributeList OPTIONAL) PROTECTED_FUNCTION
 {
 	NTSTATUS Status;
+	UNICODE_STRING ChildImageBaseName;
+	UNICODE_STRING WindowsPowerShell;
 
 	ULONG ModifiedThreadFlags;
 	ULONG ModifiedProcessDesiredAccess;
@@ -641,6 +643,20 @@ STATIC NTSTATUS NTAPI Ext_NtCreateUserProcess(
 	SIZE_T IfeoParametersSize;
 
 	RemoteNtOpenKey = 0;
+
+	// Windows PowerShell on NT 6.0 uses the system CLR and does not need VxKex.
+	// Propagating into it from a compatible parent prevents CLR startup with
+	// HRESULT 80004005. Leave its own explicit IFEO configuration intact.
+	if (ProcessParameters &&
+		NT_SUCCESS(KexRtlPathFindFileName(&ProcessParameters->ImagePathName, &ChildImageBaseName))) {
+		RtlInitConstantUnicodeString(&WindowsPowerShell, L"powershell.exe");
+		if (RtlEqualUnicodeString(&ChildImageBaseName, &WindowsPowerShell, TRUE)) {
+			return KexNtCreateUserProcess(
+				ProcessHandle, ThreadHandle, ProcessDesiredAccess, ThreadDesiredAccess,
+				ProcessObjectAttributes, ThreadObjectAttributes, ProcessFlags, ThreadFlags,
+				ProcessParameters, CreateInfo, AttributeList);
+		}
+	}
 
 	ModifiedProcessDesiredAccess = ProcessDesiredAccess;
 	ModifiedThreadDesiredAccess = ThreadDesiredAccess;

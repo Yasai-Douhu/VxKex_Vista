@@ -37,18 +37,28 @@ cls
 echo ========================================================
 echo   VxKex for Windows Vista / Server 2008 (x64) Setup
 echo ========================================================
-echo.
 echo   [1] Install VxKex
 echo   [2] Update VxKex
-echo   [3] Uninstall VxKex
-echo   [4] Exit
+echo   [3] Reset Configuration
+echo   [4] Uninstall VxKex
+echo   [5] Exit
 echo.
-set /p CHOICE="Please select an option (1-4): "
+set /p CHOICE="Please select an option (1-5): "
 
 if "%CHOICE%"=="1" goto :install
 if "%CHOICE%"=="2" goto :update
-if "%CHOICE%"=="3" goto :uninstall
-if "%CHOICE%"=="4" exit /B
+if "%CHOICE%"=="3" goto :reset
+if "%CHOICE%"=="4" goto :uninstall
+if "%CHOICE%"=="5" exit /B
+goto :menu
+
+:reset
+if exist "%SCRIPT_DIR%Reset-VxKex-Config.bat" (
+    call "%SCRIPT_DIR%Reset-VxKex-Config.bat"
+) else (
+    echo Reset-VxKex-Config.bat was not found.
+    pause
+)
 goto :menu
 
 :update

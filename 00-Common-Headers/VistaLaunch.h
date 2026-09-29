@@ -53,7 +53,8 @@ static BOOL VistaHasProductName(PCWSTR path, PCWSTR productName) {
 }
 
 static BOOL VistaIsVSCode(PCWSTR path) {
-    return VistaHasProductName(path, L"Visual Studio Code");
+    return VistaHasProductName(path, L"Visual Studio Code") ||
+        VistaHasProductName(path, L"Visual Studio Code - Insiders");
 }
 
 static BOOL VistaUsesElectronLaunchProfile(PCWSTR path) {
