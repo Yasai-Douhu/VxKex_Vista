@@ -33,18 +33,27 @@ vista-pty-clear.exe. Packaged copies are under `Installer/VistaPty`.
 
 ## Install and restore
 
-Close VS Code first. Run the packaged script with the **resources/app** directory:
+Close VS Code first. You can run the batch wrapper directly (which automatically bypasses execution policy restrictions) or the PowerShell script:
 
-```powershell
-.\install.ps1 -AppDirectory 'C:\Users\Administrator\AppData\Local\Programs\Microsoft VS Code\04c0d99f4f\resources\app'
+```cmd
+.\install.cmd
+```
+*(If `-AppDirectory` is omitted, the installer automatically detects the VS Code / VS Code Insiders `resources\app` directory).*
+
+Or specify the directory explicitly:
+
+```cmd
+.\install.cmd "C:\Users\Vista\AppData\Local\Programs\Microsoft VS Code\resources\app"
+```
+
+To restore the original node-pty module:
+```cmd
+.\uninstall.cmd
 ```
 
 The script backs up conpty.node as `conpty.node.pre-vistapty` and adds three
 adjacent support binaries. `terminal.integrated.windowsUseConptyDll` should stay
 true. No general VxKex DLL, ASAR JavaScript or user's settings file is replaced.
-The normal VxKex install.bat does not automatically patch applications with this
-optional package. VS Code updates may replace it; unknown updates require
-another interface/version check.
 
 On Vista/Server 2008, add these user settings for Windows PowerShell 3:
 
