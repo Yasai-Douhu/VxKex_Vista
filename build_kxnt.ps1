@@ -92,14 +92,14 @@ $libPath = Join-Path $OUT_DIR "KxNt.lib"
 $defPath = Join-Path $KXNT_DIR "KxNt.def"
 
 # Import libraries (from VxKex_Vista\00-Import-Libraries)
-$IMPORT_LIBS_DIR = "C:\Users\YamaR\Desktop\AI_Datas\VxKex_Vista\00-Import-Libraries"
+$IMPORT_LIBS_DIR = Join-Path $ScriptDirAbs "00-Import-Libraries"
 $ntdllLib = Join-Path $IMPORT_LIBS_DIR "ntdll_x64.lib"
 $msvcrtLib = Join-Path $IMPORT_LIBS_DIR "msvcrt_x64.lib"
 $kernel32Lib = Join-Path $IMPORT_LIBS_DIR "kernel32_x64.lib"
 $user32Lib = Join-Path $IMPORT_LIBS_DIR "user32_x64.lib"
 
 # Prebuilt libraries (from VxKex_Vista\x64\Release)
-$PREBUILT_LIBS_DIR = "C:\Users\YamaR\Desktop\AI_Datas\VxKex_Vista\x64\Release"
+$PREBUILT_LIBS_DIR = Join-Path $ScriptDirAbs "x64\Release"
 $kexDllLib = Join-Path $PREBUILT_LIBS_DIR "KexDll\KexDll.lib"
 $kexPathCchLib = Join-Path $PREBUILT_LIBS_DIR "KexPathCch\KexPathCch.lib"
 $kexSmpLib = Join-Path $PREBUILT_LIBS_DIR "KexSmp\KexSmp.lib"

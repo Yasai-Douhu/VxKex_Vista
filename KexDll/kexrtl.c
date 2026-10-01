@@ -22,6 +22,20 @@
 #include "buildcfg.h"
 #include "kexdllp.h"
 
+// Use the OS feature policy, not just CPUID or the raw shared-data bitmap.
+// For example, x64 Windows masks the legacy MMX feature in this API even when
+// ProcessorFeatures[PF_MMX_INSTRUCTIONS_AVAILABLE] is set. Never advertise
+// AVX without OS support.
+KEXAPI BOOLEAN NTAPI KexRtlIsProcessorFeaturePresent(
+	IN ULONG ProcessorFeature)
+{
+	if (ProcessorFeature >= PROCESSOR_FEATURE_MAX) {
+		return FALSE;
+	}
+
+	return (BOOLEAN) IsProcessorFeaturePresent(ProcessorFeature);
+}
+
 KEXAPI INT NTAPI KexRtlOperatingSystemBitness(
 	VOID)
 {

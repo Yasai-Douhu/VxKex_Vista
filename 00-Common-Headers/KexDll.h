@@ -418,6 +418,9 @@ KEXAPI NTSTATUS NTAPI KexRtlWow64GetProcessMachines(
 	OUT	PUSHORT	ProcessMachine,
 	OUT	PUSHORT	NativeMachine OPTIONAL);
 
+KEXAPI BOOLEAN NTAPI KexRtlIsProcessorFeaturePresent(
+	IN ULONG ProcessorFeature);
+
 KEXAPI VOID NTAPI KexRtlSetBit(
 	IN	PRTL_BITMAP	BitmapHeader,
 	IN	ULONG		BitNumber);

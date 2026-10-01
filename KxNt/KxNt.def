@@ -1,5 +1,6 @@
 LIBRARY KxNt
 EXPORTS
+	RtlIsProcessorFeaturePresent = KexDll.KexRtlIsProcessorFeaturePresent
 	NtFlushBuffersFileEx						= KexNtFlushBuffersFileEx
 
 	LdrResolveDelayLoadedAPI					= KexDll.KexLdrResolveDelayLoadedAPI

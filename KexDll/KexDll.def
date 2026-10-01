@@ -1,5 +1,6 @@
 LIBRARY "KexDll.dll"
 EXPORTS
+	KexRtlIsProcessorFeaturePresent
 	KexDataInitialize
 	KexQueryTickCount64
 	KexInitializePropagation
