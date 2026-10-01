@@ -1,6 +1,37 @@
 #include "buildcfg.h"
 #include "kxbasep.h"
 
+// Vista has ReadDirectoryChangesW, but not the Windows 10 Ex entry point.
+// The legacy notification layout can be passed through unchanged. Extended
+// records cannot be produced by the Vista API, so report that limitation to
+// callers instead of fabricating incompatible FILE_NOTIFY_EXTENDED_INFORMATION.
+KXBASEAPI BOOL WINAPI ReadDirectoryChangesExW(
+	IN HANDLE Directory,
+	OUT PVOID Buffer,
+	IN DWORD BufferLength,
+	IN BOOL WatchSubtree,
+	IN DWORD NotifyFilter,
+	OUT PDWORD BytesReturned OPTIONAL,
+	IN OUT LPOVERLAPPED Overlapped OPTIONAL,
+	IN LPOVERLAPPED_COMPLETION_ROUTINE CompletionRoutine OPTIONAL,
+	IN ULONG InformationClass)
+{
+	if (InformationClass == 1) {
+		return ReadDirectoryChangesW(
+			Directory,
+			Buffer,
+			BufferLength,
+			WatchSubtree,
+			NotifyFilter,
+			BytesReturned,
+			Overlapped,
+			CompletionRoutine);
+	}
+
+	SetLastError(InformationClass == 2 ? ERROR_NOT_SUPPORTED : ERROR_INVALID_PARAMETER);
+	return FALSE;
+}
+
 KXBASEAPI HANDLE WINAPI CreateFile2(
 	IN	PCWSTR								FileName,
 	IN	ULONG								DesiredAccess,

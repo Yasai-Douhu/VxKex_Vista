@@ -60,14 +60,15 @@ $kexSmpLib = Join-Path $ScriptDirAbs "x64\Release\KexSmp\KexSmp.lib"
 $kexPathCchLib = Join-Path $ScriptDirAbs "02-Prebuilt DLLs\x64\Release\KexPathCch\KexPathCch.lib"
 
 if (-not (Test-Path $kexPathCchLib)) {
-    $kexPathCchLib = Join-Path $ScriptDirAbs "VxKex_Vista\x64\Release\KexPathCch\KexPathCch.lib"
+    $kexPathCchLib = Join-Path $ScriptDirAbs "x64\Release\KexPathCch\KexPathCch.lib"
 }
+if (-not (Test-Path $kexPathCchLib)) { throw 'Native KexPathCch library missing' }
 
 $libArgs = @("/NOLOGO", "/DLL", "/INCREMENTAL:NO", "/SUBSYSTEM:WINDOWS", "/OPT:REF", "/OPT:ICF", "/DEBUG", "/RELEASE", "/MACHINE:X64", "/LTCG")
 $libArgs += @("/OUT:`"$dllPath`"", "/IMPLIB:`"$libPath`"", "/DEF:`"$defFile`"")
 $libArgs += @("/LIBPATH:`"$importLibsDir`"", "/LIBPATH:`"$SDK71_LIB`"")
 $libArgs += @("ntdll_x64.lib", "kernel32_x64.lib", "user32_x64.lib", "gdi32.lib", "shlwapi.lib")
-$libArgs += @("`"$kexSmpLib`"", "KexPathCch.lib")
+$libArgs += @("`"$kexSmpLib`"", "`"$kexPathCchLib`"")
 $libArgs += $objFiles
 $libArgs += @("`"$resFile`"")
 

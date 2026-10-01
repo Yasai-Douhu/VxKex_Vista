@@ -24,6 +24,7 @@
 
 #include "buildcfg.h"
 #include "kxschanlp.h"
+#include <wininet.h>
 
 //
 // This function fixes the endianness of the TLS record header.
@@ -663,17 +664,46 @@ SECURITY_STATUS TlspGetServerPublicKeyFromCertificate(
 // application.
 // Refer to schannel.dll!VerifyServerCertificate.
 //
+STATIC BOOLEAN TlspBundleContainsChainRoot(
+	IN HCERTSTORE Bundle,
+	IN PCCERT_CHAIN_CONTEXT Chain)
+{
+	PCERT_SIMPLE_CHAIN SimpleChain;
+	PCCERT_CONTEXT Root, Candidate = NULL;
+	if (Chain->cChain != 1 ||
+		(Chain->TrustStatus.dwErrorStatus & CERT_TRUST_IS_PARTIAL_CHAIN)) return FALSE;
+	SimpleChain = Chain->rgpChain[0];
+	if (!SimpleChain->cElement) return FALSE;
+	Root = SimpleChain->rgpElement[SimpleChain->cElement - 1]->pCertContext;
+	// Exclusive roots on Windows 7 do not make intermediate CAs trust anchors.
+	if (!CertCompareCertificateName(X509_ASN_ENCODING,
+		&Root->pCertInfo->Subject, &Root->pCertInfo->Issuer)) return FALSE;
+	while ((Candidate = CertEnumCertificatesInStore(Bundle, Candidate)) != NULL) {
+		if (Root->cbCertEncoded == Candidate->cbCertEncoded &&
+			RtlCompareMemory(Root->pbCertEncoded, Candidate->pbCertEncoded,
+				Root->cbCertEncoded) == Root->cbCertEncoded) {
+			CertFreeCertificateContext(Candidate);
+			return TRUE;
+		}
+	}
+	return FALSE;
+}
+
 SECURITY_STATUS TlspCheckServerCertificateOk(
 	IN OUT	PKXSCHANL_CONTEXT	Context)
 {
 	BOOL Success;
 	ULONG ChainFlags;
-	HCERTCHAINENGINE ChainEngine;
+	HCERTSTORE AdditionalStore, CollectionStore = NULL;
 	CERT_CHAIN_PARA ChainParameters;
 	CERT_CHAIN_POLICY_PARA PolicyParameters;
 	CERT_CHAIN_POLICY_STATUS PolicyStatus;
 	SSL_EXTRA_CERT_CHAIN_POLICY_PARA HttpsPolicy;
 	PCCERT_CHAIN_CONTEXT ChainContext;
+	PCCERT_CHAIN_CONTEXT CandidateChain;
+	ULONG CandidateIndex;
+	DWORD PolicyError = CERT_E_UNTRUSTEDROOT;
+	BOOLEAN HavePolicyError = FALSE;
 
 	PSTR UsageOids[] = {
 		szOID_PKIX_KP_SERVER_AUTH,
@@ -710,28 +740,21 @@ SECURITY_STATUS TlspCheckServerCertificateOk(
 	}
 
 	//
-	// Figure out what certificate chain engine we'll use.
-	// If we have a ROOT.sst file loaded, then we'll set up an engine using that
-	// root file; if not, we will use the default engine.
+	// Vista has no hExclusiveRoot chain engine. Supply the bundle for chain
+	// building, then require an exact bundle anchor before allowing unknown CA.
+	// No certificates are added to a persistent Windows certificate store.
 	//
 
-	ChainEngine = NULL;
-
+	AdditionalStore = Context->RemoteCertStore;
 	if (Context->Credential->RootCertStore != NULL) {
-		CERT_CHAIN_ENGINE_CONFIG EngineConfig;
-
-		KexRtlZeroMemory(&EngineConfig, sizeof(EngineConfig));
-		EngineConfig.cbSize = sizeof(EngineConfig);
-		EngineConfig.hExclusiveRoot = Context->Credential->RootCertStore;
-
-		// If CertCreateCertificateChainEngine fails, it sets ChainEngine to NULL.
-		// In that case we will of course just use the default chain engine, which
-		// is OK.
-		Success = CertCreateCertificateChainEngine(
-			&EngineConfig,
-			&ChainEngine);
-
-		ASSERT (Success);
+		CollectionStore = CertOpenStore(CERT_STORE_PROV_COLLECTION, 0, 0, 0, NULL);
+		if (!CollectionStore) return SP_LOG_RESULT(SEC_E_INTERNAL_ERROR);
+		if (!CertAddStoreToCollection(CollectionStore, Context->RemoteCertStore, 0, 0) ||
+			!CertAddStoreToCollection(CollectionStore, Context->Credential->RootCertStore, 0, 0)) {
+			CertCloseStore(CollectionStore, 0);
+			return SP_LOG_RESULT(SEC_E_INTERNAL_ERROR);
+		}
+		AdditionalStore = CollectionStore;
 	}
 
 	//
@@ -739,6 +762,11 @@ SECURITY_STATUS TlspCheckServerCertificateOk(
 	//
 
 	ChainFlags = 0;
+	if (Context->Credential->RootCertStore != NULL) {
+		// Native root trust must not prune the path to our exclusive bundle.
+		ChainFlags |= CERT_CHAIN_DISABLE_PASS1_QUALITY_FILTERING |
+			CERT_CHAIN_RETURN_LOWER_QUALITY_CONTEXTS;
+	}
 
 	if (Context->Credential->Flags & SCH_CRED_REVOCATION_CHECK_END_CERT) {
 		ChainFlags |= CERT_CHAIN_REVOCATION_CHECK_END_CERT;
@@ -763,16 +791,16 @@ SECURITY_STATUS TlspCheckServerCertificateOk(
 	ChainParameters.RequestedUsage.Usage.rgpszUsageIdentifier	= UsageOids;
 
 	Success = CertGetCertificateChain(
-		ChainEngine,
+		NULL,
 		Context->RemoteCertContext,
 		NULL,
-		Context->RemoteCertStore,
+		AdditionalStore,
 		&ChainParameters,
 		ChainFlags,
 		NULL,
 		&ChainContext);
 
-	SafeCertFreeCertificateChainEngine(ChainEngine);
+	if (CollectionStore) CertCloseStore(CollectionStore, 0);
 	ASSERT (Success);
 
 	if (!Success) {
@@ -786,6 +814,11 @@ SECURITY_STATUS TlspCheckServerCertificateOk(
 	KexRtlZeroMemory(&HttpsPolicy, sizeof(HttpsPolicy));
 	HttpsPolicy.cbSize = sizeof(HttpsPolicy);
 	HttpsPolicy.dwAuthType = AUTHTYPE_SERVER;
+	if (Context->Credential->RootCertStore != NULL) {
+		// Only root-store trust is supplied by the bundle. Keep hostname,
+		// validity, signature, usage, and requested revocation checks enabled.
+		HttpsPolicy.fdwChecks = SECURITY_FLAG_IGNORE_UNKNOWN_CA;
+	}
 
 	unless (Context->Credential->Flags & SCH_CRED_NO_SERVERNAME_CHECK) {
 		ULONG Cch;
@@ -831,43 +864,67 @@ SECURITY_STATUS TlspCheckServerCertificateOk(
 	KexRtlZeroMemory(&PolicyParameters, sizeof(PolicyParameters));
 	PolicyParameters.cbSize = sizeof(PolicyParameters);
 	PolicyParameters.pvExtraPolicyPara = &HttpsPolicy;
+	for (CandidateIndex = 0;
+		CandidateIndex == 0 || (Context->Credential->RootCertStore != NULL &&
+		CandidateIndex - 1 < ChainContext->cLowerQualityChainContext);
+		++CandidateIndex) {
+		CandidateChain = CandidateIndex == 0 ? ChainContext :
+			ChainContext->rgpLowerQualityChainContext[CandidateIndex - 1];
+		if (Context->Credential->RootCertStore != NULL &&
+			!TlspBundleContainsChainRoot(Context->Credential->RootCertStore, CandidateChain)) {
+			continue;
+		}
+		KexRtlZeroMemory(&PolicyStatus, sizeof(PolicyStatus));
+		PolicyStatus.cbSize = sizeof(PolicyStatus);
 
-	Success = CertVerifyCertificateChainPolicy(
-		CERT_CHAIN_POLICY_SSL,
-		ChainContext,
-		&PolicyParameters,
-		&PolicyStatus);
+		Success = CertVerifyCertificateChainPolicy(
+			CERT_CHAIN_POLICY_SSL,
+			CandidateChain,
+			&PolicyParameters,
+			&PolicyStatus);
 
-	ASSERT (Success);
+		ASSERT (Success);
+
+		if (!Success) {
+			// Win32 error numbers are positive and would be treated as SSPI success.
+			SafeCertFreeCertificateChain(ChainContext);
+			return SP_LOG_RESULT(SEC_E_INTERNAL_ERROR);
+		}
+
+		//
+		// Ignore certain errors if requested.
+		//
+
+		if (Context->Credential->Flags & SCH_CRED_IGNORE_NO_REVOCATION_CHECK) {
+			if (PolicyStatus.dwError == CRYPT_E_NO_REVOCATION_CHECK) {
+				PolicyStatus.dwError = S_OK;
+			}
+		}
+
+		if (Context->Credential->Flags & SCH_CRED_IGNORE_REVOCATION_OFFLINE) {
+			if (PolicyStatus.dwError == CRYPT_E_REVOCATION_OFFLINE) {
+				PolicyStatus.dwError = S_OK;
+			}
+		}
+		if (PolicyStatus.dwError == ERROR_SUCCESS) {
+			SafeCertFreeCertificateChain(ChainContext);
+			return SEC_E_OK;
+		}
+		if (!HavePolicyError) {
+			PolicyError = PolicyStatus.dwError;
+			HavePolicyError = TRUE;
+		}
+	}
 	SafeCertFreeCertificateChain(ChainContext);
-
-	if (!Success) {
-		return GetLastError();
-	}
-
-	//
-	// Ignore certain errors if requested.
-	//
-
-	if (Context->Credential->Flags & SCH_CRED_IGNORE_NO_REVOCATION_CHECK) {
-		if (PolicyStatus.dwError == CRYPT_E_NO_REVOCATION_CHECK) {
-			PolicyStatus.dwError = S_OK;
-		}
-	}
-
-	if (Context->Credential->Flags & SCH_CRED_IGNORE_REVOCATION_OFFLINE) {
-		if (PolicyStatus.dwError == CRYPT_E_REVOCATION_OFFLINE) {
-			PolicyStatus.dwError = S_OK;
-		}
-	}
 
 	//
 	// Map CERT_E_* or CRYPT_E_* to the appropriate return code.
-	// This is done the same way as Schannel does it - if any error code other
-	// than the ones listed is returned, then we just ignore it and return OK.
+	// An unfamiliar policy failure must not become a successful TLS connection.
 	//
 
-	switch (PolicyStatus.dwError) {
+	switch (PolicyError) {
+	case ERROR_SUCCESS:
+		return SEC_E_OK;
 	case CERT_E_EXPIRED:
 	case CERT_E_VALIDITYPERIODNESTING:
 		return SP_LOG_RESULT(SEC_E_CERT_EXPIRED);
@@ -886,7 +943,7 @@ SECURITY_STATUS TlspCheckServerCertificateOk(
 		return SP_LOG_RESULT(SEC_E_CERT_WRONG_USAGE);
 	}
 
-	return SEC_E_OK;
+	return SP_LOG_RESULT(SEC_E_CERT_UNKNOWN);
 }
 
 //

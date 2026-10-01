@@ -1,20 +1,33 @@
+[CmdletBinding()]
+param([string[]]$Only = @(), [string]$OutputRoot = '')
+
 # Build the x86 compatibility libraries shipped with the x64-host installer.
 $ErrorActionPreference = 'Stop'
 $root = $PSScriptRoot
+if (!$OutputRoot) { $OutputRoot = Join-Path $root 'Win32\Release' }
 $vc = 'C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC'
 $sdk = 'C:\Program Files\Microsoft SDKs\Windows\v7.1'
 $env:PATH = "$vc\bin;$(Split-Path $vc)\Common7\IDE;$sdk\Bin;$env:PATH"
 $env:INCLUDE = "$sdk\Include;$vc\include;$root\00-Common-Headers"
-$env:LIB = "$sdk\Lib;$vc\lib;$root\00-Import-Libraries"
+$env:LIB = "$OutputRoot\KxCryp;$sdk\Lib;$vc\lib;$root\00-Import-Libraries"
 foreach ($dir in Get-ChildItem "$root\Win32\Release" -Directory) { $env:LIB += ';' + $dir.FullName }
-foreach ($name in @('KxAdvapi','KxCom','KxCrt','KxCryp','KxDw','KxDx','KxMi','KxNet','KxUia','KxUser')) {
- $out = Join-Path $root "Win32\Release\$name"
+$names = @('KxAdvapi','KxCom','KxCrt','KxCryp','KxDw','KxDx','KxMi','KxNet','KxSChanl','KxUia','KxUser')
+if ($Only.Count -gt 0) {
+ foreach ($requested in $Only) {
+  if ($requested -notin $names) { throw "Unknown extended DLL: $requested" }
+ }
+ $names = @($names | Where-Object { $_ -in $Only })
+}
+foreach ($name in $names) {
+ $out = Join-Path $OutputRoot $name
  New-Item -ItemType Directory -Force $out | Out-Null
  $env:LIB += ';' + $out
  $objects = @()
  foreach ($source in Get-ChildItem "$root\$name\*.c") {
   $obj = Join-Path $out ($source.BaseName + '.obj')
-  & cl.exe /nologo /c /O1 /GL /Gy /Gz /MD /Zi /W3 /TC /GS- /DWIN32 /DNDEBUG /DUNICODE /D_UNICODE "/D$($name.ToUpper())_EXPORTS" "/Fo$obj" "/Fd$out\compile.pdb" $source.FullName
+  $extra = @()
+  if ($name -eq 'KxSChanl') { $extra = @('/Oi') }
+  & cl.exe /nologo /c /O1 /GL /Gy /Gz /MD /Zi /W3 /TC /GS- /DWIN32 /DNDEBUG /DUNICODE /D_UNICODE @extra "/D$($name.ToUpper())_EXPORTS" "/Fo$obj" "/Fd$out\compile.pdb" $source.FullName
   if ($LASTEXITCODE) { throw "Compilation failed: $source" }
   $objects += $obj
  }

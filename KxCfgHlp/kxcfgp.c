@@ -27,6 +27,8 @@
 #include <KxCfgHlp.h>
 #include <KexW32ML.h>
 
+INT NTAPI RtlOperatingSystemBitness(VOID);
+
 //
 // This function removes KexDll.dll from a space-separated list (same format as
 // you'd find in the IFEO VerifierDlls value).
@@ -35,77 +37,81 @@
 // If KexDll.dll was the only verifier DLL in the list, then this function will
 // cause VerifierDlls to be an empty string.
 //
-// As a side effect, VerifierDlls will be lowercased. This does not affect the
-// normal operation of Application Verifier, since their verifier DLLs are all
-// lower case anyway.
+// Matching is case-insensitive and requires a complete DLL token. Other DLL
+// names, casing and whitespace are preserved. All KexDll tokens are removed.
 //
 // For reference: The function within NTDLL that parses the VerifierDlls list is
 // called AVrfpParseVerifierDllsString. It is tolerant of double-spacing.
 //
-BOOLEAN KxCfgpRemoveKexDllFromVerifierDlls(
-	IN	PWSTR	VerifierDlls)
+BOOLEAN KxCfgpRemoveKexDllFromVerifierDlls(IN PWSTR VerifierDlls)
 {
-	ULONG Index;
-	PWSTR KexDll;
-	PCWSTR AfterKexDll;
-	BOOLEAN NonSeparatorCharacterFound;
-
-	ASSERT (VerifierDlls != NULL);
-
-	KexDll = (PWSTR) StringFindI(VerifierDlls, L"kexdll.dll");
-
-	if (!KexDll) {
-		// KexDll.dll was not found in the verifier DLLs list.
-		return FALSE;
-	}
-
-	//
-	// Shift backwards the contents of the string in order to remove the
-	// "kexdll.dll" entry.
-	//
-
-	AfterKexDll = KexDll + StringLiteralLength(L"kexdll.dll");
-	Index = 0;
-
-	do {
-		KexDll[Index] = AfterKexDll[Index];
-	} until (AfterKexDll[Index++] == '\0');
-
-	//
-	// Check to see if the VerifierDlls string consists of only separators.
-	// (note: AVrfpParseVerifierDllsString considers ' ' and '\t' to be separators)
-	//
-
-	Index = 0;
-	NonSeparatorCharacterFound = FALSE;
-
-	until (VerifierDlls[Index] == '\0') {
-		if (VerifierDlls[Index] != ' ' && VerifierDlls[Index] != '\t') {
-			NonSeparatorCharacterFound = TRUE;
-			break;
-		}
-
-		++Index;
-	}
-
-	if (NonSeparatorCharacterFound == FALSE) {
-		// The whole thing is just whitespace.
-		// Overwrite it so that it becomes an empty string.
-		VerifierDlls[0] = '\0';
-	}
-
-	return TRUE;
+    PWSTR Read, Write;
+    BOOLEAN Removed = FALSE, HasOtherDll = FALSE;
+    ASSERT (VerifierDlls != NULL);
+    if (!VerifierDlls) return FALSE;
+    Read = Write = VerifierDlls;
+    while (*Read) {
+        PCWSTR Token;
+        SIZE_T Length;
+        if (*Read == L' ' || *Read == L'\t') {
+            *Write++ = *Read++;
+            continue;
+        }
+        Token = Read;
+        while (*Read && *Read != L' ' && *Read != L'\t') ++Read;
+        Length = Read - Token;
+        if (Length == StringLiteralLength(L"kexdll.dll") &&
+            !_wcsnicmp(Token, L"kexdll.dll", Length)) {
+            Removed = TRUE;
+            continue;
+        }
+        HasOtherDll = TRUE;
+        while (Length--) *Write++ = *Token++;
+    }
+    *Write = L'\0';
+    if (Removed && !HasOtherDll) VerifierDlls[0] = L'\0';
+    return Removed;
+}
+// Vista redirects IFEO for WOW64; select the target image's registry view.
+STATIC BOOLEAN KxCfgpRecordedPathMatches(PCWSTR ExeFullPath, REGSAM View)
+{
+    HKEY Base, Key;
+    LONG Error;
+    WCHAR Recorded[MAX_PATH] = {0};
+    BOOLEAN Match = FALSE;
+    Error = RegOpenKeyExW(HKEY_LOCAL_MACHINE,
+        L"Software\\Microsoft\\Windows NT\\CurrentVersion\\Image File Execution Options",
+        0, KEY_READ | View, &Base);
+    if (Error) return FALSE;
+    Error = RegOpenKeyExW(Base, PathFindFileName(ExeFullPath), 0, KEY_READ | View, &Key);
+    RegCloseKey(Base);
+    if (Error) return FALSE;
+    Error = RegReadString(Key, NULL, L"KEX_ConfigPath", Recorded, ARRAYSIZE(Recorded));
+    if (!Error) Match = StringEqualI(Recorded, ExeFullPath);
+    RegCloseKey(Key);
+    return Match;
 }
 
-// Vista redirects IFEO for WOW64; select the target image's registry view.
 REGSAM KxCfgpIfeoView(PCWSTR ExeFullPath)
 {
     OSVERSIONINFOW Version = {sizeof(Version)};
     DWORD BinaryType;
     RtlGetVersion(&Version);
-    if (Version.dwMajorVersion == 6 && Version.dwMinorVersion == 0 &&
-        GetBinaryTypeW(ExeFullPath, &BinaryType) && BinaryType == SCS_32BIT_BINARY)
-        return KEY_WOW64_32KEY;
+    if (Version.dwMajorVersion == 6 && Version.dwMinorVersion == 0) {
+        if (GetBinaryTypeW(ExeFullPath, &BinaryType)) {
+            return BinaryType == SCS_32BIT_BINARY ? KEY_WOW64_32KEY : KEY_WOW64_64KEY;
+        }
+        if (RtlOperatingSystemBitness() != 64) return KEY_WOW64_64KEY;
+        // A missing image cannot reveal its bitness. Match recorded full paths,
+        // never just a basename in the alternate view.
+        if (KxCfgpRecordedPathMatches(ExeFullPath, KEY_WOW64_32KEY)) {
+            if (KxCfgpRecordedPathMatches(ExeFullPath, KEY_WOW64_64KEY)) {
+                SetLastError(ERROR_DUP_NAME);
+                return 0; // Ambiguous: callers must not mutate either view.
+            }
+            return KEY_WOW64_32KEY;
+        }
+    }
     return KEY_WOW64_64KEY;
 }
 
@@ -114,16 +120,20 @@ NTSTATUS KxCfgpOpenIfeoKey(PCWSTR ExeFullPath, PHKEY KeyHandle)
     UNICODE_STRING Name;
     HKEY Base;
     LONG Error;
-    if (KxCfgpIfeoView(ExeFullPath) != KEY_WOW64_32KEY) {
+    OSVERSIONINFOW Version = {sizeof(Version)};
+    REGSAM View = KxCfgpIfeoView(ExeFullPath);
+    if (!View) return STATUS_OBJECT_NAME_COLLISION;
+    RtlGetVersion(&Version);
+    if (Version.dwMajorVersion != 6 || Version.dwMinorVersion != 0) {
         RtlInitUnicodeString(&Name, ExeFullPath);
         return LdrOpenImageFileOptionsKey(&Name, FALSE, (PHANDLE)KeyHandle);
     }
     Error = RegOpenKeyExW(HKEY_LOCAL_MACHINE,
         L"Software\\Microsoft\\Windows NT\\CurrentVersion\\Image File Execution Options",
-        0, KEY_READ | KEY_WOW64_32KEY, &Base);
+        0, KEY_READ | View, &Base);
     if (Error == ERROR_SUCCESS) {
         Error = RegOpenKeyExW(Base, PathFindFileName(ExeFullPath), 0,
-            KEY_READ | KEY_WOW64_32KEY, KeyHandle);
+            KEY_READ | View, KeyHandle);
         RegCloseKey(Base);
     }
     if (Error == ERROR_SUCCESS) return STATUS_SUCCESS;
@@ -146,6 +156,7 @@ BOOLEAN KxCfgpCreateIfeoKeyForProgram(
 	ASSERT (KeyHandle != NULL);
 
 	*KeyHandle = NULL;
+	if (!KxCfgpIfeoView(ExeFullPath)) return FALSE;
 
 	IfeoBaseKey = NULL;
 	IfeoExeKey = NULL;

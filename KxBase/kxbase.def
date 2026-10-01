@@ -68,6 +68,7 @@ EXPORTS
 	GetUserDefaultGeoName
 
 	;; file.c
+	ReadDirectoryChangesExW
 	CreateFile2
 	GetTempPath2A
 	GetTempPath2W

@@ -84,12 +84,41 @@ NTSTATUS VxlpBuildIndex(
 	ULONG TotalLogEntryCount;
 	ULONG Index;
 	ULONG SeverityIndex[LogSeverityMaximumValue];
+	FILE_STANDARD_INFORMATION FileInfo;
+	IO_STATUS_BLOCK IoStatus;
+	NTSTATUS Status;
+	ULONGLONG Total, Offset, Size;
+	ULONG Item, Character;
 
 	ASSERT (LogHandle != NULL);
 	ASSERT (LogHandle->OpenMode == GENERIC_READ);
 	ASSERT (LogHandle->EntryIndexToFileOffset == NULL);
 
-	TotalLogEntryCount = VxlpGetTotalLogEntryCount(LogHandle);
+	Status = NtQueryInformationFile(LogHandle->FileHandle, &IoStatus, &FileInfo,
+		sizeof(FileInfo), FileStandardInformation);
+	if (!NT_SUCCESS(Status)) return Status;
+	if (FileInfo.EndOfFile.QuadPart < sizeof(VXLLOGFILEHEADER) ||
+		FileInfo.EndOfFile.QuadPart > 0xffffffffUL) return STATUS_FILE_INVALID;
+	// Fixed-size source strings are consumed as C strings by the viewer.
+#define CHECK_STRINGS(Member) \
+	for (Item = 0; Item < ARRAYSIZE(LogHandle->Header->Member); ++Item) { \
+		for (Character = 0; Character < ARRAYSIZE(LogHandle->Header->Member[0]); ++Character) \
+			if (!LogHandle->Header->Member[Item][Character]) break; \
+		if (Character == ARRAYSIZE(LogHandle->Header->Member[0])) return STATUS_FILE_INVALID; \
+	}
+	CHECK_STRINGS(SourceComponents);
+	CHECK_STRINGS(SourceFiles);
+	CHECK_STRINGS(SourceFunctions);
+#undef CHECK_STRINGS
+	for (Character = 0; Character < ARRAYSIZE(LogHandle->Header->SourceApplication); ++Character)
+		if (!LogHandle->Header->SourceApplication[Character]) break;
+	if (Character == ARRAYSIZE(LogHandle->Header->SourceApplication)) return STATUS_FILE_INVALID;
+	Total = 0;
+	for (Index = 0; Index < LogSeverityMaximumValue; ++Index)
+		Total += LogHandle->Header->EventSeverityTypeCount[Index];
+	if (Total > (FileInfo.EndOfFile.QuadPart - sizeof(VXLLOGFILEHEADER)) / sizeof(VXLLOGFILEENTRY))
+		return STATUS_FILE_INVALID;
+	TotalLogEntryCount = (ULONG) Total;
 
 	if (!TotalLogEntryCount) {
 		return STATUS_NO_MORE_ENTRIES;
@@ -101,10 +130,24 @@ NTSTATUS VxlpBuildIndex(
 
 	LogHandle->EntryIndexToFileOffset = SafeAllocSeh(ULONG, TotalLogEntryCount);
 
-	Entry = (PVXLLOGFILEENTRY) (LogHandle->MappedFile + sizeof(VXLLOGFILEHEADER));
+	Offset = sizeof(VXLLOGFILEHEADER);
 	RtlZeroMemory(SeverityIndex, sizeof(SeverityIndex));
 
 	for (Index = 0; TotalLogEntryCount--; ++Index) {
+		if (Offset + sizeof(VXLLOGFILEENTRY) > (ULONGLONG) FileInfo.EndOfFile.QuadPart)
+			return STATUS_FILE_INVALID;
+		Entry = (PVXLLOGFILEENTRY) (LogHandle->MappedFile + (ULONG) Offset);
+		Size = VxlpSizeOfLogFileEntry(Entry);
+		if (Offset + Size > (ULONGLONG) FileInfo.EndOfFile.QuadPart ||
+			Entry->Severity >= LogSeverityMaximumValue || Entry->Severity < 0 ||
+			Entry->SourceComponentIndex >= ARRAYSIZE(LogHandle->Header->SourceComponents) ||
+			Entry->SourceFileIndex >= ARRAYSIZE(LogHandle->Header->SourceFiles) ||
+			!Entry->TextHeaderCch || Entry->TextHeaderCch > 0xffffUL / sizeof(WCHAR) ||
+			Entry->TextCch > 0xffffUL / sizeof(WCHAR)) return STATUS_FILE_INVALID;
+		if (Entry->Text[Entry->TextHeaderCch - 1] ||
+			(Entry->TextCch && Entry->Text[Entry->TextHeaderCch + Entry->TextCch - 1]))
+			return STATUS_FILE_INVALID;
+		++SeverityIndex[Entry->Severity];
 		//
 		// record file offset of the Index'th entry into the index,
 		// for fast seeking to any particular log entry
@@ -116,8 +159,10 @@ NTSTATUS VxlpBuildIndex(
 		// skip ahead to next entry
 		//
 
-		Entry = (PVXLLOGFILEENTRY) RVA_TO_VA(Entry, VxlpSizeOfLogFileEntry(Entry));
+		Offset += Size;
 	}
+	for (Index = 0; Index < LogSeverityMaximumValue; ++Index)
+		if (SeverityIndex[Index] != LogHandle->Header->EventSeverityTypeCount[Index]) return STATUS_FILE_INVALID;
 
 	return STATUS_SUCCESS;
 }

@@ -79,3 +79,20 @@ NTSTATUS NTAPI Stub_Ext_NtQueryInformationProcess(
 		ProcessInformationLength,
 		ReturnLength);
 }
+
+// Vista lacks NtFlushBuffersFileEx.  The older call performs a full flush,
+// which also provides the durability requested by data-only flushes.
+NTSTATUS NTAPI KexNtFlushBuffersFileEx(
+	IN	HANDLE				FileHandle,
+	IN	ULONG				Flags,
+	IN	PVOID				Parameters,
+	IN	ULONG				ParametersSize,
+	OUT	PIO_STATUS_BLOCK	IoStatusBlock)
+{
+	if (!IoStatusBlock || Parameters || ParametersSize ||
+		(Flags != 0 && Flags != 1 && Flags != 2 && Flags != 4)) {
+		return STATUS_INVALID_PARAMETER;
+	}
+
+	return NtFlushBuffersFile(FileHandle, IoStatusBlock);
+}

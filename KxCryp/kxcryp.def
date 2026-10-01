@@ -2,6 +2,9 @@ LIBRARY KxCryp
 EXPORTS
 	;; bcrypt.c
 	BCryptCreateHash							= Ext_BCryptCreateHash
+	BCryptDuplicateHash                     = Ext_BCryptDuplicateHash
+	BCryptDestroyHash                       = Ext_BCryptDestroyHash
+	BCryptDuplicateKey                      = Ext_BCryptDuplicateKey
 	BCryptDeriveKey								= Ext_BCryptDeriveKey
 	BCryptDeriveKeyPBKDF2						= Ext_BCryptDeriveKeyPBKDF2
 	BCryptGenRandom								= Ext_BCryptGenRandom

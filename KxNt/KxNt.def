@@ -1,5 +1,6 @@
 LIBRARY KxNt
 EXPORTS
+	NtFlushBuffersFileEx						= KexNtFlushBuffersFileEx
 
 	LdrResolveDelayLoadedAPI					= KexDll.KexLdrResolveDelayLoadedAPI
 	LdrGetDllFullName							= KexDll.KexLdrGetDllFullName

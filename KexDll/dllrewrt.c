@@ -397,6 +397,19 @@ BOOLEAN KexShouldRewriteImportsOfDll(
 	if (RtlPrefixUnicodeString(&KexData->WinDir, FullDllName, TRUE)) {
 		UNICODE_STRING Kernel;
 		UNICODE_STRING Msvcp140;
+		UNICODE_STRING ForcedDll;
+
+		// WinHTTP/WinINet must see the KxCryp SSPI exports. On Vista/Server
+		// 2008, secur32.dll queries SecurityProviders itself; later systems use
+		// sspicli.dll. Rewrite either caller's Advapi import to reach KxAdvapi.
+		RtlInitConstantUnicodeString(&ForcedDll, L"webio.dll");
+		if (RtlEqualUnicodeString(&BaseDllName, &ForcedDll, TRUE)) return TRUE;
+		RtlInitConstantUnicodeString(&ForcedDll, L"wininet.dll");
+		if (RtlEqualUnicodeString(&BaseDllName, &ForcedDll, TRUE)) return TRUE;
+		RtlInitConstantUnicodeString(&ForcedDll, L"sspicli.dll");
+		if (RtlEqualUnicodeString(&BaseDllName, &ForcedDll, TRUE)) return TRUE;
+		RtlInitConstantUnicodeString(&ForcedDll, L"secur32.dll");
+		if (RtlEqualUnicodeString(&BaseDllName, &ForcedDll, TRUE)) return TRUE;
 
 		//
 		// The DLL is in the Windows directory.
@@ -521,10 +534,14 @@ NTSTATUS KexRewriteImageImportDirectory(
 	PIMAGE_DATA_DIRECTORY ImportDirectory;
 	PIMAGE_IMPORT_DESCRIPTOR ImportDescriptor;
 	UNICODE_STRING Kernel32;
+	UNICODE_STRING Secur32;
+	BOOLEAN Secur32OnlyAdvapi;
 	BOOLEAN AtLeastOneImportWasRewritten;
 	ULONG OldProtect;
 
 	AtLeastOneImportWasRewritten = FALSE;
+	RtlInitConstantUnicodeString(&Secur32, L"secur32.dll");
+	Secur32OnlyAdvapi = RtlEqualUnicodeString(BaseImageName, &Secur32, TRUE);
 
 	ASSERT (DllRewriteStringMapper != NULL);
 	ASSERT (ImageBase != NULL);
@@ -625,6 +642,9 @@ NTSTATUS KexRewriteImageImportDirectory(
 
 		DllNameBuffer = (PSTR) RVA_TO_VA(ImageBase, ImportDescriptor->Name);
 		RtlInitAnsiString(&ImportedDllNameAnsi, DllNameBuffer);
+		if (Secur32OnlyAdvapi && !StringEqualIA(DllNameBuffer, "advapi32.dll")) {
+			continue;
+		}
 
 		Status = KexpRewriteImportTableDllNameInPlace(
 			&ImportedDllNameAnsi);

@@ -20,6 +20,12 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="cpiwbypa.c" />
+    <ClCompile Include="preserve.c" />
+    <ClCompile Include="setupfile.c" />
+    <ClCompile Include="logassoc.c" />
+    <ClCompile Include="shlsetup.c" />
+    <ClCompile Include="setupreg.c" />
+    <ClCompile Include="setup.c" />
     <ClCompile Include="ctxmenu.c" />
     <ClCompile Include="delcfg.c" />
     <ClCompile Include="dskclnup.c" />

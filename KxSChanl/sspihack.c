@@ -120,9 +120,10 @@ VOID SppFixupFunctionPointers(
 	IN	PVOID		RetAddr)
 {
 	STATIC VOLATILE BOOLEAN AlreadyFixedUp = FALSE;
+	STATIC RTL_SRWLOCK FixupLock = {0};
 	PDLL_SECURITY_PACKAGE DllSecPkg;
 
-	if (AlreadyFixedUp || InterlockedCompareExchange8(&AlreadyFixedUp, TRUE, FALSE) == TRUE) {
+	if (AlreadyFixedUp) {
 		// Already done it.
 		return;
 	}
@@ -137,7 +138,8 @@ VOID SppFixupFunctionPointers(
 		return;
 	}
 
-	if (!AshModuleBaseNameIs(RetAddr, L"sspicli.dll")) {
+	if (!AshModuleBaseNameIs(RetAddr, L"sspicli.dll") &&
+		!AshModuleBaseNameIs(RetAddr, L"secur32.dll")) {
 		// Not invoked through SSPI infrastructure
 		return;
 	}
@@ -146,6 +148,13 @@ VOID SppFixupFunctionPointers(
 
 	if (!SppValidDllSecPkg(DllSecPkg)) {
 		// We found something we don't like, probably not the right structure
+		KexLogWarningEvent(L"SSPI package table validation failed; no function pointers changed.");
+		return;
+	}
+
+	RtlAcquireSRWLockExclusive(&FixupLock);
+	if (AlreadyFixedUp) {
+		RtlReleaseSRWLockExclusive(&FixupLock);
 		return;
 	}
 
@@ -166,4 +175,6 @@ VOID SppFixupFunctionPointers(
 	DllSecPkg->FunctionTableW->DecryptMessage = SpDecryptMessage;
 
 	ASSERT (DllSecPkg->FunctionTable == DllSecPkg->FunctionTableW);
+	AlreadyFixedUp = TRUE;
+	RtlReleaseSRWLockExclusive(&FixupLock);
 }

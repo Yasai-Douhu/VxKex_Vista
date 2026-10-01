@@ -14,6 +14,13 @@ static WCHAR *skipExecutable(WCHAR *p) {
     else while (*p && *p != L' ' && *p != L'\t') ++p;
     return p;
 }
+static BOOL takeOption(WCHAR **arguments, LPCWSTR option) {
+    WCHAR *p = *arguments;
+    while (*option) { if (*p != *option) return FALSE; ++p; ++option; }
+    if (*p && *p != L' ' && *p != L'\t') return FALSE;
+    while (*p == L' ' || *p == L'\t') ++p;
+    *arguments = p; return TRUE;
+}
 static LONG removeLaunchers(HKEY key) {
     DWORD index = 0, size; WCHAR name[256]; HKEY child; LONG error;
     error = VistaRemoveManagedDebugger(key);
@@ -32,7 +39,7 @@ static LONG removeLaunchers(HKEY key) {
 void mainCRTStartup(void) {
     WCHAR dllPath[MAX_PATH], target[MAX_PATH], *args, *command, *end;
     HMODULE kex; LONG (WINAPI *patch)(void); LONG status;
-    UINT length, n; BOOL ifeo = FALSE, code = FALSE;
+    UINT length, n; BOOL ifeo = FALSE, code = FALSE, withKex = FALSE;
     static STARTUPINFOW startup = {sizeof(startup)};
     PROCESS_INFORMATION process;
     static const WCHAR flags[] = L" --no-sandbox --disable-gpu --disable-gpu-sandbox --disable-software-rasterizer --use-gl=disabled";
@@ -50,6 +57,7 @@ void mainCRTStartup(void) {
         args[4] == L'e' && args[5] == L'o' && (args[6] == L' ' || args[6] == L'\t')) {
         ifeo = TRUE; args += 7; while (*args == L' ' || *args == L'\t') ++args;
     }
+    if (!ifeo && takeOption(&args, L"--with-kex")) withKex = TRUE;
     if (!*args) fail(L"Missing application path", ERROR_INVALID_PARAMETER);
     end = skipExecutable(args);
     n = (UINT)(end - args); length = n;
@@ -62,6 +70,12 @@ void mainCRTStartup(void) {
     lstrcatW(dllPath, L"\\KexDll.dll");
     kex = LoadLibraryW(dllPath);
     if (!kex) fail(L"Load KexDll.dll", GetLastError());
+    if (withKex) {
+        LONG (WINAPI *initializePropagation)(void) = (void *)GetProcAddress(kex, "KexInitializePropagation");
+        if (!initializePropagation) fail(L"Find propagation initialization", GetLastError());
+        status = initializePropagation();
+        if (status < 0) fail(L"Initialize context-menu propagation", (DWORD)status);
+    }
     patch = (void *)GetProcAddress(kex, "KexPatchCpiwSubsystemVersionCheck");
     if (!patch) fail(L"Find subsystem compatibility function", GetLastError());
     status = patch();

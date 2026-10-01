@@ -18,6 +18,24 @@
     <ClCompile Include="openkey.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="preserve.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="setupfile.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="logassoc.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="shlsetup.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="setupreg.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="setup.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="getcfg.c">
       <Filter>Source Files</Filter>
     </ClCompile>

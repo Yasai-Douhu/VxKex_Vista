@@ -28,6 +28,8 @@
 #include <KxCfgHlp.h>
 #include <KexW32ML.h>
 
+INT NTAPI RtlOperatingSystemBitness(VOID);
+
 //
 // Retrieve VxKex configuration for a particular program.
 // Returns TRUE on success and FALSE on failure. Call GetLastError() to obtain
@@ -124,9 +126,10 @@ KXCFGDECLSPEC BOOLEAN KXCFGAPI KxCfgGetConfiguration(
 // Enumerate all programs with VxKex enabled and call a function for each one.
 // This function works for legacy configuration as well.
 //
-KXCFGDECLSPEC BOOLEAN KXCFGAPI KxCfgEnumerateConfiguration(
+STATIC BOOLEAN KxCfgpEnumerateConfigurationView(
 	IN	PKXCFG_ENUMERATE_CONFIGURATION_CALLBACK	ConfigurationCallback,
-	IN	PVOID									CallbackExtraParameter)
+	IN	PVOID									CallbackExtraParameter,
+	IN REGSAM View)
 {
 	HKEY IfeoBaseKey;
 	ULONG Index;
@@ -144,7 +147,7 @@ KXCFGDECLSPEC BOOLEAN KXCFGAPI KxCfgEnumerateConfiguration(
 		L"Software\\Microsoft\\Windows NT\\CurrentVersion\\"
 		L"Image File Execution Options",
 		0,
-		KEY_READ | KEY_WOW64_64KEY,
+		KEY_READ | View,
 		&IfeoBaseKey);
 
 	if (ErrorCode == ERROR_FILE_NOT_FOUND) {
@@ -187,6 +190,10 @@ KXCFGDECLSPEC BOOLEAN KXCFGAPI KxCfgEnumerateConfiguration(
 		if (ErrorCode != ERROR_SUCCESS) {
 			continue;
 		}
+		if (StringEqualI(ExeBaseName, L"{VxKexPropagationVirtualKey}")) {
+			// Internal propagation template, not a user-configured executable.
+			continue;
+		}
 
 		//
 		// If not present, we Look for "Debugger" value and scan for "VxKexLdr.exe"
@@ -211,13 +218,39 @@ KXCFGDECLSPEC BOOLEAN KXCFGAPI KxCfgEnumerateConfiguration(
 		// Legacy configuration has been found - call the callback
 		ContinueEnumeration = ConfigurationCallback(ExeBaseName, TRUE, CallbackExtraParameter);
 		if (!ContinueEnumeration) {
-			RegCloseKey(IfeoExeKey);
 			RegCloseKey(IfeoBaseKey);
 			SetLastError(ERROR_SUCCESS);
 			return FALSE;
 		}
 
 NoLegacyConfigurationFound:
+		{
+			ULONG BaseGlobalFlag = 0;
+			WCHAR BaseVerifierDlls[256] = {0};
+			WCHAR ConfigurationPath[MAX_PATH] = {0};
+			RegReadI32(IfeoBaseKey, ExeBaseName, L"GlobalFlag", &BaseGlobalFlag);
+			RegReadString(IfeoBaseKey, ExeBaseName, L"VerifierDlls",
+				BaseVerifierDlls, ARRAYSIZE(BaseVerifierDlls));
+			if ((BaseGlobalFlag & FLG_APPLICATION_VERIFIER) &&
+				StringSearchI(BaseVerifierDlls, L"KexDll.dll")) {
+				RegReadString(IfeoBaseKey, ExeBaseName, L"KEX_ConfigPath",
+					ConfigurationPath, ARRAYSIZE(ConfigurationPath));
+				// Older Vista settings have no path. Expose them as basename entries;
+				// callers must not treat these as files to clean up automatically.
+				if (!ConfigurationPath[0] || PathIsRelative(ConfigurationPath) ||
+					!StringEqualI(PathFindFileName(ConfigurationPath), ExeBaseName)) {
+					ConfigurationPath[0] = 0;
+				}
+				ContinueEnumeration = ConfigurationCallback(
+					ConfigurationPath[0] ? ConfigurationPath : ExeBaseName,
+					!ConfigurationPath[0], CallbackExtraParameter);
+				if (!ContinueEnumeration) {
+					RegCloseKey(IfeoBaseKey);
+					SetLastError(ERROR_SUCCESS);
+					return FALSE;
+				}
+			}
+		}
 		//
 		// Check for "UseFilter" value. If so, we will need to enum subkeys.
 		//
@@ -231,7 +264,7 @@ NoLegacyConfigurationFound:
 			IfeoBaseKey,
 			ExeBaseName,
 			0,
-			KEY_READ | KEY_WOW64_64KEY,
+			KEY_READ | View,
 			&IfeoExeKey);
 
 		if (ErrorCode != ERROR_SUCCESS) {
@@ -243,9 +276,9 @@ NoLegacyConfigurationFound:
 		while (TRUE) {
 			WCHAR SubkeyName[32];
 			ULONG SubkeyNameCch;
-			WCHAR FilterFullPath[MAX_PATH];
-			WCHAR VerifierDlls[256];
-			ULONG GlobalFlag;
+			WCHAR FilterFullPath[MAX_PATH] = {0};
+			WCHAR VerifierDlls[256] = {0};
+			ULONG GlobalFlag = 0;
 
 			SubkeyNameCch = ARRAYSIZE(SubkeyName);
 			ErrorCode = RegEnumKeyEx(
@@ -312,5 +345,20 @@ NoLegacyConfigurationFound:
 	}
 
 	RegCloseKey(IfeoBaseKey);
+	return TRUE;
+}
+
+KXCFGDECLSPEC BOOLEAN KXCFGAPI KxCfgEnumerateConfiguration(
+	IN PKXCFG_ENUMERATE_CONFIGURATION_CALLBACK Callback,
+	IN PVOID Extra)
+{
+	OSVERSIONINFOW Version = {sizeof(Version)};
+	RtlGetVersion(&Version);
+	if (!KxCfgpEnumerateConfigurationView(Callback, Extra, KEY_WOW64_64KEY)) return FALSE;
+	// Vista has separate IFEO registry views; later Windows shares this key.
+	if (Version.dwMajorVersion == 6 && Version.dwMinorVersion == 0 &&
+		RtlOperatingSystemBitness() == 64) {
+		return KxCfgpEnumerateConfigurationView(Callback, Extra, KEY_WOW64_32KEY);
+	}
 	return TRUE;
 }

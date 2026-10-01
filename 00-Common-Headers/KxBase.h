@@ -729,6 +729,17 @@ KXBASEAPI BOOL WINAPI IsProcessCritical(
 
 //
 // file.c
+KXBASEAPI BOOL WINAPI ReadDirectoryChangesExW(
+	IN HANDLE Directory,
+	OUT PVOID Buffer,
+	IN DWORD BufferLength,
+	IN BOOL WatchSubtree,
+	IN DWORD NotifyFilter,
+	OUT PDWORD BytesReturned OPTIONAL,
+	IN OUT LPOVERLAPPED Overlapped OPTIONAL,
+	IN LPOVERLAPPED_COMPLETION_ROUTINE CompletionRoutine OPTIONAL,
+	IN ULONG InformationClass);
+
 //
 
 KXBASEAPI HANDLE WINAPI CreateFile2(

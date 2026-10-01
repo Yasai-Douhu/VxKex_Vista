@@ -215,3 +215,58 @@ ULONG KxCfgpDeleteKey(
 	IN	HANDLE	TransactionHandle OPTIONAL);
 
 #endif
+
+// Internal preservation primitives: both keys must belong to the same transaction.
+INT NTAPI RtlOperatingSystemBitness(VOID);
+LONG KxCfgpPreserveIfeoConfiguration(HKEY Source, HKEY Backup);
+LONG KxCfgpRestoreIfeoConfiguration(HKEY Source, HKEY Backup);
+LONG KxCfgpPreserveIfeoView(HKEY IfeoRoot, HKEY Backup, HANDLE Transaction, REGSAM View);
+LONG KxCfgpRestoreIfeoView(HKEY IfeoRoot, HKEY Backup, HANDLE Transaction, REGSAM View);
+// Required transaction: the caller commits only after the whole operation
+// succeeds and rolls back on every failure. Restore consumes the store.
+KXCFGDECLSPEC BOOLEAN KXCFGAPI KxCfgPreserveAllConfigurations(HANDLE Transaction);
+KXCFGDECLSPEC BOOLEAN KXCFGAPI KxCfgRestoreAllConfigurations(HANDLE Transaction);
+KXCFGDECLSPEC BOOLEAN KXCFGAPI KxCfgPrepareUninstall(BOOLEAN KeepSettings, HANDLE Transaction);
+// Native TxF primitives. Roots must be authorized by the caller; on any error
+// roll back the shared registry/filesystem transaction. Never commit here.
+LONG KxCfgpCopySetupFile(PCWSTR Source, PCWSTR Destination, HANDLE Transaction);
+LONG KxCfgpDeleteSetupFile(PCWSTR Path, HANDLE Transaction);
+LONG KxCfgpCopySetupDirectory(PCWSTR Source, PCWSTR Destination, HANDLE Transaction);
+LONG KxCfgpRemoveSetupDirectory(PCWSTR Path, HANDLE Transaction);
+// Shared with VxlView and setup: caller commits or rolls back the whole change.
+LONG KxCfgpUpdateLogAssociation(HKEY ClassesRoot, PCWSTR Executable,
+    BOOLEAN Install, HANDLE Transaction);
+LONG KxCfgpUpdateShellExtension(HKEY ClassesRoot, HKEY SoftwareRoot,
+    PCWSTR DllPath, BOOLEAN Install, HANDLE Transaction);
+// Caller authorizes all roots and uses native system paths (native setup process).
+// These stage file operations only; caller also stages registry configuration.
+LONG KxCfgpDeploySetupFiles(PCWSTR Package, PCWSTR Target, PCWSTR NativeSystem,
+    PCWSTR WowSystem, HANDLE Transaction);
+LONG KxCfgpUpdateContextMenu(HKEY ClassesRoot, PCWSTR KexDir, PCWSTR WindowsDirectory,
+    BOOLEAN Enable, BOOLEAN ExtendedMenu, HANDLE Transaction);
+LONG KxCfgpStageLoggingSettings(HKEY UserSoftware, HKEY MachineSoftware,
+    PCWSTR KexDir, BOOLEAN Enabled, PCWSTR ResolvedLogDir, HANDLE Transaction);
+
+LONG KxCfgpRemoveSetupFiles(PCWSTR Target, PCWSTR NativeSystem,
+    PCWSTR WowSystem, HANDLE Transaction);
+LONG KxCfgpValidateSetupBinary(PCWSTR Path, WORD Machine, BOOLEAN Dll, HANDLE Transaction);
+LONG KxCfgpValidateSetupPackage(PCWSTR Package, HANDLE Transaction);
+LONG KxCfgpDeploySetupPackage(PCWSTR Package, PCWSTR Target, PCWSTR NativeSystem,
+    PCWSTR WowSystem, HANDLE Transaction);
+LONG KxCfgpConfigureSetupSettings(HKEY MachineSoftware, HKEY UserSoftware,
+    PCWSTR Target, DWORD Version, BOOLEAN Install, BOOLEAN KeepSettings, HANDLE Transaction);
+LONG KxCfgpConfigurePropagationTemplate(HKEY IfeoRoot, REGSAM View,
+    BOOLEAN Install, HANDLE Transaction);
+LONG KxCfgpProcessConfigurationRoots(BOOLEAN Restore, HANDLE Transaction,
+    HKEY StoreParent, PCWSTR StorePath, HKEY NativeIfeo, HKEY WowIfeo);
+
+typedef struct _KXCFG_SETUP_CONTEXT {
+    DWORD Size;
+    PCWSTR Package, Target, NativeSystem, WowSystem;
+    HKEY MachineSoftware, UserSoftware, ClassesRoot, NativeIfeo, WowIfeo;
+    DWORD InstalledVersion;
+    PCWSTR StageName; // Output: last operation attempted, for error reporting.
+} KXCFG_SETUP_CONTEXT, *PKXCFG_SETUP_CONTEXT;
+// Roots must be authorized by the front end. This stage never commits.
+LONG KxCfgpStageSetup(PKXCFG_SETUP_CONTEXT Context, BOOLEAN Install,
+    BOOLEAN KeepSettings, HANDLE Transaction);

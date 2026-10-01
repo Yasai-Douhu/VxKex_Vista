@@ -1,3 +1,10 @@
+[CmdletBinding()]
+param(
+    [string[]]$Only = @(),
+    [string]$OutputRoot = "",
+    [switch]$NoStage
+)
+
 # VxKex_Vista Extended DLLs Build Script with VS2010 (cl.exe)
 # Builds KxAdvapi, KxBase, KxCom, KxCrt, KxCryp, KxDw, KxDx, KxMi, KxNet, KxSChanl, KxUia, KxUser
 
@@ -18,6 +25,7 @@ $env:INCLUDE = "$SDK71_INCLUDE;C:\Program Files (x86)\Microsoft Visual Studio 10
 $env:LIB = "$SDK71_LIB;C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\lib\amd64"
 
 $ScriptDirAbs = (Get-Item $ScriptDir).FullName
+if (!$OutputRoot) { $OutputRoot = Join-Path $ScriptDirAbs "x64\Release" }
 $HDR_DIR = Join-Path $ScriptDirAbs "00-Common-Headers"
 $KEXDLL_OUT = Join-Path $ScriptDirAbs "VistaDLLs"
 $KEXPATHCCH_OUT = Join-Path $ScriptDirAbs "VistaDLLs"
@@ -37,6 +45,12 @@ $ExtendedDLLs = @(
     "KxAdvapi", "KxCom", "KxCrt", "KxCryp", "KxDw",
     "KxDx", "KxMi", "KxNet", "KxSChanl", "KxUia", "KxUser"
 )
+if ($Only.Count -gt 0) {
+    foreach ($name in $Only) {
+        if ($name -notin $ExtendedDLLs) { throw "Unknown extended DLL: $name" }
+    }
+    $ExtendedDLLs = @($ExtendedDLLs | Where-Object { $_ -in $Only })
+}
 
 function Invoke-ClCompile {
     param(
@@ -47,22 +61,27 @@ function Invoke-ClCompile {
     )
     if (-not (Test-Path $OutputDir)) { New-Item -ItemType Directory -Path $OutputDir | Out-Null }
     
-    $includeFlags = @("/I", "`"$HDR_DIR`"")
+    $includeFlags = @("/I", $HDR_DIR)
     $foFlag = "/Fo" + $OutputFile
-    $srcFlag = "`"$SourceFile`""
+    $srcFlag = $SourceFile
     $flags = @("/c", "/O1", "/Os", "/Oy", "/GL", "/Gy", "/Gz", "/MD", "/Zi", "/W3", "/TC", "/GS-")
     $flags += @("/D", "WIN32")
     $flags += @("/D", "NDEBUG")
     $flags += @("/D", "_WINDOWS")
     $flags += @("/D", "_USRDLL")
     $flags += @("/D", $DefineFlag)
-    $flags += @("/D", "_WIN32_WINNT=0x0600")
-    $flags += @("/D", "WINVER=0x0600")
+    $flags += @("/D", "UNICODE", "/D", "_UNICODE")
+    if ($DefineFlag -eq "KXSCHANL_EXPORTS") {
+        # ByteSwap* must be emitted as CPU intrinsics, and the SSPI strings
+        # in this project use the wide-character Win32 API variants.
+        $flags += @("/Oi")
+    }
     $flags += $includeFlags
+    $flags += "/Fd$OutputDir\compile.pdb"
     $flags += @($foFlag, $srcFlag)
     
-    $proc = Start-Process -FilePath "cl.exe" -ArgumentList $flags -NoNewWindow -Wait -PassThru
-    if ($proc.ExitCode -ne 0) {
+    & cl.exe @flags | Out-Host
+    if ($LASTEXITCODE -ne 0) {
         return $false
     }
     return $true
@@ -71,8 +90,8 @@ function Invoke-ClCompile {
 # Build each extended DLL
 foreach ($dllName in $ExtendedDLLs) {
     $dllDir = Join-Path $ScriptDirAbs $dllName
-    $dllOutDir = Join-Path $ScriptDirAbs "x64\Release\$dllName"
-    $exportDef = "${dllName}_EXPORTS"
+    $dllOutDir = Join-Path $OutputRoot $dllName
+    $exportDef = "$($dllName.ToUpper())_EXPORTS"
     
     if (-not (Test-Path $dllDir)) {
         Write-Host "`n[dllName] Directory not found: $dllDir" -ForegroundColor Yellow
@@ -97,8 +116,7 @@ foreach ($dllName in $ExtendedDLLs) {
         
         Write-Host "  Compiling: $src" -NoNewline
         if (!(Invoke-ClCompile $srcPath $objFile $exportDef $dllOutDir)) {
-            Write-Host " FAILED" -ForegroundColor Red
-            break
+            throw "Compilation failed: $srcPath"
         }
         Write-Host " OK" -ForegroundColor Green
     }
@@ -117,10 +135,10 @@ foreach ($dllName in $ExtendedDLLs) {
         $asmObjPath = Join-Path $dllOutDir ($asmFile.Name -replace '\.asm$', '.obj')
         $objFiles += $asmObjPath
         
-        $mlArgs = @("/nologo", "/c", "/Fo`"$asmObjPath`"", "`"$asmFilePath`"")
+        $mlArgs = @("/nologo", "/c", "/Fo$asmObjPath", $asmFilePath)
         Write-Host "  Assembling: $($asmFile.Name)"
-        $process = Start-Process -FilePath "ml64.exe" -ArgumentList $mlArgs -NoNewWindow -Wait -PassThru
-        if ($process.ExitCode -ne 0) {
+        & ml64.exe @mlArgs
+        if ($LASTEXITCODE -ne 0) {
             Write-Host " FAILED" -ForegroundColor Red
             continue
         }
@@ -133,28 +151,25 @@ foreach ($dllName in $ExtendedDLLs) {
     
     $linkArgs = @("/NOLOGO", "/DLL", "/OUT:$dllPath", "/IMPLIB:$libPath",
                   "/SUBSYSTEM:WINDOWS", "/OPT:REF", "/OPT:ICF", "/MACHINE:X64", "/ENTRY:DllMain", "/LTCG",
-                  "/SETCHECKSUM", "/LIBPATH:`"$IMPORT_LIBS_DIR`"", "/LIBPATH:`"$ScriptDirAbs\VistaDLLs`"")
+                  "/LIBPATH:$OutputRoot\KxCryp", "/LIBPATH:$IMPORT_LIBS_DIR", "/LIBPATH:$ScriptDirAbs\VistaDLLs")
     
     if ($defPath) {
-        $linkArgs += "/DEF:`"$defPath`""
+        $linkArgs += "/DEF:$defPath"
     }
     
     # Add object files
     foreach ($obj in $objFiles) {
-        $linkArgs += "`"$obj`""
+        $linkArgs += $obj
     }
     
     # Add dependencies
-    $linkArgs += "`"$KexDllLib`"", "`"$KexPathCchLib`"", "`"$KexSmpLib`"", "`"$KexMlsLib`""
-    $linkArgs += "`"$ntdllLib`"", "`"$msvcrtLib`""
+    $linkArgs += $KexDllLib, $KexPathCchLib, $KexSmpLib, $KexMlsLib
+    $linkArgs += $ntdllLib, $msvcrtLib
     $linkArgs += "kernel32.lib", "user32.lib", "gdi32.lib", "advapi32.lib", "shlwapi.lib"
     
     Write-Host "  Linking $dllName.dll..." -NoNewline
-    $proc = Start-Process -FilePath "link.exe" -ArgumentList $linkArgs -NoNewWindow -Wait -PassThru
-    if ($proc.ExitCode -ne 0) {
-        Write-Host " FAILED" -ForegroundColor Red
-        continue
-    }
+    & link.exe @linkArgs
+    if ($LASTEXITCODE -ne 0) { throw "Link failed: $dllName" }
     Write-Host " OK" -ForegroundColor Green
     
     # Verify output
@@ -162,8 +177,10 @@ foreach ($dllName in $ExtendedDLLs) {
         $dllItem = Get-Item $dllPath
         $dllSizeKB = [math]::Round($dllItem.Length / 1KB, 2)
         Write-Host "  $dllName.dll: OK ($dllSizeKB KB)" -ForegroundColor Green
-        Copy-Item -Path $dllPath -Destination (Join-Path $ScriptDirAbs "VistaDLLs") -Force
-        Copy-Item -Path $libPath -Destination (Join-Path $ScriptDirAbs "VistaDLLs") -Force
+        if (!$NoStage) {
+            Copy-Item -Path $dllPath -Destination (Join-Path $ScriptDirAbs "VistaDLLs") -Force
+            Copy-Item -Path $libPath -Destination (Join-Path $ScriptDirAbs "VistaDLLs") -Force
+        }
     }
 }
 

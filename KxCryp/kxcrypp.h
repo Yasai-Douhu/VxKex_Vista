@@ -10,6 +10,18 @@
 
 EXTERN PKEX_PROCESS_DATA KexData;
 
+KXCRYPAPI NTSTATUS WINAPI Ext_BCryptDestroyHash(IN BCRYPT_HASH_HANDLE Hash);
+
+#undef SafeBCryptDestroyHash
+#define SafeBCryptDestroyHash(HashHandle) \
+	do { \
+		if (HashHandle) { \
+			NTSTATUS Status = Ext_BCryptDestroyHash(HashHandle); \
+			ASSERT (NT_SUCCESS(Status)); \
+			(HashHandle) = NULL; \
+		} \
+	} while (0)
+
 #define SafeBCryptCloseAlgorithmProvider(Provider) \
 	do { \
 		if (Provider) { \

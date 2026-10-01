@@ -44,8 +44,8 @@ function Invoke-ClCompile {
     $flags = @("/c", "/O1", "/Os", "/Oy", "/GL", "/Gy", "/Gz", "/MD", "/Zi", "/W3", "/TC", "/GS-") + $Defines + $includeFlags + @($foFlag, $srcFlag)
     $srcName = Split-Path $SourceFile -Leaf
     Write-Host "  Compiling: " $srcName -NoNewline
-    $proc = Start-Process -FilePath "cl.exe" -ArgumentList $flags -NoNewWindow -Wait -PassThru
-    if ($proc.ExitCode -ne 0) {
+    & cl.exe @flags | Out-Host
+    if ($LASTEXITCODE -ne 0) {
         Write-Host " FAILED" -ForegroundColor Red
         return $false
     }
@@ -137,8 +137,8 @@ $linkArgs += @(
 )
 
 Write-Host "  Linking KxNt.dll..." -NoNewline
-$proc = Start-Process -FilePath "link.exe" -ArgumentList $linkArgs -NoNewWindow -Wait -PassThru
-if ($proc.ExitCode -ne 0) {
+& link.exe @linkArgs | Out-Host
+if ($LASTEXITCODE -ne 0) {
     Write-Host " FAILED" -ForegroundColor Red
     Write-Host "" -ForegroundColor Red
     Write-Host "BUILD FAILED" -ForegroundColor Red

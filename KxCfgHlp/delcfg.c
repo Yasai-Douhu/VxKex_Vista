@@ -44,18 +44,20 @@ KXCFGDECLSPEC BOOLEAN KxCfgDeleteConfiguration(
 	ULONG ErrorCode;
 	BOOLEAN Success;
 	HKEY IfeoKeyHandle;
-	HKEY OriginalIfeoKeyHandle = 0;
 	ULONG Index;
 	UNICODE_STRING ExeFullPathUS;
 	WCHAR VerifierDlls[256];
 	BOOLEAN KexDllWasRemoved;
 	ULONG NumberOfValues;
 	ULONG NumberOfSubkeys;
+	REGSAM IfeoView;
 	
 	if (KxCfgpElevationRequired()) {
 		ASSERT (TransactionHandle == NULL);
 		return KxCfgpElevatedDeleteConfiguration(ExeFullPath);
 	}
+	IfeoView = KxCfgpIfeoView(ExeFullPath);
+	if (!IfeoView) return FALSE;
 
 	//
 	// 1. Open the IFEO key for the program. If there is no IFEO key for this
@@ -96,7 +98,7 @@ KXCFGDECLSPEC BOOLEAN KxCfgDeleteConfiguration(
 			L"Software\\Microsoft\\Windows NT\\CurrentVersion\\"
 			L"Image File Execution Options",
 			0,
-			KEY_ENUMERATE_SUB_KEYS | KxCfgpIfeoView(ExeFullPath),
+			KEY_ENUMERATE_SUB_KEYS | IfeoView,
 			&IfeoBaseKey);
 		if (ErrorCode == ERROR_FILE_NOT_FOUND) {
 			return TRUE;
@@ -109,7 +111,7 @@ KXCFGDECLSPEC BOOLEAN KxCfgDeleteConfiguration(
 			IfeoBaseKey,
 			PathFindFileName(ExeFullPath),
 			0,
-			KEY_READ | KxCfgpIfeoView(ExeFullPath),
+			KEY_READ | IfeoView,
 			&IfeoKeyHandle);
 		if (ErrorCode == ERROR_FILE_NOT_FOUND) {
 			RegCloseKey(IfeoBaseKey);
@@ -120,7 +122,6 @@ KXCFGDECLSPEC BOOLEAN KxCfgDeleteConfiguration(
 			return FALSE;
 		}
 
-		OriginalIfeoKeyHandle = IfeoKeyHandle;
 		RegCloseKey(IfeoBaseKey);
 	}
 	
@@ -205,10 +206,10 @@ KXCFGDECLSPEC BOOLEAN KxCfgDeleteConfiguration(
 			VerifierDlls,
 			ARRAYSIZE(VerifierDlls));
 		if (ErrorCode != ERROR_SUCCESS) {
-			RegCloseKey(OriginalIfeoKeyHandle);
 			if (ErrorCode == ERROR_FILE_NOT_FOUND) {
-				// VxKex isn't enabled.
-				return TRUE;
+				// Configuration may exist even when the verifier is disabled.
+				// Continue cleanup, but do not change unowned global flags.
+				goto RemoveEmptyKey;
 			} else {
 				SetLastError(ErrorCode);
 				return FALSE;
@@ -234,7 +235,6 @@ KXCFGDECLSPEC BOOLEAN KxCfgDeleteConfiguration(
 			}
 			
 			if (ErrorCode != ERROR_SUCCESS && ErrorCode != ERROR_FILE_NOT_FOUND) {
-				RegCloseKey(OriginalIfeoKeyHandle);
 				SetLastError(ErrorCode);
 				return FALSE;
 			}
@@ -242,8 +242,8 @@ KXCFGDECLSPEC BOOLEAN KxCfgDeleteConfiguration(
 
 		//
 		// Step 4. If VerifierDlls is now empty, we will also remove FLG_APPLICATION_VERIFIER
-		// from the global flags. We will also remove FLG_SHOW_LDR_SNAPS since it is a flag
-		// that, at this point, we can infer only VxKex would have set.
+		// from the global flags. Other flags, including loader snaps, are not owned
+		// by this configuration helper and must be preserved.
 		//
 
 		if (KexDllWasRemoved && VerifierDlls[0] == '\0') {
@@ -252,14 +252,13 @@ KXCFGDECLSPEC BOOLEAN KxCfgDeleteConfiguration(
 			ErrorCode = RegReadI32(IfeoKeyHandle, NULL, L"GlobalFlag", &GlobalFlag);
 			
 			if (ErrorCode != ERROR_SUCCESS && ErrorCode != ERROR_FILE_NOT_FOUND) {
-				RegCloseKey(OriginalIfeoKeyHandle);
 				SetLastError(ErrorCode);
 				return FALSE;
 			}
 
-			if (GlobalFlag & (FLG_APPLICATION_VERIFIER | FLG_SHOW_LDR_SNAPS)) {
+			if (GlobalFlag & FLG_APPLICATION_VERIFIER) {
 
-				GlobalFlag &= ~(FLG_APPLICATION_VERIFIER | FLG_SHOW_LDR_SNAPS);
+				GlobalFlag &= ~FLG_APPLICATION_VERIFIER;
 
 				if (GlobalFlag == 0) {
 					// GlobalFlag is now empty, so delete it.
@@ -270,7 +269,6 @@ KXCFGDECLSPEC BOOLEAN KxCfgDeleteConfiguration(
 				}
 
 				if (ErrorCode != ERROR_SUCCESS && ErrorCode != ERROR_FILE_NOT_FOUND) {
-					RegCloseKey(OriginalIfeoKeyHandle);
 					SetLastError(ErrorCode);
 					return FALSE;
 				}
@@ -289,12 +287,13 @@ KXCFGDECLSPEC BOOLEAN KxCfgDeleteConfiguration(
 		// FilterFullPath), delete the IFEO key for the program.
 		//
 
+RemoveEmptyKey:
 		ErrorCode = RegQueryInfoKey(
 			IfeoKeyHandle,
 			NULL,
 			NULL,
 			NULL,
-			NULL,
+			&NumberOfSubkeys,
 			NULL,
 			NULL,
 			&NumberOfValues,
@@ -322,9 +321,8 @@ KXCFGDECLSPEC BOOLEAN KxCfgDeleteConfiguration(
 				}
 			}
 
-			if (NumberOfValues == 0) {
+			if (NumberOfValues == 0 && NumberOfSubkeys == 0) {
 				// No values we care about here, so delete the key.
-				RegDeleteTree(IfeoKeyHandle, NULL);
 				NtDeleteKey(IfeoKeyHandle);
 				RegCloseKey(IfeoKeyHandle);
 				IfeoKeyHandle = NULL;
@@ -345,7 +343,7 @@ KXCFGDECLSPEC BOOLEAN KxCfgDeleteConfiguration(
 						L"Software\\Microsoft\\Windows NT\\CurrentVersion\\"
 						L"Image File Execution Options",
 						0,
-						KEY_READ | KEY_WRITE | KEY_WOW64_64KEY,
+						KEY_READ | KEY_WRITE | IfeoView,
 						&IfeoBaseKey);
 
 					ASSERT (ErrorCode == ERROR_SUCCESS);
@@ -361,7 +359,6 @@ KXCFGDECLSPEC BOOLEAN KxCfgDeleteConfiguration(
 
 					if (!IfeoKeyHandle) {
 						// ignore the error, it's not critical
-						RegCloseKey(OriginalIfeoKeyHandle);
 						return TRUE;
 					}
 				}
@@ -383,7 +380,6 @@ KXCFGDECLSPEC BOOLEAN KxCfgDeleteConfiguration(
 				ASSERT (ErrorCode == ERROR_SUCCESS);
 
 				if (ErrorCode != ERROR_SUCCESS) {
-					RegCloseKey(OriginalIfeoKeyHandle);
 					return TRUE;
 				}
 				

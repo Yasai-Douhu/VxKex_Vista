@@ -121,11 +121,11 @@ NTSTATUS NTAPI VxlReadLog(
 
 	MaximumIndex = VxlpGetTotalLogEntryCount(LogHandle);
 
-	if (MaximumIndex == -1) {
+	if (MaximumIndex == 0) {
 		return STATUS_NO_MORE_ENTRIES;
 	}
 
-	if (LogEntryIndex > MaximumIndex) {
+	if (LogEntryIndex >= MaximumIndex) {
 		return STATUS_NO_MORE_ENTRIES;
 	}
 
@@ -150,6 +150,10 @@ NTSTATUS NTAPI VxlReadMultipleEntriesLog(
 		return STATUS_INVALID_PARAMETER;
 	}
 
+	if (LogHandle->OpenMode != GENERIC_READ) {
+		return STATUS_INVALID_OPEN_MODE;
+	}
+
 	if (LogEntryIndexEnd < LogEntryIndexStart) {
 		return STATUS_INVALID_PARAMETER_MIX;
 	}
@@ -172,15 +176,15 @@ NTSTATUS NTAPI VxlReadMultipleEntriesLog(
 	// Fetch the requested log entries.
 	//
 
-	for (Index = LogEntryIndexStart; Index < LogEntryIndexEnd; ++Index) {
+	for (Index = LogEntryIndexStart; Index <= LogEntryIndexEnd; ++Index) {
+		if (!Entry[Index - LogEntryIndexStart]) return STATUS_INVALID_PARAMETER;
 		Status = VxlpReadLogInternal(LogHandle, Index, Entry[Index - LogEntryIndexStart]);
 
 		if (!NT_SUCCESS(Status)) {
 			return Status;
 		}
 
-		++Index;
 	}
 
-	return Status;
+	return STATUS_SUCCESS;
 }

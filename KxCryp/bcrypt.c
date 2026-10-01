@@ -3,6 +3,91 @@
 
 STATIC BCRYPT_ALG_HANDLE CachedHandles[KXCRYP_MAX_PREDEFINED_ALG_HANDLE_INDEX + 1] = {0};
 
+// Vista requires caller-owned CNG object buffers. Keep automatically allocated
+// buffers alive until the corresponding native handle is successfully destroyed.
+typedef struct _KX_OWNED_CNG_OBJECT {
+	struct _KX_OWNED_CNG_OBJECT *Next;
+	BCRYPT_HANDLE Handle;
+	ULONG ObjectCb;
+	BOOLEAN OwnsBuffer;
+	UCHAR Object[1];
+} KX_OWNED_CNG_OBJECT;
+
+STATIC RTL_SRWLOCK OwnedObjectLock = {0};
+STATIC KX_OWNED_CNG_OBJECT *OwnedObjects;
+
+STATIC NTSTATUS AllocateOwnedCngObject(
+	IN BCRYPT_HANDLE AlgorithmOrHash,
+	OUT KX_OWNED_CNG_OBJECT **Owned)
+{
+	NTSTATUS Status;
+	ULONG ObjectCb, ResultCb;
+	KX_OWNED_CNG_OBJECT *Existing;
+	ObjectCb = 0;
+	ResultCb = sizeof(ObjectCb);
+	RtlAcquireSRWLockExclusive(&OwnedObjectLock);
+	for (Existing = OwnedObjects; Existing; Existing = Existing->Next) {
+		if (Existing->Handle == AlgorithmOrHash) {
+			ObjectCb = Existing->ObjectCb;
+			break;
+		}
+	}
+	RtlReleaseSRWLockExclusive(&OwnedObjectLock);
+	if (!ObjectCb) {
+		Status = BCryptGetProperty(AlgorithmOrHash, BCRYPT_OBJECT_LENGTH,
+			(PUCHAR) &ObjectCb, sizeof(ObjectCb), &ResultCb, 0);
+		if (!NT_SUCCESS(Status)) return Status;
+	}
+	if (ResultCb != sizeof(ObjectCb) || ObjectCb == 0 ||
+		ObjectCb > ((ULONG) -1) - sizeof(KX_OWNED_CNG_OBJECT)) {
+		return STATUS_INVALID_PARAMETER;
+	}
+	*Owned = (KX_OWNED_CNG_OBJECT *) SafeAlloc(BYTE,
+		sizeof(KX_OWNED_CNG_OBJECT) + ObjectCb);
+	if (!*Owned) return STATUS_NO_MEMORY;
+	(*Owned)->ObjectCb = ObjectCb;
+	(*Owned)->OwnsBuffer = TRUE;
+	return STATUS_SUCCESS;
+}
+
+STATIC NTSTATUS AllocateCallerCngObjectRecord(ULONG ObjectCb,
+	KX_OWNED_CNG_OBJECT **Record)
+{
+	*Record = SafeAlloc(KX_OWNED_CNG_OBJECT, 1);
+	if (!*Record) return STATUS_NO_MEMORY;
+	(*Record)->ObjectCb = ObjectCb;
+	(*Record)->OwnsBuffer = FALSE;
+	return STATUS_SUCCESS;
+}
+
+STATIC VOID RememberOwnedCngObject(KX_OWNED_CNG_OBJECT *Owned,
+	BCRYPT_HANDLE Handle)
+{
+	Owned->Handle = Handle;
+	RtlAcquireSRWLockExclusive(&OwnedObjectLock);
+	Owned->Next = OwnedObjects;
+	OwnedObjects = Owned;
+	RtlReleaseSRWLockExclusive(&OwnedObjectLock);
+}
+
+STATIC VOID ReleaseOwnedCngObject(BCRYPT_HANDLE Handle)
+{
+	KX_OWNED_CNG_OBJECT **Link, *Owned = NULL;
+	RtlAcquireSRWLockExclusive(&OwnedObjectLock);
+	for (Link = &OwnedObjects; *Link; Link = &(*Link)->Next) {
+		if ((*Link)->Handle == Handle) {
+			Owned = *Link;
+			*Link = Owned->Next;
+			break;
+		}
+	}
+	RtlReleaseSRWLockExclusive(&OwnedObjectLock);
+	if (Owned) {
+		if (Owned->OwnsBuffer) RtlSecureZeroMemory(Owned->Object, Owned->ObjectCb);
+		SafeFree(Owned);
+	}
+}
+
 KXCRYPAPI NTSTATUS WINAPI Ext_BCryptOpenAlgorithmProvider(
 	OUT	BCRYPT_ALG_HANDLE	*Algorithm,
 	IN	LPCWSTR				AlgId,
@@ -233,14 +318,64 @@ KXCRYPAPI NTSTATUS NTAPI Ext_BCryptCreateHash(
 	IN	ULONG				SecretCb OPTIONAL,
 	IN	ULONG				Flags)
 {
-	return BCryptCreateHash(
-		MapPredefinedAlgorithmHandle(Algorithm),
+	NTSTATUS Status;
+	KX_OWNED_CNG_OBJECT *Owned = NULL;
+	Algorithm = MapPredefinedAlgorithmHandle(Algorithm);
+	if (!HashObject && HashObjectCb == 0 && HashHandle) {
+		Status = AllocateOwnedCngObject(Algorithm, &Owned);
+		if (!NT_SUCCESS(Status)) return Status;
+		HashObject = Owned->Object;
+		HashObjectCb = Owned->ObjectCb;
+	} else if (HashObject && HashObjectCb && HashHandle) {
+		Status = AllocateCallerCngObjectRecord(HashObjectCb, &Owned);
+		if (!NT_SUCCESS(Status)) return Status;
+	}
+	Status = BCryptCreateHash(
+		Algorithm,
 		HashHandle,
 		HashObject,
 		HashObjectCb,
 		Secret,
 		SecretCb,
 		Flags);
+	if (Owned) {
+		if (NT_SUCCESS(Status)) RememberOwnedCngObject(Owned, *HashHandle);
+		else SafeFree(Owned);
+	}
+	return Status;
+}
+
+KXCRYPAPI NTSTATUS WINAPI Ext_BCryptDuplicateHash(
+	IN BCRYPT_HASH_HANDLE Hash,
+	OUT BCRYPT_HASH_HANDLE *NewHash,
+	OUT PUCHAR HashObject OPTIONAL,
+	IN ULONG HashObjectCb,
+	IN ULONG Flags)
+{
+	NTSTATUS Status;
+	KX_OWNED_CNG_OBJECT *Owned = NULL;
+	if (!HashObject && HashObjectCb == 0 && NewHash) {
+		Status = AllocateOwnedCngObject(Hash, &Owned);
+		if (!NT_SUCCESS(Status)) return Status;
+		HashObject = Owned->Object;
+		HashObjectCb = Owned->ObjectCb;
+	} else if (HashObject && HashObjectCb && NewHash) {
+		Status = AllocateCallerCngObjectRecord(HashObjectCb, &Owned);
+		if (!NT_SUCCESS(Status)) return Status;
+	}
+	Status = BCryptDuplicateHash(Hash, NewHash, HashObject, HashObjectCb, Flags);
+	if (Owned) {
+		if (NT_SUCCESS(Status)) RememberOwnedCngObject(Owned, *NewHash);
+		else SafeFree(Owned);
+	}
+	return Status;
+}
+
+KXCRYPAPI NTSTATUS WINAPI Ext_BCryptDestroyHash(IN BCRYPT_HASH_HANDLE Hash)
+{
+	NTSTATUS Status = BCryptDestroyHash(Hash);
+	if (NT_SUCCESS(Status)) ReleaseOwnedCngObject(Hash);
+	return Status;
 }
 
 //
@@ -371,15 +506,31 @@ KXCRYPAPI NTSTATUS WINAPI Ext_BCryptGenerateSymmetricKey(
 	IN		ULONG				Flags)
 {
 	NTSTATUS Status;
+	KX_OWNED_CNG_OBJECT *Owned = NULL;
 	Algorithm = MapPredefinedAlgorithmHandle(Algorithm);
+	if (!KeyObject && KeyObjectLength == 0 && Key) {
+		Status = AllocateOwnedCngObject(Algorithm, &Owned);
+		if (Status == STATUS_NO_MEMORY) return Status;
+		if (NT_SUCCESS(Status)) {
+			KeyObject = Owned->Object;
+			KeyObjectLength = Owned->ObjectCb;
+		}
+	} else if (KeyObject && KeyObjectLength && Key) {
+		Status = AllocateCallerCngObjectRecord(KeyObjectLength, &Owned);
+		if (!NT_SUCCESS(Status)) return Status;
+	}
 	Status = BCryptGenerateSymmetricKey(
-		MapPredefinedAlgorithmHandle(Algorithm),
+		Algorithm,
 		Key,
 		KeyObject,
 		KeyObjectLength,
 		Secret,
 		SecretLength,
 		Flags);
+	if (Owned) {
+		if (NT_SUCCESS(Status)) RememberOwnedCngObject(Owned, *Key);
+		else SafeFree(Owned);
+	}
 	if (Algorithm && Status == STATUS_INVALID_HANDLE) {
 		PALGORITHM AlgorithmPointer = (PALGORITHM)Algorithm;
 		if (AlgorithmPointer->Id == ALG_ID_PBKDF2/* || AlgorithmPointer->Id == ALG_ID_SP800108_CTR_HMAC || AlgorithmPointer->Id == ALG_ID_CAPI_KDF*/) {
@@ -436,8 +587,20 @@ KXCRYPAPI NTSTATUS WINAPI Ext_BCryptImportKey(
 	IN	ULONG					InputCb,
 	IN	ULONG					Flags)
 {
-	return BCryptImportKey(
-		MapPredefinedAlgorithmHandle(Algorithm),
+	NTSTATUS Status;
+	KX_OWNED_CNG_OBJECT *Owned = NULL;
+	Algorithm = MapPredefinedAlgorithmHandle(Algorithm);
+	if (!KeyObject && KeyObjectCb == 0 && KeyHandle) {
+		Status = AllocateOwnedCngObject(Algorithm, &Owned);
+		if (!NT_SUCCESS(Status)) return Status;
+		KeyObject = Owned->Object;
+		KeyObjectCb = Owned->ObjectCb;
+	} else if (KeyObject && KeyObjectCb && KeyHandle) {
+		Status = AllocateCallerCngObjectRecord(KeyObjectCb, &Owned);
+		if (!NT_SUCCESS(Status)) return Status;
+	}
+	Status = BCryptImportKey(
+		Algorithm,
 		ImportKey,
 		BlobType,
 		KeyHandle,
@@ -446,6 +609,37 @@ KXCRYPAPI NTSTATUS WINAPI Ext_BCryptImportKey(
 		Input,
 		InputCb,
 		Flags);
+	if (Owned) {
+		if (NT_SUCCESS(Status)) RememberOwnedCngObject(Owned, *KeyHandle);
+		else SafeFree(Owned);
+	}
+	return Status;
+}
+
+KXCRYPAPI NTSTATUS WINAPI Ext_BCryptDuplicateKey(
+	IN BCRYPT_KEY_HANDLE Key,
+	OUT BCRYPT_KEY_HANDLE *NewKey,
+	OUT PUCHAR KeyObject OPTIONAL,
+	IN ULONG KeyObjectCb,
+	IN ULONG Flags)
+{
+	NTSTATUS Status;
+	KX_OWNED_CNG_OBJECT *Owned = NULL;
+	if (!KeyObject && KeyObjectCb == 0 && NewKey) {
+		Status = AllocateOwnedCngObject(Key, &Owned);
+		if (!NT_SUCCESS(Status)) return Status;
+		KeyObject = Owned->Object;
+		KeyObjectCb = Owned->ObjectCb;
+	} else if (KeyObject && KeyObjectCb && NewKey) {
+		Status = AllocateCallerCngObjectRecord(KeyObjectCb, &Owned);
+		if (!NT_SUCCESS(Status)) return Status;
+	}
+	Status = BCryptDuplicateKey(Key, NewKey, KeyObject, KeyObjectCb, Flags);
+	if (Owned) {
+		if (NT_SUCCESS(Status)) RememberOwnedCngObject(Owned, *NewKey);
+		else SafeFree(Owned);
+	}
+	return Status;
 }
 
 KXCRYPAPI NTSTATUS WINAPI Ext_BCryptImportKeyPair(
@@ -493,6 +687,7 @@ KXCRYPAPI NTSTATUS WINAPI Ext_BCryptDestroyKey(
 	IN OUT	BCRYPT_KEY_HANDLE	KeyHandle)
 {
 	NTSTATUS Status = BCryptDestroyKey(KeyHandle);
+	if (NT_SUCCESS(Status)) ReleaseOwnedCngObject(KeyHandle);
 	if (KeyHandle && Status == STATUS_INVALID_HANDLE) {
 		PKEY_OBJECT Key = (PKEY_OBJECT)KeyHandle;
 		if (Key->AlgId == ALG_ID_PBKDF2/* || Key->AlgId == ALG_ID_SP800108_CTR_HMAC || Key->AlgId == ALG_ID_CAPI_KDF*/) {

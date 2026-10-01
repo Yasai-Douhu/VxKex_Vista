@@ -72,13 +72,43 @@ LSTATUS WINAPI Ext_RegQueryValueExW(HKEY Key, LPCWSTR Name, LPDWORD Reserved,
 	LPDWORD Type, LPBYTE Value, LPDWORD Size)
 {
 	ULONG FakeType, Number = 0, ActualSize = 0;
+	ULONG OriginalCapacity = (Value && Size) ? *Size : 0;
+	ULONG NativeType = 0;
 	PCWSTR Text = NULL;
 	LSTATUS Status;
+	STATIC CONST WCHAR SchannelProvider[] = L",kxschanl.dll";
 	if (!Reserved && KxVersionRegistryValue(Key, Name, ReturnAddress(), &FakeType, &Number, &Text)) {
 		// Preserve access checks even for synthetic Win10 DWORD values on Vista.
 		Status = RegQueryValueExW(Key, Name, NULL, NULL, NULL, &ActualSize);
 		if (Status != ERROR_SUCCESS && Status != ERROR_FILE_NOT_FOUND) return Status;
 		return KxCopyVersionValue(FakeType, Number, Text, TRUE, Type, Value, Size);
+	}
+	if (Name && Size && !Reserved &&
+		StringEqualIW(Name, L"SecurityProviders") &&
+		(AshModuleBaseNameIs(ReturnAddress(), L"sspicli.dll") ||
+		 AshModuleBaseNameIs(ReturnAddress(), L"secur32.dll"))) {
+		Status = RegQueryValueExW(Key, Name, Reserved, &NativeType, Value, Size);
+		if (Type) *Type = NativeType;
+		if ((Status == ERROR_SUCCESS || Status == ERROR_MORE_DATA) &&
+			NativeType == REG_SZ && *Size >= sizeof(WCHAR) &&
+			*Size <= MAXDWORD - (sizeof(SchannelProvider) - sizeof(WCHAR))) {
+			ULONG NativeSize = *Size;
+			ULONG RequiredSize = NativeSize + sizeof(SchannelProvider) - sizeof(WCHAR);
+			*Size = RequiredSize;
+			if (!Value || Status == ERROR_MORE_DATA || OriginalCapacity < RequiredSize) {
+				return Value ? ERROR_MORE_DATA : ERROR_SUCCESS;
+			}
+			// REG_SZ is normally terminated. Never truncate a malformed value.
+			if (NativeSize & (sizeof(WCHAR) - 1) ||
+				((PWSTR) Value)[NativeSize / sizeof(WCHAR) - 1] != L'\0') {
+				*Size = NativeSize;
+				return Status;
+			}
+			RtlCopyMemory(Value + NativeSize - sizeof(WCHAR),
+				SchannelProvider, sizeof(SchannelProvider));
+			return ERROR_SUCCESS;
+		}
+		return Status;
 	}
 	return RegQueryValueExW(Key, Name, Reserved, Type, Value, Size);
 }

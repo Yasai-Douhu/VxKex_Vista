@@ -32,9 +32,17 @@ BOOLEAN SppLoadRootCertificates(
 	IN OUT	PKXSCHANL_CREDENTIAL	Credential)
 {
 	WCHAR BundlePath[MAX_PATH];
+	HRESULT Result;
+	DWORD Error;
 
-	StringCchCopy(BundlePath, ARRAYSIZE(BundlePath), KexData->KexDir.Buffer);
-	PathCchAppend(BundlePath, ARRAYSIZE(BundlePath), L"Certificates\\ROOT.sst");
+	Result = StringCchCopy(BundlePath, ARRAYSIZE(BundlePath), KexData->KexDir.Buffer);
+	if (FAILED(Result)) {
+		return FALSE;
+	}
+	Result = PathCchAppend(BundlePath, ARRAYSIZE(BundlePath), L"Certificates\\ROOT.sst");
+	if (FAILED(Result)) {
+		return FALSE;
+	}
 
 	Credential->RootCertStore = CertOpenStore(
 		CERT_STORE_PROV_FILENAME,
@@ -43,13 +51,14 @@ BOOLEAN SppLoadRootCertificates(
 		CERT_STORE_OPEN_EXISTING_FLAG | CERT_STORE_READONLY_FLAG | CERT_STORE_SHARE_CONTEXT_FLAG,
 		BundlePath);
 
-	ASSERT (Credential->RootCertStore != NULL);
-
 	//
-	// Don't fail if we couldn't open ROOT.sst.
-	// There is a fallback in TlspCheckServerCertificateOk which uses the system
-	// root store if Credential->RootCertStore is NULL.
+	// The bundle is optional. Only its absence permits system-root fallback.
+	// A damaged or inaccessible bundle must not silently change the trust policy.
 	//
+	if (!Credential->RootCertStore) {
+		Error = GetLastError();
+		return Error == ERROR_FILE_NOT_FOUND || Error == ERROR_PATH_NOT_FOUND;
+	}
 
 	return TRUE;
 }

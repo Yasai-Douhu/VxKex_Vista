@@ -26,12 +26,12 @@ Windows Registry Editor Version 5.00
 ; 2. Restore default clean VxKex configuration (Default: C:\VxKex)
 ; ------------------------------------------------------------------------------
 [HKEY_LOCAL_MACHINE\SOFTWARE\VXsoft\VxKex]
-"InstalledVersion"=dword:800008b3
+"InstalledVersion"=dword:800008b8
 "KexDir"="C:\\VxKex"
 "LogDir"="C:\\VxKex\\Logs"
 
 [HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\VXsoft\VxKex]
-"InstalledVersion"=dword:800008b3
+"InstalledVersion"=dword:800008b8
 "KexDir"="C:\\VxKex"
 "LogDir"="C:\\VxKex\\Logs"
 

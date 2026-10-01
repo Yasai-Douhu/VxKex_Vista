@@ -1,4 +1,5 @@
 # VxKex_Vista KxCfgHlp Build Script with VS2010 (cl.exe)
+param([string]$OutputDirectory = '')
 $ErrorActionPreference = "Stop"
 
 Write-Host "========================================" -ForegroundColor Cyan
@@ -19,6 +20,7 @@ $ScriptDirAbs = (Get-Item $ScriptDir).FullName
 $HDR_DIR = Join-Path $ScriptDirAbs "00-Common-Headers"
 $SRC_DIR = Join-Path $ScriptDirAbs "KxCfgHlp"
 $OUT_DIR = Join-Path $ScriptDirAbs "Win32\Release\KxCfgHlp"
+if ($OutputDirectory) { $OUT_DIR = $OutputDirectory }
 
 if (-not (Test-Path $OUT_DIR)) { New-Item -ItemType Directory -Path $OUT_DIR | Out-Null }
 
@@ -31,13 +33,13 @@ function Invoke-ClCompile {
     )
     if (-not (Test-Path $OutputDir)) { New-Item -ItemType Directory -Path $OutputDir | Out-Null }
     
-    $includeFlags = @("/I", "`"$HDR_DIR`"")
+    $includeFlags = @("/I", $HDR_DIR)
     $foFlag = "/Fo" + $OutputFile
-    $srcFlag = "`"$SourceFile`""
+    $srcFlag = $SourceFile
     $flags = @("/c", "/O1", "/Os", "/Oy", "/GL", "/Gy", "/Gz", "/MD", "/Zi", "/W3", "/TC", "/GS-") + $Defines + $includeFlags + @($foFlag, $srcFlag)
     $srcName = Split-Path $SourceFile -Leaf
     Write-Host "  Compiling: " $srcName -NoNewline
-    & "cl.exe" @flags
+    & "cl.exe" @flags | Out-Host
     if ($LASTEXITCODE -ne 0) {
         Write-Host " FAILED" -ForegroundColor Red
         return $false
@@ -49,7 +51,7 @@ function Invoke-ClCompile {
 Write-Host "" -ForegroundColor Yellow
 Write-Host "[1/2] Compiling KxCfgHlp source files..." -ForegroundColor Yellow
 
-$Sources = @("cpiwbypa.c", "ctxmenu.c", "delcfg.c", "dskclnup.c", "elevate.c", "getcfg.c", "kexdir.c", "kxcfgp.c", "kxschanl.c", "logging.c", "msisup.c", "openkey.c", "setcfg.c")
+$Sources = @("cpiwbypa.c", "ctxmenu.c", "delcfg.c", "dskclnup.c", "elevate.c", "getcfg.c", "kexdir.c", "kxcfgp.c", "kxschanl.c", "logging.c", "msisup.c", "openkey.c", "preserve.c", "setupfile.c", "logassoc.c", "shlsetup.c", "setupreg.c", "setup.c", "setcfg.c")
 $ObjFiles = @()
 $allOk = $true
 
@@ -78,9 +80,9 @@ $libPath = Join-Path $OUT_DIR "KxCfgHlp.lib"
 Write-Host "" -ForegroundColor Yellow
 Write-Host "[2/2] Archiving KxCfgHlp.lib..." -ForegroundColor Yellow
 
-$libArgs = @("/NOLOGO", "/LTCG", "/MACHINE:X86", "/OUT:`"$libPath`"")
+$libArgs = @("/NOLOGO", "/LTCG", "/MACHINE:X86", "/OUT:$libPath")
 foreach ($obj in $ObjFiles) {
-    $libArgs += "`"$obj`""
+    $libArgs += $obj
 }
 
 & "lib.exe" @libArgs

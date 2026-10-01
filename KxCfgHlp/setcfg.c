@@ -195,6 +195,10 @@ KXCFGDECLSPEC BOOLEAN KXCFGAPI KxCfgSetConfiguration(
 	KEX_StrongVersionSpoof	= Configuration->StrongSpoofOptions;
 
 	try {
+		// Vista stores configuration by image basename. Retain the last configured
+		// full path for the management UI; this does not change IFEO matching.
+		ErrorCode = RegWriteString(KeyHandle, NULL, L"KEX_ConfigPath", ExeFullPath);
+		if (ErrorCode) return FALSE;
 		ErrorCode = KxCfgpConfigureVistaLauncher(KeyHandle, ExeFullPath,
 			Configuration->Enabled && !Configuration->DisableAppSpecificHacks);
 		if (ErrorCode) return FALSE;
