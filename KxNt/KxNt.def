@@ -1,6 +1,7 @@
 LIBRARY KxNt
 EXPORTS
-	RtlIsProcessorFeaturePresent = KexDll.KexRtlIsProcessorFeaturePresent
+	RtlCanonicalizeDomainName = KexDll.KexRtlCanonicalizeDomainName @2200
+	RtlIsProcessorFeaturePresent = KexDll.KexRtlIsProcessorFeaturePresent @2201
 	NtFlushBuffersFileEx						= KexNtFlushBuffersFileEx
 
 	LdrResolveDelayLoadedAPI					= KexDll.KexLdrResolveDelayLoadedAPI

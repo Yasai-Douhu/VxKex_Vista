@@ -1,6 +1,7 @@
 LIBRARY "KexDll.dll"
 EXPORTS
-	KexRtlIsProcessorFeaturePresent
+	KexRtlCanonicalizeDomainName @300
+	KexRtlIsProcessorFeaturePresent @301
 	KexDataInitialize
 	KexQueryTickCount64
 	KexInitializePropagation
@@ -67,7 +68,7 @@ EXPORTS
 
 	KexLdrResolveDelayLoadedAPI
 
-	ApiSetQueryApiSetPresence
+	ApiSetQueryApiSetPresence @1
 
 	KexHkInstallBasicHook
 	KexHkRemoveBasicHook

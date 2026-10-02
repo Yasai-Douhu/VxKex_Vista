@@ -1,0 +1,41 @@
+{
+  "BaseCommit": "24a03ae",
+  "Results": [
+    {
+      "Path": "Installer/KxNt.dll",
+      "BaselineNames": 2015,
+      "OrdinalChanges": {},
+      "NewExports": {
+        "RtlCanonicalizeDomainName": 2200,
+        "RtlIsProcessorFeaturePresent": 2201
+      }
+    },
+    {
+      "Path": "Installer/Kex32/KxNt.dll",
+      "BaselineNames": 2055,
+      "OrdinalChanges": {},
+      "NewExports": {
+        "RtlCanonicalizeDomainName": 2200,
+        "RtlIsProcessorFeaturePresent": 2201
+      }
+    },
+    {
+      "Path": "Installer/KexDll.dll",
+      "BaselineNames": 103,
+      "OrdinalChanges": {},
+      "NewExports": {
+        "KexRtlCanonicalizeDomainName": 300,
+        "KexRtlIsProcessorFeaturePresent": 301
+      }
+    },
+    {
+      "Path": "Installer/Kex32/KexDll.dll",
+      "BaselineNames": 103,
+      "OrdinalChanges": {},
+      "NewExports": {
+        "KexRtlCanonicalizeDomainName": 300,
+        "KexRtlIsProcessorFeaturePresent": 301
+      }
+    }
+  ]
+}

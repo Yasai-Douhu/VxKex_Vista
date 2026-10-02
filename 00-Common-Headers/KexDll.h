@@ -421,6 +421,11 @@ KEXAPI NTSTATUS NTAPI KexRtlWow64GetProcessMachines(
 KEXAPI BOOLEAN NTAPI KexRtlIsProcessorFeaturePresent(
 	IN ULONG ProcessorFeature);
 
+KEXAPI NTSTATUS NTAPI KexRtlCanonicalizeDomainName(
+	OUT PUNICODE_STRING DestinationString,
+	IN PCUNICODE_STRING SourceString,
+	IN BOOLEAN Strict);
+
 KEXAPI VOID NTAPI KexRtlSetBit(
 	IN	PRTL_BITMAP	BitmapHeader,
 	IN	ULONG		BitNumber);

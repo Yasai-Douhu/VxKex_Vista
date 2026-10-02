@@ -18,3 +18,5 @@ $out = "$root\audit\KxNtParity\$Architecture"
 New-Item -ItemType Directory -Force $out | Out-Null
 & cl.exe /nologo /MT /O1 /W4 "/Fo$out\processor-feature.obj" "/Fe$out\processor-feature.exe" "$PSScriptRoot\kxnt_processor_feature_probe.c" /link /SUBSYSTEM:CONSOLE,6.0
 if ($LASTEXITCODE) { throw "KxNt probe build failed ($Architecture)" }
+& cl.exe /nologo /MT /O1 /W4 "/Fo$out\domain.obj" "/Fe$out\domain.exe" "$PSScriptRoot\kxnt_domain_probe.c" /link /SUBSYSTEM:CONSOLE,6.0
+if ($LASTEXITCODE) { throw "Domain probe build failed ($Architecture)" }

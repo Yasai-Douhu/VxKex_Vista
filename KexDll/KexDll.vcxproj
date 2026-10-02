@@ -287,6 +287,7 @@
     <ClCompile Include="kexhk.c" />
     <ClCompile Include="kexldr.c" />
     <ClCompile Include="kexrtl.c" />
+    <ClCompile Include="rtldomain.c" />
     <ClCompile Include="logging.c" />
     <ClCompile Include="ntjob.c" />
     <ClCompile Include="ntobj.c" />

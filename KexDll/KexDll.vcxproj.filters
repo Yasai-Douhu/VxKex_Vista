@@ -35,6 +35,9 @@
     <ClCompile Include="kexrtl.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="rtldomain.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="dllnotif.c">
       <Filter>Source Files</Filter>
     </ClCompile>

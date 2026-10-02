@@ -3,6 +3,7 @@ param(
     [Parameter(Mandatory=$true)][string]$GuestPassword,
     [string]$GuestUser = 'Administrator',
     [string]$GuestDirectory = 'C:\KxNtParity',
+    [ValidateSet('processor-feature','domain')][string]$Probe = 'processor-feature',
     [string]$VMRun = 'C:\Program Files\VMware\VMware Workstation\vmrun.exe'
 )
 $ErrorActionPreference = 'Stop'
@@ -32,15 +33,24 @@ foreach ($arch in @('x86','x64')) {
         Invoke-GuestTool @('copyFileFromHostToGuest', $VMX, $source, "$guest\$dll.dll")
         $hashes[$dll] = (Get-FileHash -Algorithm SHA256 $source).Hash
     }
-    $exe = "$results\$arch\processor-feature.exe"
+    $exe = "$results\$arch\$Probe.exe"
     if (!(Test-Path $exe)) { throw "Build probes first: tests/build_kxnt_probes.ps1 -Architecture $arch" }
-    Invoke-GuestTool @('copyFileFromHostToGuest', $VMX, $exe, "$guest\processor-feature.exe")
-    Invoke-GuestTool @('runProgramInGuest', $VMX, "$guest\processor-feature.exe", "$guest\KxNt.dll", "$guest\processor-feature.txt")
-    $log = "$results\$arch\processor-feature.txt"
-    Invoke-GuestTool @('copyFileFromGuestToHost', $VMX, "$guest\processor-feature.txt", $log)
+    Invoke-GuestTool @('copyFileFromHostToGuest', $VMX, $exe, "$guest\$Probe.exe")
+    Invoke-GuestTool @('runProgramInGuest', $VMX, "$guest\$Probe.exe", "$guest\KxNt.dll", "$guest\$Probe.txt")
+    $log = "$results\$arch\$Probe.txt"
+    Invoke-GuestTool @('copyFileFromGuestToHost', $VMX, "$guest\$Probe.txt", $log)
     $text = [IO.File]::ReadAllText($log)
-    if ($text -notmatch 'Result=PASS' -or $text -notmatch 'ValidFeatureChecks=64 InvalidFeatureChecks=5 Failures=0') {
-        throw "Processor feature verification failed ($arch): $text"
+    if ($text -notmatch 'Result=PASS') {
+        throw "Verification failed ($Probe/$arch): $text"
+    }
+    if ($Probe -eq 'processor-feature' -and $text -notmatch 'ValidFeatureChecks=64 InvalidFeatureChecks=5 Failures=0') {
+        throw "Processor feature checks missing ($arch)"
+    }
+    if ($Probe -eq 'domain') {
+        $reference = Get-Content -Raw "$root\docs\validation\kxnt-domain-reference.json" | ConvertFrom-Json
+        $lines = @($text -split '\r?\n' | Where-Object { $_ -and $_ -notmatch '^ProcessBits=' })
+        $difference = Compare-Object @($reference.Output) $lines
+        if ($difference) { throw "Domain output differs from native RTL reference ($arch): $($difference | Out-String)" }
     }
     $receipt += [pscustomobject]@{
         Architecture = $arch
@@ -48,6 +58,6 @@ foreach ($arch in @('x86','x64')) {
         ProbeSHA256 = (Get-FileHash -Algorithm SHA256 $exe).Hash
         Output = $text
     }
-    Write-Host "$arch processor feature: PASS"
+    Write-Host "$arch ${Probe}: PASS"
 }
-$receipt | ConvertTo-Json -Depth 5 | Set-Content -Encoding UTF8 "$results\processor-feature-receipt.json"
+$receipt | ConvertTo-Json -Depth 5 | Set-Content -Encoding UTF8 "$results\$Probe-receipt.json"

@@ -8,7 +8,7 @@
 | 機能 | 実装 | 検証 |
 |---|---|---|
 | RtlIsProcessorFeaturePresent | 完了 | Server 2008 x86 / x64 成功 |
-| RtlCanonicalizeDomainName | 未着手 | 未実施 |
+| RtlCanonicalizeDomainName | 完了 | Server 2008 x86 / x64 成功 |
 | RtlGetDeviceFamilyInfoEnum | 未着手 | 未実施 |
 | RtlGetPersistedStateLocation | 未着手 | 未実施 |
 | RtlIsPackageSid / RtlIsCapabilitySid | 未着手 | 未実施 |
@@ -21,6 +21,8 @@
 | 既存の未解決 native 転送 | 調査段階 | 呼び出すアプリと API ごとに検証予定 |
 
 ## 2026-10-02: RtlIsProcessorFeaturePresent
+
+コミット・プッシュ済み: `e1a3a52`。
 
 ### 実施内容
 
@@ -62,6 +64,34 @@ native RTL がある場合は native RTL、ない場合は documented Win32 API 
 
 REST API はタスクスケジューラの `YamaR` / 最上位の特権で実行されている。ファイル転送・診断 EXE・本プローブの実行は成功した。cmd.exe のコマンド実行だけは終了コード 1 が続いたため、検証はネイティブ EXE を直接起動するスクリプトで行う。タスクスケジューラへの移行を、この失敗の原因とは断定していない。
 
+## 2026-10-02: RtlCanonicalizeDomainName
+
+### 実施内容
+
+- NEXT の実装を `KexDll/rtldomain.c` に移植。公開エクスポート、共通宣言、Visual Studio プロジェクトを更新した。
+- ドメイン名の IDN 変換・小文字化、IPv4 / IPv6 の正規化、IPv4 mapped IPv6 の IPv4 への変換、strict フラグの扱いを実装。
+- VS2010 同梱 SDK には ip2string.h がないため、既に VM で存在確認した 4 つの IP 変換関数の宣言を追加した。Windows Sockets DLL の読み込みやネットワークアクセスは不要。
+- SourceString の NULL / 不正な Length / MaximumLength を検査。不正 UTF-16 の下位 API の `STATUS_NO_UNICODE_TRANSLATION` を、native RTL の `STATUS_INVALID_IDN_NORMALIZATION` に合わせた。
+- 追加関数の ordinal を固定し、移植前 (`24a03ae`) の既存の公開名の番号を維持した。新規公開 API を自動採番すると既存番号がずれるため、以降の追加も固定番号を用いる。KxNt の今回の追加は 2200 / 2201、KexDll は 300 / 301。
+
+### 検証範囲
+
+ホストの native `ntdll!RtlCanonicalizeDomainName` で参照結果を取得し、Server 2008 の 32bit / 64bit の KxNt → KexDll 経路と比較。25 ケースすべてで NTSTATUS、Length、出力 UTF-16 が一致した。
+
+対象: ASCII 大文字、末尾ドット、Punycode、ドイツ語・日本語 IDN、IPv4、省略形式・16進・8進 IPv4 と strict フラグ、IPv6、IPv4 mapped IPv6、スコープ、括弧・ポート付き表記、空文字、連続ドット、空白・アンダースコア、孤立サロゲート。
+
+追加確認: ガードページ直前で終わる非 NULL 終端の入力、256 文字の長い入力の拒否、出力の長さ・NULL 終端、2,000 回の確保と RtlFreeUnicodeString による解放、プロセスヒープの検査。いずれも両アーキテクチャで成功。
+
+参照結果は `docs/validation/kxnt-domain-reference.json`、VM のログ・検証バイナリ SHA256 は `docs/validation/kxnt-domain.json` に保存。実際の終了コード、期待する全行との比較、PASS 表示を確認する。CPU 機能照会の回帰検証も両アーキテクチャで成功。
+
+`tests/check_kxnt_export_ordinals.py` により、KxNt / KexDll の x86 / x64 全4バイナリの既存の公開名の ordinal を比較し、変更ゼロを確認。結果は `docs/validation/kxnt-export-ordinals.json` に保存した。
+
+```powershell
+./tests/run_kxnt_processor_feature_vm.ps1 -Probe domain -VMX '<VM の vmx パス>' -GuestPassword '<ゲストのパスワード>'
+```
+
+制約: Vista の IDN テーブルを使用しているため、今回のケース外の新しい Unicode 文字や正規化仕様まで現行 Windows と同一とは保証しない。メモリ不足の注入、Vista クライアント VM、実アプリの回帰は未実施。
+
 ## 次の作業
 
-RtlCanonicalizeDomainName を実装し、IDN / IPv4 / IPv6 / 不正入力 / 長さ / 解放処理を x86 / x64 で検証する。スレッド通知・待機などの状態管理を伴う機能も、調査の対象範囲として引き続き進める。
+RtlGetDeviceFamilyInfoEnum と RtlGetPersistedStateLocation を実装・検証する。スレッド通知・待機などの状態管理を伴う機能も、調査の対象範囲として引き続き進める。
