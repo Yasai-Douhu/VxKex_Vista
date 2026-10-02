@@ -1,5 +1,6 @@
 LIBRARY KxNt
 EXPORTS
+	RtlGetPersistedStateLocation = KexDll.KexRtlGetPersistedStateLocation @2203
 	RtlGetDeviceFamilyInfoEnum = KexDll.KexRtlGetDeviceFamilyInfoEnum @2202
 	RtlCanonicalizeDomainName = KexDll.KexRtlCanonicalizeDomainName @2200
 	RtlIsProcessorFeaturePresent = KexDll.KexRtlIsProcessorFeaturePresent @2201

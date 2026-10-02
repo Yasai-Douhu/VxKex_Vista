@@ -21,6 +21,7 @@
 
 #include "buildcfg.h"
 #include "kexdllp.h"
+#include <limits.h>
 
 // Use the OS feature policy, not just CPUID or the raw shared-data bitmap.
 // For example, x64 Windows masks the legacy MMX feature in this API even when
@@ -77,6 +78,43 @@ KEXAPI INT NTAPI KexRtlOperatingSystemBitness(
 		NULL);
 	return Wow64Information ? 64 : 32;
 #endif
+}
+
+// NT 6.0 has no StateSeparation redirection map. Port NEXT's documented
+// DefaultPath fallback, retaining the native byte-count and error contract.
+KEXAPI NTSTATUS NTAPI KexRtlGetPersistedStateLocation(
+	IN PCWSTR SourceID,
+	IN PCWSTR CustomValue OPTIONAL,
+	IN PCWSTR DefaultPath OPTIONAL,
+	IN STATE_LOCATION_TYPE StateLocationType,
+	OUT PWCHAR TargetPath,
+	IN ULONG BufferCbIn,
+	OUT PULONG BufferCbOut OPTIONAL)
+{
+	SIZE_T Characters;
+	ULONG Required;
+	UNREFERENCED_PARAMETER(SourceID);
+	UNREFERENCED_PARAMETER(CustomValue);
+
+	if ((ULONG) StateLocationType >= LocationTypeMaximum) {
+		return STATUS_INVALID_PARAMETER_3;
+	}
+	if (!DefaultPath) {
+		return STATUS_OBJECT_NAME_NOT_FOUND;
+	}
+	Characters = wcslen(DefaultPath);
+	if (Characters > (ULONG_MAX / sizeof(WCHAR)) - 1) {
+		return STATUS_INTEGER_OVERFLOW;
+	}
+	Required = (ULONG) (Characters + 1) * sizeof(WCHAR);
+	if (BufferCbOut) {
+		*BufferCbOut = Required;
+	}
+	if (BufferCbIn < Required) {
+		return STATUS_BUFFER_OVERFLOW;
+	}
+	RtlMoveMemory(TargetPath, DefaultPath, Required);
+	return STATUS_SUCCESS;
 }
 
 KEXAPI VOID NTAPI KexRtlGetNtVersionNumbers(

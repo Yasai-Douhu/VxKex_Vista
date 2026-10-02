@@ -8,6 +8,7 @@
       "NewExports": {
         "RtlCanonicalizeDomainName": 2200,
         "RtlGetDeviceFamilyInfoEnum": 2202,
+        "RtlGetPersistedStateLocation": 2203,
         "RtlIsProcessorFeaturePresent": 2201
       }
     },
@@ -18,6 +19,7 @@
       "NewExports": {
         "RtlCanonicalizeDomainName": 2200,
         "RtlGetDeviceFamilyInfoEnum": 2202,
+        "RtlGetPersistedStateLocation": 2203,
         "RtlIsProcessorFeaturePresent": 2201
       }
     },
@@ -28,6 +30,7 @@
       "NewExports": {
         "KexRtlCanonicalizeDomainName": 300,
         "KexRtlGetDeviceFamilyInfoEnum": 302,
+        "KexRtlGetPersistedStateLocation": 303,
         "KexRtlIsProcessorFeaturePresent": 301
       }
     },
@@ -38,6 +41,7 @@
       "NewExports": {
         "KexRtlCanonicalizeDomainName": 300,
         "KexRtlGetDeviceFamilyInfoEnum": 302,
+        "KexRtlGetPersistedStateLocation": 303,
         "KexRtlIsProcessorFeaturePresent": 301
       }
     }

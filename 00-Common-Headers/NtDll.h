@@ -2951,6 +2951,12 @@ typedef struct _EVENT_BASIC_INFORMATION {
 
 STATIC PKUSER_SHARED_DATA SharedUserData = (PKUSER_SHARED_DATA) 0x7FFE0000;
 
+typedef enum _STATE_LOCATION_TYPE {
+	LocationTypeRegistry,
+	LocationTypeFileSystem,
+	LocationTypeMaximum
+} TYPEDEF_TYPE_NAME(STATE_LOCATION_TYPE);
+
 #pragma region Nt* function declarations
 
 NTSYSCALLAPI NTSTATUS NTAPI NtQueryEvent(

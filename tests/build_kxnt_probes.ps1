@@ -22,3 +22,5 @@ if ($LASTEXITCODE) { throw "KxNt probe build failed ($Architecture)" }
 if ($LASTEXITCODE) { throw "Domain probe build failed ($Architecture)" }
 & cl.exe /nologo /MT /O1 /W4 "/Fo$out\device-family.obj" "/Fe$out\device-family.exe" "$PSScriptRoot\kxnt_device_family_probe.c" /link /SUBSYSTEM:CONSOLE,6.0
 if ($LASTEXITCODE) { throw "Device family probe build failed ($Architecture)" }
+& cl.exe /nologo /MT /O1 /W4 "/Fo$out\persisted-state.obj" "/Fe$out\persisted-state.exe" "$PSScriptRoot\kxnt_persisted_state_probe.c" /link /SUBSYSTEM:CONSOLE,6.0
+if ($LASTEXITCODE) { throw "Persisted state probe build failed ($Architecture)" }

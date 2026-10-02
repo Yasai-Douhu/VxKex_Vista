@@ -10,7 +10,7 @@
 | RtlIsProcessorFeaturePresent | 完了 | Server 2008 x86 / x64 成功 |
 | RtlCanonicalizeDomainName | 完了 | Server 2008 x86 / x64 成功 |
 | RtlGetDeviceFamilyInfoEnum | 完了 | Server 2008 x86 / x64 成功 |
-| RtlGetPersistedStateLocation | 未着手 | 未実施 |
+| RtlGetPersistedStateLocation | 完了（既定パスへのフォールバック） | Server 2008 x86 / x64 成功 |
 | RtlIsPackageSid / RtlIsCapabilitySid | 未着手 | 未実施 |
 | RtlCheckTokenMembershipEx | 未着手 | 未実施 |
 | ZwCompareObjects | 未着手 | 未実施 |
@@ -94,9 +94,11 @@ REST API はタスクスケジューラの `YamaR` / 最上位の特権で実行
 
 ## 次の作業
 
-RtlGetPersistedStateLocation を実装・検証する。スレッド通知・待機などの状態管理を伴う機能も、調査の対象範囲として引き続き進める。
+SID 分類とトークン検査を実装・検証する。スレッド通知・待機などの状態管理を伴う機能も、調査の対象範囲として引き続き進める。
 
 ## 2026-10-02: RtlGetDeviceFamilyInfoEnum
+
+コミット・プッシュ済み: `17c252f`。
 
 - KexDll の実装と KxNt の公開経路を追加。固定 ordinal は KexDll 302、KxNt 2202。
 - UAP バージョンはプロセスの PEB の major / minor / build を 16bit ごとに格納する。本家の固定値 3570 は使わない。NT 6.0 に unified build revision がないため、revision は 0。
@@ -113,3 +115,30 @@ Server 2008 x86 / x64 で次を確認した。
 - KexDll / KxNt の両アーキテクチャのビルドと、既存エクスポート番号の維持。
 
 ログ・SHA256 は `docs/validation/kxnt-device-family.json`。再実行は `tests/run_kxnt_processor_feature_vm.ps1 -Probe device-family`。Vista クライアントでの分類と実アプリでの回帰は未検証。
+
+## 2026-10-02: RtlGetPersistedStateLocation
+
+### 実施内容
+
+- NEXT の既定パスへのフォールバックを移植。NT 6.0 には StateSeparation のリダイレクトマップがないため、DefaultPath があればコピーし、なければ `STATUS_OBJECT_NAME_NOT_FOUND` を返す。マップによるリダイレクト機構全体の実装ではない。
+- STATE_LOCATION_TYPE を共通ヘッダーに追加。レジストリ (0) / ファイルシステム (1) を受け付ける。
+- 必要サイズは終端 WCHAR を含むバイト数。不足時は `STATUS_BUFFER_OVERFLOW` と必要サイズを返し、出力バッファには書き込まない。
+- WCHAR 数から ULONG のバイト数へ変換する際の整数オーバーフローを検査。本家の省略していた検査を追加した。
+- 公開 ordinal は KexDll 303、KxNt 2203。既存の公開番号を維持。
+- [Microsoft の仕様](https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntddk/nf-ntddk-rtlgetpersistedstatelocation)を確認した。kernel mode の資料だけに依存せず、ホストの user mode native ntdll でも返却値を測定して比較した。
+
+### 検証範囲
+
+Server 2008 x86 / x64 と native Windows の参照結果で、16 ケースの NTSTATUS、必要サイズ、出力 UTF-16、例外結果が一致した。
+
+対象: 両保存先種別、不正な種別と負の値、NULL バッファでのサイズ照会、1 / 2 バイト不足、ちょうどのサイズ、余裕のあるサイズ、任意のサイズ出力の省略、空の既定パス、既定パスなし、CustomValue、日本語を含むファイルパス、不正な NULL 出力先。
+
+失敗時のバッファ全体の不変性と前後のガードも検査。不正な NULL 出力先に十分なサイズを指定するケースでは、native 同様にアクセス違反が起こることをプローブ内の SEH で捕捉した。このケースを通常の成功として返す実装ではない。
+
+資料: `docs/validation/kxnt-persisted-state-reference.json`（native 参照）、`docs/validation/kxnt-persisted-state.json`（VM ログと SHA256）。再実行は `tests/run_kxnt_processor_feature_vm.ps1 -Probe persisted-state`。
+
+残る検証: 整数オーバーフローを起こす巨大な実文字列の動的検証、Vista クライアント、実アプリ、StateSeparation マップによるリダイレクト。CPU 機能照会、ドメイン正規化、デバイス情報の既存3機能は最新 DLL で再検証済み。
+
+### ビルドの自動化
+
+`tests/build_kxnt_parity.ps1` で KexDll → KxNt → プローブを x86 / x64 で順番にビルドする。途中のコンパイラー・リンカーの終了コードが非ゼロなら停止し、古いバイナリで検証を続けない。詳細ログは `audit/KxNtParity/` に保存する。必要な KexSmp / KexMLS / KexPathCch のライブラリは事前にビルドしておく。

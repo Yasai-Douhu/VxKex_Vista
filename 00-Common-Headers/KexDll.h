@@ -426,6 +426,15 @@ KEXAPI VOID NTAPI KexRtlGetDeviceFamilyInfoEnum(
 	OUT PULONG DeviceFamily OPTIONAL,
 	OUT PULONG DeviceForm OPTIONAL);
 
+KEXAPI NTSTATUS NTAPI KexRtlGetPersistedStateLocation(
+	IN PCWSTR SourceID,
+	IN PCWSTR CustomValue OPTIONAL,
+	IN PCWSTR DefaultPath OPTIONAL,
+	IN STATE_LOCATION_TYPE StateLocationType,
+	OUT PWCHAR TargetPath,
+	IN ULONG BufferCbIn,
+	OUT PULONG BufferCbOut OPTIONAL);
+
 KEXAPI NTSTATUS NTAPI KexRtlCanonicalizeDomainName(
 	OUT PUNICODE_STRING DestinationString,
 	IN PCUNICODE_STRING SourceString,
