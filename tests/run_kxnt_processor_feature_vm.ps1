@@ -3,7 +3,7 @@ param(
     [Parameter(Mandatory=$true)][string]$GuestPassword,
     [string]$GuestUser = 'Administrator',
     [string]$GuestDirectory = 'C:\KxNtParity',
-    [ValidateSet('processor-feature','domain')][string]$Probe = 'processor-feature',
+    [ValidateSet('processor-feature','domain','device-family')][string]$Probe = 'processor-feature',
     [string]$VMRun = 'C:\Program Files\VMware\VMware Workstation\vmrun.exe'
 )
 $ErrorActionPreference = 'Stop'
@@ -45,6 +45,9 @@ foreach ($arch in @('x86','x64')) {
     }
     if ($Probe -eq 'processor-feature' -and $text -notmatch 'ValidFeatureChecks=64 InvalidFeatureChecks=5 Failures=0') {
         throw "Processor feature checks missing ($arch)"
+    }
+    if ($Probe -eq 'device-family' -and ($text -notmatch 'OptionalOutputCombinations=8 Failures=0' -or $text -notmatch 'SpoofedVersionCases=3')) {
+        throw "Device family checks missing ($arch)"
     }
     if ($Probe -eq 'domain') {
         $reference = Get-Content -Raw "$root\docs\validation\kxnt-domain-reference.json" | ConvertFrom-Json

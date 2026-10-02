@@ -7,6 +7,7 @@
       "OrdinalChanges": {},
       "NewExports": {
         "RtlCanonicalizeDomainName": 2200,
+        "RtlGetDeviceFamilyInfoEnum": 2202,
         "RtlIsProcessorFeaturePresent": 2201
       }
     },
@@ -16,6 +17,7 @@
       "OrdinalChanges": {},
       "NewExports": {
         "RtlCanonicalizeDomainName": 2200,
+        "RtlGetDeviceFamilyInfoEnum": 2202,
         "RtlIsProcessorFeaturePresent": 2201
       }
     },
@@ -25,6 +27,7 @@
       "OrdinalChanges": {},
       "NewExports": {
         "KexRtlCanonicalizeDomainName": 300,
+        "KexRtlGetDeviceFamilyInfoEnum": 302,
         "KexRtlIsProcessorFeaturePresent": 301
       }
     },
@@ -34,6 +37,7 @@
       "OrdinalChanges": {},
       "NewExports": {
         "KexRtlCanonicalizeDomainName": 300,
+        "KexRtlGetDeviceFamilyInfoEnum": 302,
         "KexRtlIsProcessorFeaturePresent": 301
       }
     }

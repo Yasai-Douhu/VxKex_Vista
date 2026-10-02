@@ -20,3 +20,5 @@ New-Item -ItemType Directory -Force $out | Out-Null
 if ($LASTEXITCODE) { throw "KxNt probe build failed ($Architecture)" }
 & cl.exe /nologo /MT /O1 /W4 "/Fo$out\domain.obj" "/Fe$out\domain.exe" "$PSScriptRoot\kxnt_domain_probe.c" /link /SUBSYSTEM:CONSOLE,6.0
 if ($LASTEXITCODE) { throw "Domain probe build failed ($Architecture)" }
+& cl.exe /nologo /MT /O1 /W4 "/Fo$out\device-family.obj" "/Fe$out\device-family.exe" "$PSScriptRoot\kxnt_device_family_probe.c" /link /SUBSYSTEM:CONSOLE,6.0
+if ($LASTEXITCODE) { throw "Device family probe build failed ($Architecture)" }

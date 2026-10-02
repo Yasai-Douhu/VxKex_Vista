@@ -36,6 +36,32 @@ KEXAPI BOOLEAN NTAPI KexRtlIsProcessorFeaturePresent(
 	return (BOOLEAN) IsProcessorFeaturePresent(ProcessorFeature);
 }
 
+KEXAPI VOID NTAPI KexRtlGetDeviceFamilyInfoEnum(
+	OUT PULONGLONG UAPInfo OPTIONAL,
+	OUT PULONG DeviceFamily OPTIONAL,
+	OUT PULONG DeviceForm OPTIONAL)
+{
+	PPEB Peb = NtCurrentPeb();
+	NT_PRODUCT_TYPE ProductType = SharedUserData->NtProductType;
+
+	// Follow the version exposed to this process, including PEB spoofing.
+	// NT 6.0 has no unified build revision (UBR); use zero rather than a
+	// fabricated Windows 10 servicing revision.
+	if (UAPInfo) {
+		*UAPInfo = ((ULONGLONG) (Peb->OSMajorVersion & 0xffff) << 48) |
+			((ULONGLONG) (Peb->OSMinorVersion & 0xffff) << 32) |
+			((ULONGLONG) Peb->OSBuildNumber << 16);
+	}
+	if (DeviceFamily) {
+		*DeviceFamily = ProductType == NtProductWinNt ? 3 : 9;
+	}
+	if (DeviceForm) {
+		// Match NEXT's desktop fallback. This is a compatibility default,
+		// not hardware chassis detection on laptops/tablets.
+		*DeviceForm = 3;
+	}
+}
+
 KEXAPI INT NTAPI KexRtlOperatingSystemBitness(
 	VOID)
 {

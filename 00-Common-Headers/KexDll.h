@@ -421,6 +421,11 @@ KEXAPI NTSTATUS NTAPI KexRtlWow64GetProcessMachines(
 KEXAPI BOOLEAN NTAPI KexRtlIsProcessorFeaturePresent(
 	IN ULONG ProcessorFeature);
 
+KEXAPI VOID NTAPI KexRtlGetDeviceFamilyInfoEnum(
+	OUT PULONGLONG UAPInfo OPTIONAL,
+	OUT PULONG DeviceFamily OPTIONAL,
+	OUT PULONG DeviceForm OPTIONAL);
+
 KEXAPI NTSTATUS NTAPI KexRtlCanonicalizeDomainName(
 	OUT PUNICODE_STRING DestinationString,
 	IN PCUNICODE_STRING SourceString,

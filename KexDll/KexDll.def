@@ -1,5 +1,6 @@
 LIBRARY "KexDll.dll"
 EXPORTS
+	KexRtlGetDeviceFamilyInfoEnum @302
 	KexRtlCanonicalizeDomainName @300
 	KexRtlIsProcessorFeaturePresent @301
 	KexDataInitialize

@@ -9,7 +9,7 @@
 |---|---|---|
 | RtlIsProcessorFeaturePresent | 完了 | Server 2008 x86 / x64 成功 |
 | RtlCanonicalizeDomainName | 完了 | Server 2008 x86 / x64 成功 |
-| RtlGetDeviceFamilyInfoEnum | 未着手 | 未実施 |
+| RtlGetDeviceFamilyInfoEnum | 完了 | Server 2008 x86 / x64 成功 |
 | RtlGetPersistedStateLocation | 未着手 | 未実施 |
 | RtlIsPackageSid / RtlIsCapabilitySid | 未着手 | 未実施 |
 | RtlCheckTokenMembershipEx | 未着手 | 未実施 |
@@ -94,4 +94,22 @@ REST API はタスクスケジューラの `YamaR` / 最上位の特権で実行
 
 ## 次の作業
 
-RtlGetDeviceFamilyInfoEnum と RtlGetPersistedStateLocation を実装・検証する。スレッド通知・待機などの状態管理を伴う機能も、調査の対象範囲として引き続き進める。
+RtlGetPersistedStateLocation を実装・検証する。スレッド通知・待機などの状態管理を伴う機能も、調査の対象範囲として引き続き進める。
+
+## 2026-10-02: RtlGetDeviceFamilyInfoEnum
+
+- KexDll の実装と KxNt の公開経路を追加。固定 ordinal は KexDll 302、KxNt 2202。
+- UAP バージョンはプロセスの PEB の major / minor / build を 16bit ごとに格納する。本家の固定値 3570 は使わない。NT 6.0 に unified build revision がないため、revision は 0。
+- Vista クライアントは Desktop (3)、Server / DC は Server (9) として分類。フォームは本家と同じ Desktop (3) の互換既定値。ノート PC / タブレットなどの筐体を検出する実装ではない。
+- [Microsoft の関数仕様](https://learn.microsoft.com/en-us/windows/win32/devnotes/rtlgetdevicefamilyinfoenum)と [SDK 定義](https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/um/winnt.h)で宣言・定数・Windows 10 以降の API であることを確認。VM の native ntdll には関数がないことを再確認した。
+
+### 検証範囲
+
+Server 2008 x86 / x64 で次を確認した。
+
+- 任意出力の NULL を含む全8組み合わせ。NULL の出力には触れず、値の前後のガードと LastError を保持。
+- RtlGetVersion が報告する 6.0.6003 に一致するバージョン構成、Server 系列の分類。
+- プローブ自身の PEB だけを一時的に 10.0.19045 / 10.0.26100 / 6.1.7601 に変更した3ケースで追従を確認。書き込み前に PEB のレイアウトを RtlGetVersion と照合し、終了時に元の値へ戻した。システム設定は変更していない。
+- KexDll / KxNt の両アーキテクチャのビルドと、既存エクスポート番号の維持。
+
+ログ・SHA256 は `docs/validation/kxnt-device-family.json`。再実行は `tests/run_kxnt_processor_feature_vm.ps1 -Probe device-family`。Vista クライアントでの分類と実アプリでの回帰は未検証。
