@@ -58,6 +58,8 @@ if ($LASTEXITCODE) { throw "Windowless UTF conversion probe build failed ($Archi
 if ($LASTEXITCODE) { throw "Traced windowless UTF probe build failed ($Architecture)" }
 & cl.exe /nologo /MT /O1 /W4 "/Fo$out\open-key-reference.obj" "/Fe$out\open-key-reference.exe" "$PSScriptRoot\kxnt_open_key_reference_probe.c" /link /SUBSYSTEM:CONSOLE,6.0
 if ($LASTEXITCODE) { throw "Registry open reference probe build failed ($Architecture)" }
+& cl.exe /nologo /MT /O1 /W4 "/Fo$out\open-key-options.obj" "/Fe$out\open-key-options.exe" "$PSScriptRoot\kxnt_open_key_options_probe.c" /link /SUBSYSTEM:CONSOLE,6.0
+if ($LASTEXITCODE) { throw "Registry open options probe build failed ($Architecture)" }
 & cl.exe /nologo /MT /O1 /W4 "/Fo$out\registry-transaction.obj" "/Fe$out\registry-transaction.exe" "$PSScriptRoot\kxnt_registry_transaction_probe.c" /link /SUBSYSTEM:CONSOLE,6.0 advapi32.lib KtmW32.lib
 if ($LASTEXITCODE) { throw "Registry transaction probe build failed ($Architecture)" }
 & cl.exe /nologo /MT /O1 /W4 "/Fo$out\utf8-resource.obj" "/Fe$out\utf8-resource.exe" "$PSScriptRoot\kxnt_utf8_resource_probe.c" /link /SUBSYSTEM:CONSOLE,6.0

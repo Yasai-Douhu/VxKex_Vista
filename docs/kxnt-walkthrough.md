@@ -752,3 +752,17 @@ kxnt_utf8_probe.cにKXNT_UTF8_RESOURCE_TRACEでのみ有効なsnapshotを加え�
 証跡: docs/validation/kxnt-utf8-fulltrace-server.json / kxnt-utf8-fulltrace-vista.json、kxnt-utf8-fulltrace-identities.json、kxnt-utf8-fullcase-event-traces.json。再実行は両形式build後、windowless runnerにTraceResourcesと未使用RunNameを渡す。CDBの正確なcommands / module hash / 不完全実行との区別はevent-traces証跡に保存した。内部RVAは当該Server ntdll専用の診断であり、配布コードには追加していない。
 
 元のconsole cold差分、残るEventの全面帰属とlifecycle、通常IFEO統合、監査の他の未完了項目は引き続き未完了。配布DLL、Installer、system DLL、Releasesは変更していない。
+
+## 2026-10-04: NtOpenKeyEx のフラグと構造体alignmentを両形式で再測定
+
+監査全体の実装に戻るため、未解決native転送のNtOpenKeyExを再確認した。[Microsoftの仕様](https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/wdm/nf-wdm-zwopenkeyex)はWindows 7以降のAPIで、OpenOptions=0を旧openと同等とする。一方、既存の実測にはOpenOptions=8とOBJ_OPENLINKの違いがあり、単純なフラグ変換はまだ正当化できない。
+
+- tests/kxnt_open_key_options_probe.cを追加。既存のread-only probeを拡張し、通常SYSTEM、CurrentControlSetリンク、欠落キーの3入力 × attributes0x40 / 0x140 × 12OpenOptionsをnative hostで測定。加えて同じObjectAttributesをbyte offset0〜8へ置いた9入力、合計81ケース / 形式を測定した。旧APIは3入力 ×2attributesとalignment9入力の15ケース / 形式。
+- VS2010で両形式をbuild。再現runner tests/run_kxnt_open_key_options.ps1でホストnative / legacy、Server / Vistaのnative absence / legacyを確認した。NT6 VMのexit5はNativeExPresent=0 / NATIVE_EX_ABSENTを実際のlogで確認した期待する非存在診断であり、起動成功やadapter成功と扱わない。legacyは各15行とFailures=0を要求した。LastError / LastStatusを各呼出しで検査し、handle成功時にはNtQueryKeyで実際のキー名を確認した。
+- ホストの両形式でCurrentControlSetにOpenOptions=8・attributes0x40を渡すとControlSet001へ解決された。同じ8でもattributes0x140ではCurrentControlSetのリンク自身が返った。旧NtOpenKeyにattributes0x140を渡した結果もリンク自身。したがって、このnative referenceではoptions8を無条件にOBJ_OPENLINKへ変換すると、要求と異なるキーを返す。
+- ホストnativeはoptions0x10 / 0x18も受理した。この観測を全Windows版の規範とせず、公開仕様の4 / 8だけを理由に未知bitを一律INVALID_PARAMETER_4へする実装も現時点で採用しない。backup / restoreは権限と検証順序を含めて別問題である。
+- alignmentのoffset4はホストWOW64で成功、ホストx64ではSTATUS_DATATYPE_MISALIGNMENT。offset1 / 2などは拒否された。入力構造体を無条件にalignedなローカルcopyへ移すと、このnative parameter validationを失うおそれがある。任意のpointer配置やoutput pointerの検証順序を網羅した試験ではない。
+
+証跡: docs/validation/kxnt-open-key-options-server.json / kxnt-open-key-options-vista.json（それぞれ両形式、native / legacy raw、source / EXE / runner hash、VMX / user）。RunNameごとに別archiveへ保存し、途中例外はIncompleteを残す。キー作成・ACL変更・特権有効化・配布API変更は行っていない。
+
+次工程は、仕様とnativeで保証される通常openの移植を進めつつ、flags4 / 8 / 0x10、保護キー、相対root / view、削除競合、引数検証順序を別途解決する。通常openだけでNtOpenKeyEx全体が完成したとは扱わない。WNFは元監査の実利用確認・設計条件を維持する。UTF資源の残る帰属と通常IFEO統合検証も未完了のまま。Installer / system DLL / Releasesは変更していない。
