@@ -575,3 +575,24 @@ VMのSystem32 / SysWOW64からnative ntdllを改めて取得し、machine種別�
 - 全試験でLastError / LastStatus維持、取得成功handleの型をキー名照会で確認。通常キー3種類の読み取り・TLSの測定であり、standard user、backup権限を有効化したtoken、保護キー、アクセス拒否ACL、削除競合、不正pointer、相対RootDirectory、WOW64 view指定は未検証。
 
 証跡: `docs/validation/kxnt-open-key-reference.json`（native / legacy / VM rawログ、source・EXE SHA256）。ビルドは両アーキテクチャの `tests/build_kxnt_probes.ps1`、実行は `tests/run_kxnt_open_key_reference.ps1 -VMX <VMX> -GuestPassword <パスワード>`。静的再集計は `tests/audit_kxnt_native_forwarders.py --native-x86 <SysWOW64のsnapshot> --native-x64 <System32のsnapshot>`。今回の追加は診断EXE / 検査ツール / 記録のみで、配布DLLやシステムDLL、Releasesは変更していない。
+
+## 2026-10-03: 空の相対名による backup / restore open と ACL 境界
+
+NtOpenKeyEx の追加検討として、既存キーを native NtOpenKey で先に参照し、NtCreateKey にその handle と空の相対名を渡す方式を測定した。**通常キーでは transaction に結び付かない、読み書き可能な backup / restore handle を取得できた。ただし、最初の参照取得を ACL が拒否するキーには対応できない。全般的な置換としては未採用。**
+
+- Server 2008 の WOW64 / x64 で各96ケース。4 privilege状態 × 通常ACL / protected空DACL / OWNER RIGHTS拒否ACE × 参照時のアクセス0 / KEY_QUERY_VALUE / READ_CONTROL / MAXIMUM_ALLOWED × 既存 / 欠落キー。
+- 通常キーと空DACLでは、READ_CONTROLで参照し、空名でbackup / restore createするとdisposition=2。Backupだけは読取り成功・書込み拒否、Restoreだけは逆、両方は読書き成功。成功した読取りのMarker内容も照合。transactionをfinishした後の失効と異なり、その場で有効なnative handleとなった。
+- KEY_QUERY_VALUEは空DACLで拒否されるが、所有者には暗黙のREAD_CONTROLがある。単に空DACLの成功だけで任意の保護キー対応とは判断できない。[MicrosoftのOWNER RIGHTS説明](https://github.com/MicrosoftDocs/windowsserverdocs/blob/main/WindowsServerDocs/identity/ad-ds/manage/understand-security-identifiers.md) を確認し、S-1-3-4へのKEY_ALL_ACCESS拒否ACEも追加した。実際に設定されたDACLのACE数0 / 1をnative照会した。
+- OWNER RIGHTS拒否では、Backup / Restoreを有効にしても全4参照アクセスがACCESS_DENIED。空名createまで到達しない。この方式は「先に何らかの参照を取得できるキー」に依存する。ゼロアクセスの参照も通常キーでACCESS_DENIEDとなった。
+- 欠落キー48ケースはOBJECT_NAME_NOT_FOUNDでcreate未実行。名前付きcreateへフォールバックしていない。既存キーの成功createはdisposition=2を要求した。Markerを書き戻すのは専用fixtureだけであり、その操作後のtimestamp不変を主張していない。transaction側の8 timestamp / 欠落キーrollback検査も再実行した。
+- ホストfiltered tokenはprivilegeなしだけを測定し、有効化できない3状態を明示。ホストnativeのprivilege有効状態との同等性は未確認。
+
+### 診断用キーの後始末
+
+初期版ではOWNER RIGHTS拒否後のDACL復元・名前からのRegDeleteKeyが拒否され、ホストに専用fixtureが6個残った。最終版は作成時のDELETE権限付きhandleを保持し、native NtDeleteKeyで専用Targetを削除してから親を削除する。最終実行はホスト / VMの両形式でTarget削除STATUS_SUCCESS、親削除成功、token復元、Failures=0を確認した。DACL復元そのものが拒否された場合も記録し、復元成功と誤記しない。キー全体の削除をcleanupの条件とした。
+
+残った6個は、今回の固定キー名、子がTargetだけ、Marker=69133742を照合する一回限りの管理者清掃helperで削除し、ホストの専用親に子が残らないことを確認した。既存アプリの設定キーは対象にしていない。清掃の要約は docs/validation/kxnt-registry-fixture-cleanup.json。
+
+診断プローブとrunnerを更新。runnerは96件の網羅、48件の欠落拒否、16件のOWNER RIGHTS参照拒否、有効なprivilege別read/write、effective ACL、削除を明示gateにした。証跡は更新した docs/validation/kxnt-registry-transaction.json（source / EXE / runner SHA256とhost / VMのraw結果）。再実行方法は前節と同じ。
+
+VM再接続では専用native-launchからcmd.exe /d /c exit 0を起動し、CreateProcess成功・子終了0を確認した。配布DLL・システムDLL・Releasesは変更していない。任意root、symlink、view、削除競合、非所有者token、通常IFEO、Vistaクライアントの包括検証と、保護キーを扱える代替方式の検討は継続する。

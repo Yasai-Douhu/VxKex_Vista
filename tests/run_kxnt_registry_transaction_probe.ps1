@@ -30,13 +30,27 @@ foreach($arch in @('x86','x64')){
         if($output -notmatch "PostFinish Mode=$mode Missing=0 .*WriteStatus=c0190003"){throw 'Write failure after commit unproven'}
     }
     if([regex]::Matches($output,'MissingKeyOpen=2 TargetTimestampSame=1').Count -ne 8){throw 'Missing-key rollback/timestamp checks incomplete'}
+    if([regex]::Matches($output,'(?m)^Pinned ').Count -ne 96){throw 'Pinned matrix incomplete'}
+    if([regex]::Matches($output,'Pinned .* Missing=1 Open=c0000034 Create=deadbeef').Count -ne 48){throw 'Missing key opened/created by pinned path'}
+    if([regex]::Matches($output,'Pinned Restricted=2 .* Missing=0 Open=c0000022 Create=deadbeef').Count -ne 16){throw 'Owner-rights denial not proven'}
+    if($output -notmatch 'Restricted=1 DaclPresent=1 AceCount=0' -or $output -notmatch 'Restricted=2 DaclPresent=1 AceCount=1'){throw 'Effective ACLs not verified'}
+    foreach($restricted in @(0,1)){
+        foreach($mode in @(1,2,3)){
+            $read=if($mode -eq 2){'c0000022'}else{'00000000'}
+            $write=if($mode -eq 1){'c0000022'}else{'00000000'}
+            if($output -notmatch "Pinned Restricted=$restricted PinAccess=00020000 Mode=$mode Missing=0 Open=00000000 Create=00000000 Disposition=2 .*Read=$read Write=$write"){throw 'Durable pinned privilege/access behavior incomplete'}
+        }
+    }
+    if($output -notmatch 'DeleteOwnedTargetStatus=00000000'){throw 'Owned target not deleted'}
     $receipt += [pscustomobject]@{
         Architecture=$arch;VMX=$VMX;ProbeSHA256=(Get-FileHash $probe).Hash
         SourceSHA256=(Get-FileHash "$PSScriptRoot\kxnt_registry_transaction_probe.c").Hash
+        RunnerSHA256=(Get-FileHash $PSCommandPath).Hash
         HostOutput=[IO.File]::ReadAllText("$results\$arch\registry-transaction-host.txt")
         Output=$output;Conclusion='Committed transaction-bound key cannot directly replace the durable native NtOpenKeyEx handle'
-        Scope='Owned HKCU fixtures; thread-private duplicated token; modes none/backup/restore/both; rollback of created leaves; cleanup verified'
+        PinnedConclusion='Empty-relative-name create provides durable privileged handles if initial pin succeeds; OWNER RIGHTS denial blocks all tested pin masks even with backup/restore'
+        Scope='Owned HKCU fixtures; private token; four privilege modes; three ACL states; four pin masks; missing-key refusal; effective ACL checks; marker read/write; native DELETE handle cleanup'
     }
-    Write-Host "$arch raw native transaction experiment: commit invalidates privileged key operations; approach rejected"
+    Write-Host "${arch}: transaction binding fails; pinned durable handles work conditionally; protected pin denied; owned fixture deleted"
 }
 $receipt | ConvertTo-Json -Depth 5 | Set-Content -Encoding UTF8 "$results\registry-transaction-receipt.json"

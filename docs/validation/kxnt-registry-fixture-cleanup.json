@@ -1,0 +1,16 @@
+{
+  "FixedNames": [
+    "TxnOpen-19288-28490296",
+    "TxnOpen-21680-28289453",
+    "TxnOpen-22248-28142968",
+    "TxnOpen-22928-28207234",
+    "TxnOpen-28568-28338484",
+    "TxnOpen-4620-28243109"
+  ],
+  "DeletedCount": 6,
+  "CurrentChildCount": 0,
+  "CleanupHelperSHA256": "BC3B595982198C5720513F139949E87DF323A6287736CDEA5D4C913473A662C9",
+  "CleanupLogSHA256": "E3B138F6B0217A675810726CAE5F4015866BE63BBACAD391D15BCBA012284883",
+  "Scope": "Only fixed owned fixture parents with Target and matching DWORD Marker; one-off elevated process; no production registry settings",
+  "Result": "PASS"
+}
