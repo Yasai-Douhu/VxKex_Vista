@@ -530,6 +530,29 @@ VS2010 / SDKの両ビルド成功。ホストnative、ホストKxNtからnative�
 
 作業ブランチInstallerとVM専用フォルダーへの配備。Vistaクライアント、native32bit OS、標準ユーザー、通常IFEO起動、全scheduler interleaving、4GB入力、全overlap、不正pointerの全配置は未検証。システムDLL / Releasesは変更していない。KxNt移植全体は継続中。
 
+## 2026-10-03: backup / restore のトランザクション代替を実測
+
+旧NtCreateKeyをNtOpenKeyExの代わりに使うと、欠落キーを作ってしまう。Vistaのtransaction付きcreateで「既存ならcommit、新規ならrollback」を行い、通常のkey handleを返せるか実測した。[ZwCreateKeyTransactedの仕様](https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/wdm/nf-wdm-zwcreatekeytransacted) はbackup / restore指定を受理し、[Win32の仕様](https://learn.microsoft.com/en-us/windows/win32/api/winreg/nf-winreg-regcreatekeytransactedw) でもcommit後の操作に制約がある。
+
+**transaction-bound handleを直接返す方式は採用しない。** Server 2008のWOW64 / x64双方で、native NtCreateKeyTransactedが返した既存key handleもcommit後に読み書きできなくなった。Win32 transaction HKEY wrapperだけの制約ではない。
+
+### 条件と結果
+
+- tests/kxnt_registry_transaction_probe.cを追加。HKCUのSoftware\VxKexProbe\TxnOpen-PID-tickに自分専用の親、Target、Markerを作る。既存fixtureと衝突したら変更せず中止。Missingという子はtransaction内で作られても必ずrollbackし、既存Targetを開いたときだけcommitする。
+- 自プロセスのtokenを複製し、thread-privateなimpersonation tokenのprivilegeなし / Backupのみ / Restoreのみ / 両方を測定。元のprocess tokenや別ユーザーのtokenを変更しない。終了時に元のthread tokenを復元した。
+- VMは4状態すべて実行。GrantedAccessはBackup=01020019、Restore=010f0006、両方=010f001f。DesiredAccess=KEY_READがbackup / restore指定で上書きされることを確認した。これを全Windows版の規範的access maskと扱わない。
+- privilegeなしのtransaction createは既存・欠落ともACCESS_DENIED。native NtOpenKeyExが欠落キーにOBJECT_NAME_NOT_FOUNDを返した前節の結果と異なり、検証順序の適応も必要になる。
+- Backup / 両方では、既存Targetのcommit前のNtQueryValueKeyはSUCCESS、Marker=69133742。commit後はc0190003（TRANSACTION_NOT_ACTIVE）。Restore / 両方のcommit後NtSetValueKeyもc0190003。Restoreのみのreadは権限がなくACCESS_DENIEDなので、writeでtransaction失効を別に確認した。
+- rollback後のMissingは通常のRegOpenKeyExでERROR_FILE_NOT_FOUND。全8transactionで確認し、既存Targetの更新日時も不変だった。新規キーのrollback済みhandleはKEY_DELETED等を返し、そのまま通常handleとして使えない。
+- 最後にTarget、もし残っていればMissing、専用親fixtureを削除。key / transaction / token handleを閉じ、削除失敗、token復元失敗、timestamp変更は試験を失敗させる。VxKexProbeの共通親やユーザーの既存キーを削除しない。
+- ホストfiltered tokenにはBackup / Restore privilegeがないため、privilegeなしだけ実行し、3状態はPrivilegesUnavailableを明示した。ホストnativeのprivilege有効状態との完全な比較ではない。
+
+Native ObjectBasicInformationの固定長56bytesでGrantedAccessを測定した。初期のWin32 transaction HKEYや長さ128bytesでの照会は不適切だったため、native handleと固定長に修正して最終証跡を取得した。試験のPASSはfixture不変性・cleanupとこの失効挙動の確認であり、NtOpenKeyEx代替の成功ではない。
+
+再実行: tests/build_kxnt_probes.ps1を両形式で実行 → tests/run_kxnt_registry_transaction_probe.ps1にVMXとGuestPasswordを指定。証跡: docs/validation/kxnt-registry-transaction.json（native前後結果、privilege対照、fixtureとcleanup、source / EXE SHA256）。
+
+配布API・転送先・システムDLLは変更していない。通常open / OBJ_OPENLINKは引き続き移植候補。backup / restoreを無視した成功や失効したhandleの公開はしない。保護ACL、任意のroot / flags、削除競合、registry virtualization、Vistaクライアントは未検証。他の代替方式すべてが不可能だという結論ではない。
+
 ## 2026-10-03: 残る native 転送の再集計とレジストリopenの測定
 
 VMのSystem32 / SysWOW64からnative ntdllを改めて取得し、machine種別を照合して現在のInstallerを検査した。`tests/audit_kxnt_native_forwarders.py` は明示したDLL snapshotと基準コミット24a03aeに対し、公開名、ordinal転送、native named転送先を解析して再現可能なJSONを出力する。対象DLLのSHA256も保存した。
