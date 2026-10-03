@@ -5,9 +5,11 @@ param(
  [Parameter(Mandatory=$true)][ValidatePattern('^[a-z0-9-]+$')][string]$RunName,
  [switch]$Suite,
  [switch]$EventTrace,
+ [switch]$RuntimeSuite,
  [string]$VMRun='C:\Program Files\VMware\VMware Workstation\vmrun.exe'
 )
 $ErrorActionPreference='Stop'
+if($RuntimeSuite){if($EventTrace){throw 'Select one diagnostic mode'};$Suite=$true}
 if($EventTrace -and !$Suite){throw 'EventTrace uses the static-import suite fixtures; also specify Suite'}
 $root=Split-Path $PSScriptRoot
 $allowed='C:\Users\YamaR\Documents\Virtual Machines\VxKex-Next-Parity-Test\Server2008-SetupParity.vmx'
@@ -17,6 +19,7 @@ if(Test-Path $archive){throw 'Use a fresh RunName to retain earlier evidence'}
 New-Item -ItemType Directory $archive|Out-Null
 $state='Incomplete';$results=@();$suiteResults=@();$eventResults=@();$debuggerFiles=@();$files=@();$sources=@{}
 $kinds=@('processor-feature','domain','device-family','persisted-state','sid-package','sid-capability','membership','compare','file-information','alert','performance','srw')
+if($RuntimeSuite){$kinds=@('utf8','silent-exit')}
 function Guest([string[]]$Arguments){& $VMRun -T ws -gu $GuestUser -gp $GuestPassword @Arguments;if($LASTEXITCODE){throw "VMware failed: $($Arguments[0])"}}
 try {
  foreach($source in @('tests/kxnt_open_key_adapter_probe.c','tests/kxnt_ifeo_deployment_probe.c','tests/kxnt_ifeo_imports.def','tests/build_kxnt_ifeo_probe.ps1','tests/run_kxnt_ifeo_vm.ps1')){$sources[$source]=(Get-FileHash "$root\$source").Hash}
@@ -57,12 +60,12 @@ try {
   if((Get-FileHash "$archive\native-ntdll-x86.dll").Hash -ne 'A3D767B53F36E97DFEFCAD305AE050C98D5282D0107B7D51A36825C25F544506'){throw 'Internal CDB offsets are diagnostic-only and require this exact verified clone ntdll image'}
  }
  # Capture a failing driver too, including cleanup results, before interpreting exit.
- [string[]]$driverArgs=@('runProgramInGuest',$VMX,"$guest\deployment.exe");if($EventTrace){$driverArgs+='--event-trace'}elseif($Suite){$driverArgs+='--suite'}
+ [string[]]$driverArgs=@('runProgramInGuest',$VMX,"$guest\deployment.exe");if($RuntimeSuite){$driverArgs+='--runtime-suite'}elseif($EventTrace){$driverArgs+='--event-trace'}elseif($Suite){$driverArgs+='--suite'}
  & $VMRun -T ws -gu $GuestUser -gp $GuestPassword @driverArgs
  $driverExit=$LASTEXITCODE
  Guest @('copyFileFromGuestToHost',$VMX,"$guest\deployment.txt","$archive\deployment.txt")
  $driver=[IO.File]::ReadAllText("$archive\deployment.txt")
- foreach($arch in @(if(!$EventTrace){'x86';'x64'})){
+ foreach($arch in @(if(!$EventTrace -and !$RuntimeSuite){'x86';'x64'})){
   & $VMRun -T ws -gu $GuestUser -gp $GuestPassword copyFileFromGuestToHost $VMX "$guest\applied-$arch.txt" "$archive\applied-$arch.txt"
   if(!$LASTEXITCODE){
    $text=[IO.File]::ReadAllText("$archive\applied-$arch.txt")
@@ -84,8 +87,31 @@ try {
   $text=[IO.File]::ReadAllText("$archive\applied-$kind-$arch.txt");$binding=[IO.File]::ReadAllText("$archive\bindings-$kind-$arch.txt")
   $provider=if($arch -eq 'x86'){'C:\VxKex\Kex32\KxNt.dll'}else{'C:\Windows\System32\KxNt.dll'}
   $passed=$text -match 'Result=PASS' -and $text -notmatch 'Failures=[1-9]|Result=FAIL' -and $binding -match [regex]::Escape("Provider=$provider") -and $binding -match 'Implementation=C:\\Windows\\System32\\KexDll\.dll' -and $binding -match 'StaticBindingCount=26 Matches=26 EarlyKexDllLoaded=1 Result=PASS' -and [regex]::Matches($binding,'(?m)^Import=.*Equal=1 Owner=.+').Count -eq 26
-  $referenceHash=$null
+  $referenceHash=$null;$reference=$null;$control=$null
   switch($kind){
+   'silent-exit' {
+    $native="$archive\native-silent-exit-$arch.txt";$image="$root\audit\KxNtParity\IfeoSuite\$arch\KxNtIfeo-silent-exit-$arch.exe"
+    & $image ntdll.dll $native
+    if($LASTEXITCODE){throw 'Native silent exit comparison failed'}
+    $reference=[IO.File]::ReadAllText($native);$referenceHash=(Get-FileHash $native).Hash
+    $actual=@($text -split '\r?\n'|Where-Object {$_ -match '^Case='})
+    $expected=@($reference -split '\r?\n'|Where-Object {$_ -match '^Case='}|ForEach-Object {if($_ -match '^Case=self(?: |-)'){$_ -replace 'Status=00000000','Status=c00000bb'}else{$_}})
+    $passed=$passed -and $actual.Count -eq 9 -and ($actual -join "`n") -ceq ($expected -join "`n") -and $text -match 'RepeatCalls=1000 HandleDelta=0' -and $text -match 'Failures=0 ReportingSupported=0'
+   }
+   'utf8' {
+    Guest @('copyFileFromGuestToHost',$VMX,"$guest\control-utf8-$arch.txt","$archive\control-utf8-$arch.txt")
+    $control=[IO.File]::ReadAllText("$archive\control-utf8-$arch.txt")
+    $native="$archive\native-utf8-$arch.txt";$image="$root\audit\KxNtParity\IfeoSuite\$arch\KxNtIfeo-utf8-$arch.exe"
+    & $image native $native
+    if($LASTEXITCODE){throw 'Native UTF comparison failed'}
+    $reference=[IO.File]::ReadAllText($native);$referenceHash=(Get-FileHash $native).Hash
+    $actual=@($text -split '\r?\n'|Where-Object {$_ -match '^(Call=|Pointer=|Scalars=|Overlap=)'})
+    $expected=@($reference -split '\r?\n'|Where-Object {$_ -match '^(Call=|Pointer=|Scalars=|Overlap=)'})
+    $cold=[regex]::Match($text,'Parallel=4 Phase=0 Calls=16000 Errors=0 HandleDelta=(\d+)')
+    $coldControl=[regex]::Match($control,'Parallel=4 Phase=0 Calls=8000 Errors=0 HandleDelta=(\d+)')
+    $passed=$passed -and $actual.Count -eq 4893 -and ($actual -join "`n") -ceq ($expected -join "`n") -and $cold.Success -and $coldControl.Success -and $cold.Groups[1].Value -eq $coldControl.Groups[1].Value -and $text -match 'Phase=1 Calls=16000 Errors=0 HandleDelta=0' -and $control -match 'Phase=1 Calls=8000 Errors=0 HandleDelta=0' -and $control -match 'Failures=0 Result=CONTROL'
+    $control|Set-Content -Encoding UTF8 "$archive\retained-control-utf8-$arch.txt"
+   }
    'processor-feature' {$passed=$passed -and $text -match 'ValidFeatureChecks=64 InvalidFeatureChecks=5 Failures=0'}
    'domain' {$passed=$passed -and $text -match 'AllocationFreeCycles=2000 Failures=0'}
    'device-family' {$passed=$passed -and $text -match 'OptionalOutputCombinations=8 Failures=0' -and $text -match 'SpoofedVersionCases=3'}
@@ -109,13 +135,13 @@ try {
    'srw' {$passed=$passed -and $text -match 'MixedOperations=4000 Threads=4 Writes=2000 HandleDelta=0' -and $text -match 'ConditionShared=0 Exit=0' -and $text -match 'ConditionShared=1 Exit=0'}
   }
   $bin="$root\audit\KxNtParity\IfeoSuite\$arch"
-  $suiteResults+=[pscustomobject]@{Architecture=$arch;Probe=$kind;Passed=$passed;FixtureSHA256=(Get-FileHash "$bin\KxNtIfeo-$kind-$arch.exe").Hash;ImportTable=[IO.File]::ReadAllText("$bin\$kind-imports.txt");ReferenceSHA256=$referenceHash;Bindings=$binding;Output=$text}
+  $suiteResults+=[pscustomobject]@{Architecture=$arch;Probe=$kind;Passed=$passed;FixtureSHA256=(Get-FileHash "$bin\KxNtIfeo-$kind-$arch.exe").Hash;ImportTable=[IO.File]::ReadAllText("$bin\$kind-imports.txt");ReferenceSHA256=$referenceHash;ReferenceOutput=$reference;LookupControlOutput=$control;Bindings=$binding;Output=$text}
   Write-Host "$arch $kind integration Passed=$passed"
  }}}
  $state='Failed'
- if($Suite -and !$EventTrace -and ($suiteResults.Count -ne 24 -or ($suiteResults|Where-Object {!$_.Passed}))){throw 'Detailed suite failed; preserve actual output, bindings and teardown'}
- if($driverExit -ne 0 -or $driver -match '(?m)^FAIL ' -or $driver -notmatch 'Failures=0 Result=PASS' -or (!$EventTrace -and ($results.Count -ne 2 -or ($results|Where-Object {!$_.Passed})))){throw 'IFEO integration or deployment cleanup failed; preserve raw logs'}
+ if($Suite -and !$EventTrace -and ($suiteResults.Count -ne $(if($RuntimeSuite){4}else{24}) -or ($suiteResults|Where-Object {!$_.Passed}))){throw 'Detailed suite failed; preserve actual output, bindings and teardown'}
+ if($driverExit -ne 0 -or $driver -match '(?m)^FAIL ' -or $driver -notmatch 'Failures=0 Result=PASS' -or (!$EventTrace -and !$RuntimeSuite -and ($results.Count -ne 2 -or ($results|Where-Object {!$_.Passed})))){throw 'IFEO integration or deployment cleanup failed; preserve raw logs'}
  if($EventTrace){if($eventResults.Count -ne 2 -or ($eventResults|Where-Object {!$_.Measured})){throw 'Incomplete event trace'};$state='Measured'}else{$state='Passed'}
 } finally {
- [pscustomobject]@{State=$state;VMX=$VMX;GuestUser=$GuestUser;RunName=$RunName;SourceSHA256=$sources;PackageFiles=$files;DriverSHA256=(Get-FileHash "$root\audit\KxNtParity\x64\ifeo-deployment.exe").Hash;DriverExit=$driverExit;DriverOutput=$driver;Results=$results;SuiteIncluded=[bool]$Suite;SuiteResults=$suiteResults;EventTrace=[bool]$EventTrace;EventResults=$eventResults;DebuggerFiles=$debuggerFiles;Scope='Disposable Server 2008 clone, native x64 and WOW64; real install/KexCfg/AVRF/static ntdll import rewrite/ordinary-open comparison and optional detailed suite with exact import-slot equality; event trace is observation under CDB and never replaces failed resource gates; no native x86 OS, Vista IFEO or UTF resource completion; binding an API is not proof of its behavior unless covered by the executed detailed probe'}|ConvertTo-Json -Depth 8|Set-Content -Encoding UTF8 "$archive\receipt.json"
+ [pscustomobject]@{State=$state;VMX=$VMX;GuestUser=$GuestUser;RunName=$RunName;SourceSHA256=$sources;PackageFiles=$files;DriverSHA256=(Get-FileHash "$root\audit\KxNtParity\x64\ifeo-deployment.exe").Hash;DriverExit=$driverExit;DriverOutput=$driver;Results=$results;SuiteIncluded=[bool]$Suite;RuntimeSuite=[bool]$RuntimeSuite;SuiteResults=$suiteResults;EventTrace=[bool]$EventTrace;EventResults=$eventResults;DebuggerFiles=$debuggerFiles;Scope='Disposable Server 2008 clone, native x64 and WOW64; real install/KexCfg/AVRF/static ntdll import rewrite/ordinary-open comparison and optional detailed suite with exact import-slot equality; event trace is observation under CDB and never replaces failed resource gates; no native x86 OS, Vista IFEO or UTF resource completion; binding an API is not proof of its behavior unless covered by the executed detailed probe'}|ConvertTo-Json -Depth 8|Set-Content -Encoding UTF8 "$archive\receipt.json"
 }

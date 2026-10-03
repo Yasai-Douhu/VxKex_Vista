@@ -1,4 +1,4 @@
-param([ValidateSet('x86','x64')][string]$Architecture='x64',[switch]$Suite,[switch]$UninstrumentedSrw,[switch]$EventPhaseTrace)
+param([ValidateSet('x86','x64')][string]$Architecture='x64',[switch]$Suite,[switch]$UninstrumentedSrw,[switch]$EventPhaseTrace,[switch]$RuntimeSuite)
 $ErrorActionPreference='Stop'
 $root=Split-Path $PSScriptRoot
 $vc='C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC'
@@ -16,12 +16,12 @@ if($LASTEXITCODE){throw 'Static import fixture failed'}
 $imports=(& "$vc\bin\dumpbin.exe" /imports "$out\KxNtIfeoOpen-$Architecture.exe") -join "`n"
 if($LASTEXITCODE -or $imports -notmatch '(?im)^\s+ntdll\.dll\s*$' -or $imports -notmatch 'NtOpenKeyEx' -or $imports -match '(?im)^\s+(KxNt|KexDll)\.dll\s*$'){throw 'Fixture must import native ntdll, never pre-bind the compatibility DLL'}
 $imports|Set-Content -Encoding UTF8 "$out\ifeo-imports.txt"
-if($Suite){
+if($Suite -or $RuntimeSuite){
  $suiteOut="$root\audit\KxNtParity\IfeoSuite\$Architecture"
  New-Item -ItemType Directory -Force $suiteOut|Out-Null
  & lib.exe /nologo "/def:$PSScriptRoot\kxnt_ifeo_suite_imports.def" "/machine:$Architecture" "/out:$suiteOut\suite-imports.lib"
  if($LASTEXITCODE){throw 'Suite import library failed'}
- foreach($kind in @('processor-feature','domain','device-family','persisted-state','sid-package','sid-capability','membership','compare','file-information','alert','performance','srw')){
+ foreach($kind in @('processor-feature','domain','device-family','persisted-state','sid-package','sid-capability','membership','compare','file-information','alert','performance','srw','utf8','silent-exit')){
   $source=if($kind -like 'sid-*'){'sid_class'}else{$kind.Replace('-','_')}
   [string[]]$libs=@(if($kind -eq 'membership'){'advapi32.lib'})
   [string[]]$trace=@(if($kind -eq 'srw' -and !$UninstrumentedSrw){'/DKXNT_IFEO_SRW_RESOURCE_TRACE'})

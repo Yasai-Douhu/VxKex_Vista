@@ -19,12 +19,12 @@
 | スレッド通知・待機 / Zw 別名 | 実装済み（プロセス内の状態管理） | Server 2008 x86 / x64、Nt / Zw の native 比較・4,096スレッド反復・実 ID 再利用・終了後回収成功 |
 | RtlQueryPerformanceCounter / Frequency（既存の未解決転送） | 実装済み | Server 2008 x86 / x64、native 参照・未整列出力・例外・並列照会成功 |
 | RtlTryAcquireSRWLockExclusive / Shared（既存の未解決転送） | NT 6.0 の native SRW と併用する試行取得を実装 | Server 2008 WOW64 / x64、待機者・条件変数・並行取得・例外・native 参照を検証 |
-| RtlUTF8ToUnicodeN / RtlUnicodeToUTF8N（既存の未解決転送） | 部分変換・不正文字置換・サイズ照会を実装 | Server 2008 WOW64 / x64、native比較4,850呼出し・guard・全scalar往復・並行・overlap成功。初期化資源の完全な帰属は未確定 |
-| RtlReportSilentProcessExit（起動時のリンク依存） | 入口のみ追加。NT 6.0 の終了監視は未対応 | 不正ハンドル9ケース比較・未対応エラー・反復・Zig インポート解決を検証。WER の報告成功とは扱わない |
+| RtlUTF8ToUnicodeN / RtlUnicodeToUTF8N（既存の未解決転送） | 部分変換・不正文字置換・サイズ照会を実装 | Server 2008 WOW64 / x64、native比較4,850呼出し・guard・全scalar往復・並行・overlap成功。初期化資源の完全な帰属は未確定。通常IFEOで値比較一致、両形式warm handle delta1で資源gate失敗 |
+| RtlReportSilentProcessExit（起動時のリンク依存） | 入口のみ追加。NT 6.0 の終了監視は未対応 | 不正ハンドル9ケース比較・未対応エラー・反復・Zig インポート解決を検証。通常IFEOでも両形式の9case・1000反復を確認。WER の報告成功とは扱わない |
 | ConDrv 向け NtWriteFile / ZwWriteFile | NT-I/O 内容プロファイルに限定した同期書込みを実装 | Server 2008 x86 / x64、実 Zig 標準出力・ファイル・パイプ、境界・衝突・並行・VT 成功。native の UTF-8 描画制限、通常 IFEO 起動の統合検証は残る |
 | WNF / ZwQueryWnfStateData | 調査段階 | 本家にも未実装があるため実機能の対応を判断する必要あり |
 | 既存の未解決 native 転送 | 調査段階 | 呼び出すアプリと API ごとに検証予定 |
-| NtOpenKeyEx（既存の未解決転送） | 実装前の契約・代替基盤を調査 | Server 2008 WOW64 / x64のOBJ_OPENLINKによるリンク自身のopenを確認。backup / restoreは未対応・未検証 |
+| NtOpenKeyEx（既存の未解決転送） | 通常openを実装。拡張optionsはNT6で拒否 | Server / Vista両形式140case・1000反復成功。Server使い捨てcloneの通常IFEOも成功。backup / restore等は未対応 |
 
 ## 2026-10-02: RtlIsProcessorFeaturePresent
 
@@ -827,3 +827,16 @@ tests/kxnt_open_key_adapter_probe.c に KXNT_IFEO_IMPORT 時だけ有効な静�
 - tests/analyze_kxnt_ifeo_event.ps1は保存receipt / log / probe / native imageをhash記録し、phase順序、CS+10、CAS previous0、実handle格納、測定区間との位置関係、delta1 / 0を検査する。tests/kxnt_ifeo_event_trace.cdbとbuild / runnerオプションで採取を再現できる。UninstrumentedSrwはsnapshot列挙を追加せず、EventPhaseTraceは診断exportだけを加える。既存handle delta0のgateは維持した。
 
 証跡: docs/validation/kxnt-ifeo-event-server.json。四回目のreceiptとraw、三回目のIncomplete receipt / raw SRW / binding / trace、二つの初期Incomplete receipt hash、native disassemblyと解析結果を保存。解析はtests/analyze_kxnt_ifeo_event.ps1へInitialArchive（三回目） / MeasuredArchive（四回目） / 未使用Outputを指定する。観測対象はServer 2008使い捨てcloneのWOW64二processで、debuggerは実行時期を変える。歴史的な比較Event、全UTF Event、初回SRWの未採取identityを全面帰属させない。資源gateの全面解決、Vista IFEO、UTF / NtWriteFile / SilentExitの通常起動での詳細動作、拡張registry flags、WNFなど元監査の残りは未完了。配布DLL / Installer / Releasesはこの工程で変更していない。
+
+## 2026-10-04: UTF / Silent Process Exit の通常 IFEO 詳細試験
+
+前工程ではbindingだけだった2機能を、実install / KexCfg / AVRFの通常起動で実行した。build_kxnt_ifeo_probe.ps1 -RuntimeSuiteとrun_kxnt_ifeo_vm.ps1 -RuntimeSuiteを追加した。既存core suiteの範囲は変更せず、追加4image（2機能×両形式）を選択して実行する。UTFでは同じ静的import imageによるlookup-only controlを別processで先に実行し、その後変換probeを実行する。自動retryや資源gate緩和は行わない。
+
+- VS2010で両形式build、dumpbinでntdllの26importと直接KxNt / KexDll import不在を確認。使い捨てServer 2008 cloneを起動し、前工程guest directoryを別名へ保存して新規fixtureを作成した。
+- 実OSは6.0.6003 / ProductType3 / NativeArchitecture9、driver自身はKexDll未読込み。4imageの非登録起動はすべてc0000139。候補全fileをinstallし、System32 / SysWOW64とpackage-rootのKexDll / KxNt計8copyを候補とbyte比較した。4imageを実KexCfgで登録し、各mainのIAT26slotと実provider exportのaddress一致・KexDll早期読込み・owner pathを確認した。
+- Silent Process ExitのWOW64 / x64は両方PASS。不正 / null / closed / event / thread / self / limited / zero-access handleの9caseについて、同じfixtureのhost native参考と状態・例外・LastErrorが一致（有効selfのstatusだけ期待するNOT_SUPPORTEDへ対応）。両形式1000反復でhandle delta0、ReportingSupported=0。WER報告や終了監視が実装された証拠にはしない。
+- UTFの両形式で4850call、24pointer case、18overlap case、全1112064scalarの往復がhost native参考の4893値行と完全一致した。状態、出力長、buffer内容、例外、LastError / LastStatusも比較対象。4threadの各phase16000callで値error0だった。
+- ただし両形式とも変換phase0のhandle delta0、phase1のdelta1でFailures=1 / Result=FAIL。lookup-onlyはphase0でdelta1、phase1でdelta0 / CONTROL。cold差分一致・warm delta0の既存gateを両方満たさず、UTFの通常IFEO資源検証と全体receiptはFailed。driverも2probeの失敗を記録しexit1。このcountだけで追加objectをEventやloader lockと断定しない。前のSRW traceや変換値一致を根拠にFAILをPASSへ変更しない。
+- 全4childは自然終了し、4owned IFEO profileを除去、実uninstall後directory / HKLM marker不在を確認した。cleanup自体は成功。次は、このIFEO変換processのphase0 / 1におけるobject identity・作成stack・native critical-sectionへの格納を採取し、過去の異なるprocessの結果と分けて検証する。
+
+証跡: docs/validation/kxnt-ifeo-runtime-server.json（原Failed receiptを保持、package / sources / EXE hash、main binding / native参考 / lookup control / 変換raw全件）。docs/validation/kxnt-ifeo-runtime-analysis.json。解析用tests/analyze_kxnt_ifeo_runtime.ps1はReceipt / 未使用Outputを指定し、値比較と資源gateとSilentExitの未対応を別々に検査する。NT6 Server cloneの両形式で通常IFEOに到達したことは示すが、Vista IFEO・native32bit OS・UTF資源問題の修正・WER報告機能の完成は示さない。配布DLL / Installer / Releasesは変更していない。拡張registry flags、ConDrv通常IFEO、WNF実利用・設計と監査の残りは引き続き未完了。

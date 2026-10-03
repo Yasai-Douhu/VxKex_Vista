@@ -1,0 +1,95 @@
+{
+  "ReceiptSHA256": "61C0B8D04C8A67B46B72F7BA38EF406ED86A27B914D011EEB3E3B8EF456C29BE",
+  "AnalyzerSHA256": "3B9E3A340B31A26D8CD1D5319C03579C44750A547037EFCBFC34D575A8AEE18C",
+  "ReceiptState": "Failed",
+  "DriverExit": 1,
+  "Results": [
+    {
+      "Architecture": "x86",
+      "Probe": "utf8",
+      "NativeValueRowsEqual": true,
+      "Calls": 4850,
+      "PointerCases": 24,
+      "OverlapCases": 18,
+      "ScalarCoverage": 1112064,
+      "Parallel": [
+        {
+          "Phase": 0,
+          "Errors": 0,
+          "HandleDelta": 0
+        },
+        {
+          "Phase": 1,
+          "Errors": 0,
+          "HandleDelta": 1
+        }
+      ],
+      "LookupControl": [
+        {
+          "Phase": 0,
+          "Errors": 0,
+          "HandleDelta": 1
+        },
+        {
+          "Phase": 1,
+          "Errors": 0,
+          "HandleDelta": 0
+        }
+      ],
+      "ResourceGatePassed": false,
+      "OriginalRowPassed": false
+    },
+    {
+      "Architecture": "x86",
+      "Probe": "silent-exit",
+      "NativeHandleValidationEqual": true,
+      "Cases": 9,
+      "Passed": true,
+      "ReportingImplemented": false
+    },
+    {
+      "Architecture": "x64",
+      "Probe": "utf8",
+      "NativeValueRowsEqual": true,
+      "Calls": 4850,
+      "PointerCases": 24,
+      "OverlapCases": 18,
+      "ScalarCoverage": 1112064,
+      "Parallel": [
+        {
+          "Phase": 0,
+          "Errors": 0,
+          "HandleDelta": 0
+        },
+        {
+          "Phase": 1,
+          "Errors": 0,
+          "HandleDelta": 1
+        }
+      ],
+      "LookupControl": [
+        {
+          "Phase": 0,
+          "Errors": 0,
+          "HandleDelta": 1
+        },
+        {
+          "Phase": 1,
+          "Errors": 0,
+          "HandleDelta": 0
+        }
+      ],
+      "ResourceGatePassed": false,
+      "OriginalRowPassed": false
+    },
+    {
+      "Architecture": "x64",
+      "Probe": "silent-exit",
+      "NativeHandleValidationEqual": true,
+      "Cases": 9,
+      "Passed": true,
+      "ReportingImplemented": false
+    }
+  ],
+  "Limits": "Server 2008 disposable clone ordinary IFEO/AVRF startup only. Native value equality does not replace the UTF resource gate; both failed intervals remain failed. Events are not attributed by count alone. SilentExit verifies explicit unsupported reporting and handle validation, not WER implementation. No Vista IFEO or native x86 OS coverage."
+}
