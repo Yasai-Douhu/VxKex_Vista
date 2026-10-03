@@ -7,6 +7,9 @@ typedef VOID (WINAPI *LOCK_OP)(PSRWLOCK);
 typedef LONG (WINAPI *GET_STATUS)(void);
 typedef VOID (WINAPI *SET_STATUS)(LONG);
 static FILE *out;static unsigned failures;
+#ifdef KXNT_IFEO_SRW_RESOURCE_TRACE
+#include "kxnt_utf8_trace.h"
+#endif
 static TRY_LOCK tryE,tryS;static LOCK_OP acquireE,acquireS,releaseE,releaseS;
 static GET_STATUS getstatus;static SET_STATUS seedstatus;
 static HANDLE watchdogDone;
@@ -83,6 +86,9 @@ static DWORD WINAPI mixedWorker(PVOID argument) {
 }
 static void mixed(void) {
     HANDLE threads[4];DWORD wait,errors,before,after;unsigned i;
+#ifdef KXNT_IFEO_SRW_RESOURCE_TRACE
+    utf8_snapshot("srw-before");
+#endif
     GetProcessHandleCount(GetCurrentProcess(),&before);
     for(i=0;i<4;++i)threads[i]=CreateThread(NULL,0,mixedWorker,(PVOID)(ULONG_PTR)i,0,NULL);
     wait=WaitForMultipleObjects(4,threads,TRUE,10000);check("mixed-workers-finish",wait==WAIT_OBJECT_0);
@@ -92,6 +98,9 @@ static void mixed(void) {
     check("mixed-protected-data",sequence==2000 && complement==~sequence && readers==0 && writers==0 && mixedLock.Ptr==NULL);
     check("mixed-handle-delta",after==before);
     fprintf(out,"MixedOperations=4000 Threads=4 Writes=%lu HandleDelta=%ld\n",sequence,(LONG)after-(LONG)before);
+#ifdef KXNT_IFEO_SRW_RESOURCE_TRACE
+    utf8_snapshot("srw-after");
+#endif
 }
 typedef struct {SRWLOCK Lock;CONDITION_VARIABLE Cv;HANDLE Started;BOOL Shared;ULONG Value;} CV_CONTEXT;
 static DWORD WINAPI cvWorker(PVOID argument) {

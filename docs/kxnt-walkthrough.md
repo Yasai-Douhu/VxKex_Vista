@@ -797,3 +797,21 @@ tests/kxnt_open_key_adapter_probe.c に KXNT_IFEO_IMPORT 時だけ有効な静�
 証跡: docs/validation/kxnt-ifeo-open-key-server.json（最終receipt、候補58file hash、両raw probe、driver、PE import表、初回 / 二回目の区別）。再現は両形式 build_kxnt_ifeo_probe.ps1 の後、run_kxnt_ifeo_vm.ps1へ使い捨てcloneのVMX / credentials / 新規RunNameを渡す。固定guest fixtureが残る場合はdriverのteardown結果を確認してから、既存fixtureを別の専用archive名へ保存する。ユーザーVMへこのrunnerを適用しない。
 
 今回証明した通常IFEO統合は NtOpenKeyEx の OpenOptions=0 に限定する。Vista clientの通常IFEO、native32bit OS、監査にある他APIの静的import / loader初期化、backup / restore等の拡張options、UTFの残る資源gateと帰属、WNFの実利用・設計は引き続き未完了。監査全体の完了とは扱わない。
+
+## 2026-10-04: 監査対象の詳細テストを通常IFEO経由で実行
+
+通常ローダー経路の検証を、processor feature、domain正規化、device family、persisted state、package / capability SID、通常token membership、object比較、拡張file操作、thread alert / wait、RTL性能counter、SRW tryの12種類へ広げた。新規 tests/kxnt_ifeo_suite_provider.h / imports.def と build / runner の Suite switch を使い、既存の詳細probe本体を再利用する。アプリ名や製品固有のproduction分岐を追加していない。
+
+- 各suite EXEは26個の ntdll APIを静的importする。helperはWindowsの実IAT slotを読み、既に存在するKxNtに対するGetProcAddressの結果と同じaddressであることを検査する。無関係なAPIに仮のcalling conventionを与えず、実呼出しの型は既存probeが保持する。helperがKxNt / KexDllを新しくLoadLibraryすることはなく、既存moduleのreferenceだけを取得して従来のFreeLibraryと釣り合わせる。別libraryの読込みは従来のnative経路を保つ。
+- x86のIAT変数名装飾、PowerShellの単一library引数のarray保持、VS2010 Cの宣言位置をビルド時に修正し、両形式の12suite EXEをbuildした。これらは診断のビルド不具合で、production APIの変更ではない。診断macroのC4127とfunction address castのC4054等の警告は残る。
+- 使い捨てcloneは実測NT6.0.6003 / ProductType3 / native architecture9、driverのKexDll未読込みを確認した。ユーザーVMの製品設定を変更していない。26 EXEで未適用の0xc0000139を確認し、58file候補を実VistaSetupで導入。KexCfgで各imageを有効化してから実行した。DLLのsystem / packageコピー8個のbyte一致、実provider / implementationパス、26個のslot一致を検証した。
+- 初回のsuiteはState=Failed / driver exit1。WOW64のobject比較は16通常caseを完了したが、800並列callの測定中にhandleが1個増えFailures=1。同じprocessのbefore / after identity差分でhandle f0 / kernel object0526D040のEventが追加された。SRWのWOW64も4,000混合操作と保護データ確認は成功したが、handle delta1で失敗した。SRW初回には型・identity一覧がなく、その1個をEventやloader lockへ帰属させていない。どちらも失敗として保存した。
+- 初回のSIDは値の差ではなく、runnerがnative参考ログ末尾のSidClassificationCases / Result行を除外せず比較したため拒否された。全4組の678値行（660構造体、NULL、17guard境界）は元native参考と一致した。runner側の参考行filterを修正し、初回receiptのFalseは書き換えていない。
+- tests/kxnt_srw_probe.cにKXNT_IFEO_SRW_RESOURCE_TRACE時だけ有効なbefore / after snapshotを追加。既存のhandle / kernel object / 型の採取コードを再利用する。defaultのprobeには追加観測がなく、IFEO suiteのSRWだけinstrumented buildにする。元のhandle delta0合否条件は維持した。追加の列挙や関数lookupがloader競合や実行タイミングを変えることを明示する。
+- 新規archiveへ再実行。24組すべてのsuiteと2組の通常openが成功し、全child自然終了、driver Failures=0 / exit0、runner Passed。processorの64 +5入力、domainの2,000確保解放、familyの8出力 / 3偽装値、persistedの16入力、SIDのnative値比較、membershipの2,000反復、比較の800並列callとlive identity維持、fileの96case / 2回の1,000反復、alertのNt / Zw各4,096 thread churnと強制終了waiter、counterの4thread / 4,000callずつ / 16unaligned / 10invalid出力、SRWの4,000混合操作と条件変数を確認した。
+- traced SRWではWOW64のbefore / after 27個、x64の19個の全handle identityと型を採取し、列挙数とGetProcessHandleCountの一致、追加・削除なしを確認した。二回目の成功から初回の資源差分の原因解明・修正完了を主張しない。初回比較のEvent作成元、SRW初回増加のidentity・作成元は未確認。
+- 全26 owned IFEO keyを除去し、候補のuninstall後にdirectory / HKLM marker不在を確認した。source / EXE / 全候補file hashと両回のrawを保存。tests/analyze_kxnt_ifeo_suite.ps1は両receiptを別々に検査し、初回SIDの値一致、比較の追加Event、traced SRWの全identityを解析する。過去のFailedをPassedへ変更しない。
+
+証跡: docs/validation/kxnt-ifeo-core-suite-server.json（InitialFailed / TracedPassed / Analysis）。再実行は build_kxnt_ifeo_probe.ps1 -Architecture x86 -Suite と x64 -Suite の後、run_kxnt_ifeo_vm.ps1 -Suiteへ使い捨てclone VMX / credentials / 新規RunNameを指定する。既存guest fixtureはteardown成功を確認して別の専用archiveへ保存する。解析はanalyze_kxnt_ifeo_suite.ps1へInitialReceipt / TracedReceipt / 未使用Outputを渡す。意味・競合試験と単なるbinding検査を区別する。
+
+今回のbinding表にはUTF、NtWriteFile、SilentExitも含むが、その動作をsuiteで実行したとの証拠にはしない。これらの通常起動での詳細検証、Vista clientのIFEO、native32bit OS、初回資源増加とUTFの残る資源gate、拡張registry options、WNFの実利用・設計は未完了。production DLL / Installer / Releasesはこの工程では変更していない。

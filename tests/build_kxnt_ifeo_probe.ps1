@@ -1,4 +1,4 @@
-param([ValidateSet('x86','x64')][string]$Architecture='x64')
+param([ValidateSet('x86','x64')][string]$Architecture='x64',[switch]$Suite)
 $ErrorActionPreference='Stop'
 $root=Split-Path $PSScriptRoot
 $vc='C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC'
@@ -16,6 +16,23 @@ if($LASTEXITCODE){throw 'Static import fixture failed'}
 $imports=(& "$vc\bin\dumpbin.exe" /imports "$out\KxNtIfeoOpen-$Architecture.exe") -join "`n"
 if($LASTEXITCODE -or $imports -notmatch '(?im)^\s+ntdll\.dll\s*$' -or $imports -notmatch 'NtOpenKeyEx' -or $imports -match '(?im)^\s+(KxNt|KexDll)\.dll\s*$'){throw 'Fixture must import native ntdll, never pre-bind the compatibility DLL'}
 $imports|Set-Content -Encoding UTF8 "$out\ifeo-imports.txt"
+if($Suite){
+ $suiteOut="$root\audit\KxNtParity\IfeoSuite\$Architecture"
+ New-Item -ItemType Directory -Force $suiteOut|Out-Null
+ & lib.exe /nologo "/def:$PSScriptRoot\kxnt_ifeo_suite_imports.def" "/machine:$Architecture" "/out:$suiteOut\suite-imports.lib"
+ if($LASTEXITCODE){throw 'Suite import library failed'}
+ foreach($kind in @('processor-feature','domain','device-family','persisted-state','sid-package','sid-capability','membership','compare','file-information','alert','performance','srw')){
+  $source=if($kind -like 'sid-*'){'sid_class'}else{$kind.Replace('-','_')}
+  [string[]]$libs=@(if($kind -eq 'membership'){'advapi32.lib'})
+  [string[]]$trace=@(if($kind -eq 'srw'){'/DKXNT_IFEO_SRW_RESOURCE_TRACE'})
+  $image="$suiteOut\KxNtIfeo-$kind-$Architecture.exe"
+  & cl.exe /nologo /MT /O1 /W4 /D_WIN32_WINNT=0x0600 /D_CRT_SECURE_NO_WARNINGS @trace "/FI$PSScriptRoot\kxnt_ifeo_suite_provider.h" "/Fo$suiteOut\$kind.obj" "/Fe$image" "$PSScriptRoot\kxnt_${source}_probe.c" /link /SUBSYSTEM:CONSOLE,6.0 "$suiteOut\suite-imports.lib" @libs
+  if($LASTEXITCODE){throw "Detailed IFEO suite build failed: $kind"}
+  $table=(& "$vc\bin\dumpbin.exe" /imports $image) -join "`n"
+  if($LASTEXITCODE -or $table -notmatch '(?im)^\s+ntdll\.dll\s*$' -or $table -notmatch 'RtlCanonicalizeDomainName' -or $table -notmatch 'NtAlertThreadByThreadId' -or $table -match '(?im)^\s+(KxNt|KexDll)\.dll\s*$'){throw "Wrong static imports: $kind"}
+  $table|Set-Content -Encoding UTF8 "$suiteOut\$kind-imports.txt"
+ }
+}
 if($Architecture -eq 'x64'){
  & cl.exe /nologo /MT /O1 /W4 "/Fo$out\ifeo-deployment.obj" "/Fe$out\ifeo-deployment.exe" "$PSScriptRoot\kxnt_ifeo_deployment_probe.c" /link /SUBSYSTEM:CONSOLE,6.0 advapi32.lib shell32.lib
  if($LASTEXITCODE){throw 'Guarded IFEO driver failed'}
