@@ -19,6 +19,7 @@
 | スレッド通知・待機 / Zw 別名 | 実装済み（プロセス内の状態管理） | Server 2008 x86 / x64、Nt / Zw の native 比較・4,096スレッド反復・実 ID 再利用・終了後回収成功 |
 | RtlQueryPerformanceCounter / Frequency（既存の未解決転送） | 実装済み | Server 2008 x86 / x64、native 参照・未整列出力・例外・並列照会成功 |
 | RtlTryAcquireSRWLockExclusive / Shared（既存の未解決転送） | NT 6.0 の native SRW と併用する試行取得を実装 | Server 2008 WOW64 / x64、待機者・条件変数・並行取得・例外・native 参照を検証 |
+| RtlUTF8ToUnicodeN / RtlUnicodeToUTF8N（既存の未解決転送） | 実装前の契約測定 | ホスト native 各754ケースを両アーキテクチャで取得、Server 2008 の native 不在を再確認 |
 | RtlReportSilentProcessExit（起動時のリンク依存） | 入口のみ追加。NT 6.0 の終了監視は未対応 | 不正ハンドル9ケース比較・未対応エラー・反復・Zig インポート解決を検証。WER の報告成功とは扱わない |
 | ConDrv 向け NtWriteFile / ZwWriteFile | NT-I/O 内容プロファイルに限定した同期書込みを実装 | Server 2008 x86 / x64、実 Zig 標準出力・ファイル・パイプ、境界・衝突・並行・VT 成功。native の UTF-8 描画制限、通常 IFEO 起動の統合検証は残る |
 | WNF / ZwQueryWnfStateData | 調査段階 | 本家にも未実装があるため実機能の対応を判断する必要あり |
@@ -485,3 +486,19 @@ VS2010 / SDK の x86 / x64 ビルド成功。`tests/kxnt_srw_probe.c` をホス�
 証跡: `docs/validation/kxnt-srw.json`（native / VM 生ログ、source / DLL / EXE SHA256）、更新した `kxnt-condrv.json` / `kxnt-performance.json` / `kxnt-export-ordinals.json`。再実行: `tests/build_kxnt_parity.ps1` → `tests/run_kxnt_srw_vm.ps1 -VMX <VMX> -GuestPassword <パスワード>`。
 
 今回も VM の `C:\KxNtParity` と作業ブランチの Installer の配備。Vista クライアント、native 32bit OS、標準ユーザー、通常 IFEO 経路全体の統合検証は残る。SRW の追加を KxNt 全体の移植完了とは扱わない。
+
+## 2026-10-03: UTF-8 / UTF-16 変換の native 契約測定
+
+次の既存未解決転送2件に向け、実装前の比較基準を追加した。両関数は本家でも native 転送であり、単純なコピーで Vista 向けにはならない。[UTF8ToUnicodeN](https://learn.microsoft.com/en-us/windows/win32/devnotes/rtlutf8tounicoden) / [UnicodeToUTF8N](https://learn.microsoft.com/en-us/windows/win32/devnotes/rtlunicodetoutf8n) の公開要件は Windows 7 / Server 2008 R2 以降。Server 2008 の x86 / x64 native ntdll で両 export 不在を再測定した（診断終了5を明示的に照合）。**互換実装はまだ追加しておらず、VM での変換成功とは扱わない。**
+
+`tests/kxnt_utf8_probe.c` と `tests/run_kxnt_utf8_reference.ps1` を追加。ホスト native で各754呼出しを実行し、x86 / x64 の status、actual byte count、全32出力バイト、例外、LastError / LastStatus を含む固定行が一致した。出力容量外の canary と TLS の維持をプローブ自身でも確認した。
+
+- UTF-8: ASCII / 埋込みNUL、日本語、2〜4 byte文字、最大 scalar、継続 byte 単独、途中で切れた列、overlong、surrogate符号化、上限超過、不正lead、途中にASCIIがある不正列。UTF-16: 同様の有効文字、単独high / low surrogate、不正pair、最大pair、奇数入力長。
+- 全入力に出力容量0〜24 bytes、NULL出力によるサイズ照会（容量0 / 1）、actual count無し、出力とcount両方NULLを測定。NULL source の長さ0 / 非0も含む。
+- 有効な UTF-8 の4 byte文字で UTF-16出力に2 bytesしか残らない場合、native は high surrogate まで書き、BUFFER_TOO_SMALL と実出力 bytes を返す。一方 UTF-16 → UTF-8 は出力文字の bytes 全体が入る容量まで書かない。この方向差を検出した。
+- 不正文字の置換単位は不正 byte 数と常に同じではない。例として ED A0 80 の surrogate 符号化は2つの U+FFFD、F4 90 80 80 は3つに置換された。切れた有効prefixや途中のASCIIを含む列も別の消費単位になる。
+- UTF-16の奇数byte長は出力ありでは INVALID_PARAMETER_5、NULL出力による照会では完全なWCHAR分だけ数える。NULL source は長さ0でも INVALID_PARAMETER_4、検証エラー時は actual count の sentinel が維持される。
+
+これらはホストの特定の native 実装で得た契約測定。Windows 7 の全挙動の証明、全 scalar / 全不正列、guard page / 不正非NULL pointer、overlap、並行変換の検証はまだない。次の実装ではこの基準に加えてそれらを検証する。成功するだけのstubや、変換不能なbyteを黙って削除する処理は追加しない。
+
+証跡: `docs/validation/kxnt-utf8-reference.json`（raw出力とソース / EXE SHA256）。再実行: `tests/build_kxnt_probes.ps1 -Architecture x86` / `x64` → `tests/run_kxnt_utf8_reference.ps1 -VMX <VMX> -GuestPassword <パスワード>`。VMへの追加物は `C:\KxNtParity\x86` / `x64` の診断EXEとログだけ。Installer / システムDLL / Releasesはこの測定では変更していない。
