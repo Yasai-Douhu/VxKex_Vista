@@ -5,6 +5,12 @@
 #include <string.h>
 typedef struct {USHORT Length,Maximum;PWSTR Buffer;} STRING;
 typedef struct {ULONG Length;HANDLE Root;STRING *Name;ULONG Attributes;PVOID Security,Qos;} ATTR;
+#ifdef KXNT_IFEO_IMPORT
+__declspec(dllimport) LONG WINAPI NtOpenKeyEx(PHANDLE,ACCESS_MASK,ATTR*,ULONG);
+#ifndef _WIN64
+#pragma comment(linker,"/alternatename:__imp__NtOpenKeyEx@16=__imp__NtOpenKeyEx")
+#endif
+#endif
 typedef LONG (WINAPI *OPEN)(PHANDLE,ACCESS_MASK,ATTR*);
 typedef LONG (WINAPI *OPENEX)(PHANDLE,ACCESS_MASK,ATTR*,ULONG);
 typedef LONG (WINAPI *QUERY)(HANDLE,ULONG,PVOID,ULONG,PULONG);
@@ -33,9 +39,20 @@ int main(int argc,char **argv){
     ACCESS_MASK access[]={KEY_READ,0,MAXIMUM_ALLOWED,KEY_READ|KEY_WOW64_32KEY,KEY_READ|KEY_WOW64_64KEY};
     ULONG options[]={1,4,8,12,16,24,32,0xffffffff};unsigned i,j,k;DWORD protect,startCount,endCount;LONG s;BOOL nativePresent;
     if(argc!=3)return 2;out=fopen(argv[2],"w");if(!out)return 3;
+#ifdef KXNT_IFEO_IMPORT
+    /* This image imports ntdll!NtOpenKeyEx. AVRF must rewrite it before main;
+       no explicit LoadLibrary may conceal an early-loader failure. */
+    provider=GetModuleHandleW(L"KxNt.dll");if(!provider || !GetModuleHandleW(L"KexDll.dll"))return 4;
+#else
     provider=LoadLibraryA(argv[1]);if(!provider)return 4;
+#endif
     old=(OPEN)GetProcAddress(native,"NtOpenKey");ex=(OPENEX)GetProcAddress(provider,"NtOpenKeyEx");query=(QUERY)GetProcAddress(native,"NtQueryKey");object=(QUERY)GetProcAddress(native,"NtQueryObject");getstatus=(GETSTATUS)GetProcAddress(native,"RtlGetLastNtStatus");seed=(SEED)GetProcAddress(native,"RtlSetLastWin32ErrorAndNtStatusFromNtStatus");
     if(!old || !ex || !query || !object || !getstatus || !seed)return 5;
+#ifdef KXNT_IFEO_IMPORT
+    fprintf(out,"StaticImportEqual=%d EarlyKexDllLoaded=1\n",(PVOID)NtOpenKeyEx==(PVOID)ex);
+    if((PVOID)NtOpenKeyEx!=(PVOID)ex)return 10;
+    ex=NtOpenKeyEx;
+#endif
     nativePresent=GetProcAddress(native,"NtOpenKeyEx")!=NULL;
     GetModuleFileNameA(provider,path,sizeof(path));fprintf(out,"Provider=%s\n",path);
     if(!GetModuleHandleExA(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS|GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT,(LPCSTR)ex,&implementation))return 6;

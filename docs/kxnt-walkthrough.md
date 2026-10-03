@@ -781,3 +781,19 @@ kxnt_utf8_probe.cにKXNT_UTF8_RESOURCE_TRACEでのみ有効なsnapshotを加え�
 証跡: docs/validation/kxnt-open-key-adapter-server.json / kxnt-open-key-adapter-vista.json、kxnt-open-key-export-ordinals.json。再実行はbuild_kxnt_parity.ps1の後にtests/run_kxnt_open_key_adapter.ps1へVMX / user / password / scratch / 未使用RunNameを指定する。receiptがPassedでもscopeは通常openとホストnative委譲に限定する。
 
 今回のVM配備は専用scratchだけで、system DLL / 原作業ツリーのInstaller / Releasesは変更していない。native32bit OS、任意のsecurity descriptor / QOS、registry virtualization、transaction root、削除競合、通常IFEOの統合は未検証。GuestUserは記録したがtokenの標準 / 昇格状態を別測定していない。拡張flags、とくに保護ACLを迂回すべきbackup / restoreの実装・検証は継続する。UTFの資源gateと監査の残りも未完了。
+
+## 2026-10-04: 通常の IFEO / AVRF 起動で NtOpenKeyEx の静的インポートを検証
+
+tests/kxnt_open_key_adapter_probe.c に KXNT_IFEO_IMPORT 時だけ有効な静的インポート診断を追加した。tests/kxnt_ifeo_imports.def は KxNt ではなく ntdll!NtOpenKeyEx を参照する。専用 build script は両形式の PE import 表を dumpbin で検査し、ntdll と対象 API があり、KxNt / KexDll の直接 import がないことを要求する。main では LoadLibrary せず、既に読み込まれた KxNt / KexDll と IAT の実関数アドレスを照合し、その静的 import を全比較ケースに使用する。既存の通常 build は専用 scratch の明示 LoadLibrary のまま。
+
+- 再起動後のユーザー Server VM では MCP / 直接 vmrun の cmd.exe が exit1だったが、既存の owned native-launch 経由の cmd.exe は flags0で自然終了0、転送も成功した。ホストの REST API は VM 一覧取得成功、vmrest は session0、VMware 本体は session1。この差だけをゲスト実行失敗の原因と断定しない。
+- グローバル KexDir はプロセス単位で上書きできず、private AVRF DLLを指定するだけでは配布 DLL の検証にならない。ユーザー VM の system DLL と製品設定を変更する代わりに、既存の使い捨て Server 2008 clone で実インストーラーを使った。cloneをこの工程で起動した。元の両VMは変更していない。
+- tests/run_kxnt_ifeo_vm.ps1 は clone の正確な VMX だけを受理し、新規 host archive / guest fixture を要求する。58ファイルの候補全体、ソース / EXE の hash を記録する。guest driver は使い捨て marker、実際の管理者 token、新規インストール状態、未所有の IFEO key 不在を確認してから変更する。各 child に60秒の待機上限を設け、timeout時は owned child だけを終了し失敗とする。
+- 未適用の同じ両形式 EXE は entrypoint不足 0xc0000139 で自然終了した。候補 VistaSetup で導入後、KexCfg /ADD でその EXE だけを有効化。x64 / WOW64とも早期 KexDll 読込みと static import address一致、native NtOpenKeyとの140比較、8非対応option拒否、1,000回 open / closeの handle delta0、Failures=0を確認した。直接LoadLibraryによる代用ではない。
+- 最終実行で system32 / SysWOW64 の KexDll / KxNtと C:\VxKex の両形式 package copy、計8DLLを候補とbyte比較した。実providerはx64が C:\Windows\system32\kxnt.dll、WOW64が C:\VxKex\Kex32\kxnt.dll。implementationは両形式の system32\kexdll.dll（WOW64ではredirectされた32bit DLL）であり、比較した候補に対応する。候補の主要4DLLは現在のReleaseとhash一致。
+- /DELETE、実VistaSetupのuninstallを実行し、owned IFEO key不在と製品directory / HKLM marker不在を確認した。最終driver自然終了0 / Failures=0、runner State=Passed、両形式Passed。ユーザーVMのインストールと original Installer / Releases は更新していない。
+- 初回は診断側が Kex64\KxNt.dll の存在を誤って要求し、導入後の比較で停止した。profileを有効化せず、uninstall成功。二回目は実driverと両probe成功だったが、runnerがWOW64の実Kex32読込み先を拒否した。両回のIncomplete記録を残した。実配置のbyte比較と期待providerを修正した三回目で最終成功を確認し、過去の失敗記録を書き換えていない。VS2010のfunction pointer診断castに対するC4054警告は残る。
+
+証跡: docs/validation/kxnt-ifeo-open-key-server.json（最終receipt、候補58file hash、両raw probe、driver、PE import表、初回 / 二回目の区別）。再現は両形式 build_kxnt_ifeo_probe.ps1 の後、run_kxnt_ifeo_vm.ps1へ使い捨てcloneのVMX / credentials / 新規RunNameを渡す。固定guest fixtureが残る場合はdriverのteardown結果を確認してから、既存fixtureを別の専用archive名へ保存する。ユーザーVMへこのrunnerを適用しない。
+
+今回証明した通常IFEO統合は NtOpenKeyEx の OpenOptions=0 に限定する。Vista clientの通常IFEO、native32bit OS、監査にある他APIの静的import / loader初期化、backup / restore等の拡張options、UTFの残る資源gateと帰属、WNFの実利用・設計は引き続き未完了。監査全体の完了とは扱わない。

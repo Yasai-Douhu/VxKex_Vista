@@ -1,0 +1,353 @@
+{
+  "Final": {
+    "State": "Passed",
+    "VMX": "C:\\Users\\YamaR\\Documents\\Virtual Machines\\VxKex-Next-Parity-Test\\Server2008-SetupParity.vmx",
+    "GuestUser": "Administrator",
+    "RunName": "server-clone-20261004-final",
+    "SourceSHA256": {
+      "tests/kxnt_ifeo_deployment_probe.c": "B3C1274ADAF248752B04F9C515CB56E0724467FB4E06747CF2394377F542E660",
+      "tests/kxnt_open_key_adapter_probe.c": "B34881CA7A028B40102328E603D4BAD92F260D30713F143702ACFB6409936E89",
+      "tests/build_kxnt_ifeo_probe.ps1": "BAB0704AFD71FFDB48FAB0089CD5F4124228B469EBFBB42C9DB7F31B977396B5",
+      "tests/run_kxnt_ifeo_vm.ps1": "65E6EE61FB1343119C719C064DA8A23CCA03FE812D0D986535CDBF853A4E1A19",
+      "tests/kxnt_ifeo_imports.def": "2F39FA69B194FCAC5E5EF184B8E401C465DD650E9FE38B98B75053E7528875D3"
+    },
+    "PackageFiles": [
+      {
+        "Path": "configure-vscode-vista.cmd",
+        "SHA256": "230F9B511538ADF626B976AB7D64BDFE869112FF071B585EE95543713553B411",
+        "Bytes": 1131
+      },
+      {
+        "Path": "Enable-Java-Gradle.ps1",
+        "SHA256": "036CB59A8A9B6FE43BDD5FF2C93BDC2B5AE26853485964EE0EF9141903F8B31F",
+        "Bytes": 4086
+      },
+      {
+        "Path": "Enable-Java-JDK.ps1",
+        "SHA256": "4C6C4E0FE940799818ABD457CB1C9E523064F66710A3604E3162269265409B50",
+        "Bytes": 3328
+      },
+      {
+        "Path": "install.bat",
+        "SHA256": "1763E661C9A26E5CC26CBA22233651C8567B510CB1F6C39E74191EF1BFB775D8",
+        "Bytes": 3057
+      },
+      {
+        "Path": "KexCfg.exe",
+        "SHA256": "6E1B5781554BD7720739566BCA8B8F6CD034EEC4325A0C45B809F163F704F81D",
+        "Bytes": 137728
+      },
+      {
+        "Path": "KexDll.dll",
+        "SHA256": "2AB93E3C945DC598E944F33B103D04FDB0F45D605D293D0C620A1BD1F3813ADB",
+        "Bytes": 262656
+      },
+      {
+        "Path": "KexShlEx.dll",
+        "SHA256": "8A9A75C11D7C19D910867F302C06FCCD5BDBBAB90406D77E7E22B9049E074FB2",
+        "Bytes": 38400
+      },
+      {
+        "Path": "KxAdvapi.dll",
+        "SHA256": "FCDE20BBB79257A9938BD3033F64ED7705DF6FF9F8DF000AB8B31733096BC9A2",
+        "Bytes": 57344
+      },
+      {
+        "Path": "KxBase.dll",
+        "SHA256": "F14A98DCA2C861433D90468C8C8781C872E0BEB6C5A115E368A3B4506F383FA6",
+        "Bytes": 154112
+      },
+      {
+        "Path": "KxCom.dll",
+        "SHA256": "77B5D204770884680C7128DF26D1F96468A3D445FAEFD89292307C5B6EE6CC7C",
+        "Bytes": 48640
+      },
+      {
+        "Path": "KxCrt.dll",
+        "SHA256": "A24027D72DDA28EC49C45E97721EBCA752370F712F59DEBECBDBB398EE3EBED9",
+        "Bytes": 54272
+      },
+      {
+        "Path": "KxCryp.dll",
+        "SHA256": "8F29BC6951F17D1C78B4DE8C5D8D7309FD9FE5E08673C7228E712B85A897656E",
+        "Bytes": 28160
+      },
+      {
+        "Path": "KxDw.dll",
+        "SHA256": "263D2964CC53FB99266601C97791DAE13DD49E57D0AF6D4DA251153905C6A851",
+        "Bytes": 3072
+      },
+      {
+        "Path": "KxDx.dll",
+        "SHA256": "5B7D6E62D74858C9EBBD6A1D57790BE7700F7AF829755BACDD08D74D6A0B3ABD",
+        "Bytes": 31232
+      },
+      {
+        "Path": "KxMi.dll",
+        "SHA256": "60C2B019550093190F3923EFB0B152E01489DC77F5111A89636EE3BD4F5702BC",
+        "Bytes": 21504
+      },
+      {
+        "Path": "KxNet.dll",
+        "SHA256": "58B58AA4B085609EFA7320E3D0ACA5C7E8EF5814B946E9A91BFDD24DDF94EAC7",
+        "Bytes": 34816
+      },
+      {
+        "Path": "KxNt.dll",
+        "SHA256": "1A8B84959743AF2550AD1CCD43897471613D0B5AD3F4A1118AC2448E822C4CB2",
+        "Bytes": 121856
+      },
+      {
+        "Path": "KxSChanl.dll",
+        "SHA256": "4C3DB1007D819AAEB5158D8150C9235E8272A889D62D4AD4AAD0CE73547B04D6",
+        "Bytes": 70144
+      },
+      {
+        "Path": "KxUia.dll",
+        "SHA256": "456EC115E22AF17D93DDA517EC8B7569D55F4439E4E3A1A7EE8EE2FCED69CC77",
+        "Bytes": 9728
+      },
+      {
+        "Path": "KxUser.dll",
+        "SHA256": "EB95959A1F1113641977D89F3AA43B1132F706AD89A4FE98B072B0FA3FF18761",
+        "Bytes": 115200
+      },
+      {
+        "Path": "launch-vscode-1.138-vista.cmd",
+        "SHA256": "F45EF0C6C75325757B8C3AB250DD79A8FB5A525E132FBDD85EA2CCD98825079B",
+        "Bytes": 808
+      },
+      {
+        "Path": "launch-vscode-vista.cmd",
+        "SHA256": "EE32D5CC47E3B17F8E294EE072360B1B8826AEEB7D79A6F023479D2D28CF3E29",
+        "Bytes": 559
+      },
+      {
+        "Path": "Remove-VxKex-Files.cmd",
+        "SHA256": "0006F99F0C4210F21E9542BD495CB77ED9C03C5043E6ADEEE069735864541420",
+        "Bytes": 1797
+      },
+      {
+        "Path": "Reset-VxKex-Config.bat",
+        "SHA256": "343662F01492F66C92AE4291D0153035998FE829EE80FC7E131A696E730F6838",
+        "Bytes": 3111
+      },
+      {
+        "Path": "Reset-VxKex-Config.reg",
+        "SHA256": "AC5BE68C313EFE0667442EA4883A2B3792FFA6AFD9B96606E2FBD00C1C230917",
+        "Bytes": 4713
+      },
+      {
+        "Path": "Run-VxKexSetup.cmd",
+        "SHA256": "0BA64FA43E36B1D61A95CF7C741DD0B7FC880DDB90AC6A8A946FDF7FBD95CC02",
+        "Bytes": 1934
+      },
+      {
+        "Path": "VistaRun.exe",
+        "SHA256": "2E61D802164AB39D71B8893300A4C5F735BEA43F084E31DE23A3D2B37DB12D48",
+        "Bytes": 8192
+      },
+      {
+        "Path": "VistaSetup.exe",
+        "SHA256": "1A1B794CC8548A130C3BCC4D848A4678FBA4C4C2CF5F247655F5D26CC7E6BCF4",
+        "Bytes": 49664
+      },
+      {
+        "Path": "VxlView.exe",
+        "SHA256": "2CC9B5B408C695C3A336472C317B51F5F604611C6A3D3EC271E71D3E0C17F2B6",
+        "Bytes": 182272
+      },
+      {
+        "Path": "Certificates\\ROOT.sst",
+        "SHA256": "3F39EA1770E162443CDE855B28760FBDC7F7107E3FC9EB7BFAFA61CFD335AFD2",
+        "Bytes": 134887
+      },
+      {
+        "Path": "Kex32\\KexCfg.exe",
+        "SHA256": "D83F9F438848FFBDD417F2549FEF3CA69BAA037DF30A4031062E4FB1955CAFCF",
+        "Bytes": 117760
+      },
+      {
+        "Path": "Kex32\\KexDll.dll",
+        "SHA256": "B5C55310E8437A14B1BADA7596691EE99D3D78E7D866AF5206486DF81CB8B278",
+        "Bytes": 260096
+      },
+      {
+        "Path": "Kex32\\KxAdvapi.dll",
+        "SHA256": "6EC093ADA4D1771E9324E1A544DEAF4E452ECBC4C686C3ED8C57C054C1C99F6C",
+        "Bytes": 55808
+      },
+      {
+        "Path": "Kex32\\KxBase.dll",
+        "SHA256": "935C22E13005EEA5D8F4F2FC1E34BB24D541E09D7831074BFF1DD96B26FAD909",
+        "Bytes": 143872
+      },
+      {
+        "Path": "Kex32\\KxCom.dll",
+        "SHA256": "0CB3268FF2393B646AEF7E3A1E981854E772D110FF34782168D8EBEF72252745",
+        "Bytes": 41984
+      },
+      {
+        "Path": "Kex32\\KxCrt.dll",
+        "SHA256": "5C740F925A100B0172F618A550B6485C1F7E0F5B59B793C4602C05000E487406",
+        "Bytes": 58880
+      },
+      {
+        "Path": "Kex32\\KxCryp.dll",
+        "SHA256": "886363548607EB6932EED160EE5BA31900774CBA087423F4682E066199A14CAD",
+        "Bytes": 24576
+      },
+      {
+        "Path": "Kex32\\KxDw.dll",
+        "SHA256": "CE844EF168A2690E97E16BBD4A49DD194E3D58A11D5CB87194B44A0E19A994A8",
+        "Bytes": 2560
+      },
+      {
+        "Path": "Kex32\\KxDx.dll",
+        "SHA256": "B2D7FFDCACD4F6E7A4D26241F50C56B838CD5551FD321AC84368C2DD963DB6B8",
+        "Bytes": 28672
+      },
+      {
+        "Path": "Kex32\\KxMi.dll",
+        "SHA256": "BB714E6E89C181FCAD3A83D3D1A659CD1DB32B00570D02F436A4A1E562D885E1",
+        "Bytes": 20480
+      },
+      {
+        "Path": "Kex32\\KxNet.dll",
+        "SHA256": "D3A5C8DDE57F3478273FE18C517C15F5984E3FC5F9947E47161A86581F070D8E",
+        "Bytes": 34304
+      },
+      {
+        "Path": "Kex32\\KxNt.dll",
+        "SHA256": "FAF144C2F8927935D8691CB7CAEA428948D16309D7DCB888988BB26BB9F0F900",
+        "Bytes": 123904
+      },
+      {
+        "Path": "Kex32\\KxSChanl.dll",
+        "SHA256": "75519293C13A9EC2C9D44921CDD4BB895B8CE5000A83B2DCAD35D5CE7E563ACC",
+        "Bytes": 56320
+      },
+      {
+        "Path": "Kex32\\KxUia.dll",
+        "SHA256": "C9A778E1F2ECAC3ABABADFA76585CEE83B0CC385DAB611BCD951767414AC1609",
+        "Bytes": 9728
+      },
+      {
+        "Path": "Kex32\\KxUser.dll",
+        "SHA256": "E90DEDF74E9D5E31D859FFF5CF94D241A408100A0F7A524AA6D2B36CAB80F385",
+        "Bytes": 112128
+      },
+      {
+        "Path": "Kex32\\VxlView.exe",
+        "SHA256": "A2722E46C2E6E4DAA0B3DB93F9DFEB28395C3087B87E0F649558CE23122B32FC",
+        "Bytes": 173568
+      },
+      {
+        "Path": "Kex64\\dwrw10.dll",
+        "SHA256": "FFEC1381D353FCB6107CEB30C7947EA9C6793CA24770193088C4BA8EC7F1B4E6",
+        "Bytes": 1962856
+      },
+      {
+        "Path": "VistaPty\\conpty.node",
+        "SHA256": "ACE86F0F580E2E7D853A13A110FE5D43B050F40143AB283B7B40E28A8FE5A210",
+        "Bytes": 91136
+      },
+      {
+        "Path": "VistaPty\\install.cmd",
+        "SHA256": "699B4459AC7EC229D0BA5E5EB906482D6F301BCD69794FD954237E8E30599704",
+        "Bytes": 230
+      },
+      {
+        "Path": "VistaPty\\install.ps1",
+        "SHA256": "109CAE4181546A1FE9A169BC414CD15F08E9739B58CC773D4876A9690375C406",
+        "Bytes": 3027
+      },
+      {
+        "Path": "VistaPty\\NODE-LICENSE",
+        "SHA256": "1413F0AE4500F1689552909D01CE0D6ACD6A0D8B63869BE9D7CCDC260255EC29",
+        "Bytes": 131885
+      },
+      {
+        "Path": "VistaPty\\README.md",
+        "SHA256": "15CE14A315D62331FFF22D04568CCBD28991A916407E298B76BB9B757CE0F8F0",
+        "Bytes": 5922
+      },
+      {
+        "Path": "VistaPty\\uninstall.cmd",
+        "SHA256": "C733F7C6523DB251B2095E8ACD0B5BFD9EE6C4EAF4E381B49A3F885CDAB26435",
+        "Bytes": 234
+      },
+      {
+        "Path": "VistaPty\\uninstall.ps1",
+        "SHA256": "47D2B8EB06F82528FDF1ED791BAFC006B51688E4B4FB0FAE4A8664944CFB31E3",
+        "Bytes": 2435
+      },
+      {
+        "Path": "VistaPty\\vista-pty-clear.exe",
+        "SHA256": "240054583E9C57CEAF72F64130BD96F7F2ED49C8903B1ED14B82D618DF60AEEE",
+        "Bytes": 38400
+      },
+      {
+        "Path": "VistaPty\\winpty-agent.exe",
+        "SHA256": "18C00539B806F469EC3623BAA13F5865CC4044F662B2C201B5A3C4D9F5B8F278",
+        "Bytes": 882072
+      },
+      {
+        "Path": "VistaPty\\WINPTY-LICENSE",
+        "SHA256": "49C18DB6B32E1EE4F12BE1029DFB88CA6AF973333888CE23103602DCEC96FAE7",
+        "Bytes": 1106
+      },
+      {
+        "Path": "VistaPty\\winpty.dll",
+        "SHA256": "41095A39C0CB721453AC79FDD83D1509876A10BD5F2FF53ADD9A74764CDCA7F1",
+        "Bytes": 772504
+      }
+    ],
+    "DriverSHA256": "4B4B280A63DEE15C0045795DDA6BC92303DF2EFD695DDBB2109BFDC6761AEE2E",
+    "DriverExit": 0,
+    "DriverOutput": "PASS exact disposable VM marker Error=0\r\nPASS elevated operator Error=0\r\nPASS fresh deployment required Error=2\r\nPASS never adopt existing IFEO fixture Error=2\r\nPASS never adopt existing IFEO fixture Error=2\r\nPASS capture actual operator token Error=2\r\nPASS loaded operator SID Error=0\r\nChild=C:\\VxKexProbe\\KxNtIfeo\\KxNtIfeoOpen-x64.exe PID=1900 Wait=00000000 Exit=c0000139\r\nPASS unregistered static import fails before main Error=0\r\nChild=C:\\VxKexProbe\\KxNtIfeo\\KxNtIfeoOpen-x86.exe PID=1872 Wait=00000000 Exit=c0000139\r\nPASS unregistered static import fails before main Error=1812\r\nChild=C:\\VxKexProbe\\KxNtIfeo\\Package\\VistaSetup.exe PID=2544 Wait=00000000 Exit=00000000\r\nPASS install full candidate using real setup Error=1812\r\nPASS installed KexDll/KxNt byte-identical to candidate Error=0\r\nPASS installed KexDll/KxNt byte-identical to candidate Error=0\r\nPASS installed KexDll/KxNt byte-identical to candidate Error=0\r\nPASS installed KexDll/KxNt byte-identical to candidate Error=0\r\nPASS installed package-root DLL byte-identical to candidate Error=0\r\nPASS installed package-root DLL byte-identical to candidate Error=0\r\nPASS installed package-root DLL byte-identical to candidate Error=0\r\nPASS installed package-root DLL byte-identical to candidate Error=0\r\nChild=C:\\VxKexProbe\\KxNtIfeo\\Package\\KexCfg.exe PID=1992 Wait=00000000 Exit=00000000\r\nPASS enable exact diagnostic image through real KexCfg Error=0\r\nChild=C:\\VxKexProbe\\KxNtIfeo\\KxNtIfeoOpen-x64.exe PID=2512 Wait=00000000 Exit=00000000\r\nPASS registered static import and full ordinary-open comparisons Error=0\r\nChild=C:\\VxKexProbe\\KxNtIfeo\\Package\\KexCfg.exe PID=1924 Wait=00000000 Exit=00000000\r\nPASS enable exact diagnostic image through real KexCfg Error=0\r\nChild=C:\\VxKexProbe\\KxNtIfeo\\KxNtIfeoOpen-x86.exe PID=2784 Wait=00000000 Exit=00000000\r\nPASS registered static import and full ordinary-open comparisons Error=1812\r\nChild=C:\\VxKexProbe\\KxNtIfeo\\Package\\KexCfg.exe PID=444 Wait=00000000 Exit=00000000\r\nPASS remove owned IFEO fixture Error=1812\r\nChild=C:\\VxKexProbe\\KxNtIfeo\\Package\\KexCfg.exe PID=488 Wait=00000000 Exit=00000000\r\nPASS remove owned IFEO fixture Error=1812\r\nChild=C:\\VxKexProbe\\KxNtIfeo\\Package\\VistaSetup.exe PID=2656 Wait=00000000 Exit=00000000\r\nPASS remove diagnostic installation Error=1812\r\nPASS fresh deployment state restored Error=2\r\nPASS owned IFEO key absent after cleanup Error=2\r\nPASS owned IFEO key absent after cleanup Error=2\r\nFailures=0 Result=PASS\r\n",
+    "Results": [
+      {
+        "Architecture": "x86",
+        "Passed": true,
+        "FixtureSHA256": "65F5EA341C7D5C9F10BEA0B8BFE1C95F5E820AF43BED329B2252EFC6DD63130E",
+        "Output": "StaticImportEqual=1 EarlyKexDllLoaded=1\r\nProvider=C:\\VxKex\\Kex32\\kxnt.dll\r\nImplementation=C:\\Windows\\system32\\kexdll.dll NativePresent=0 AliasEqual=1\r\nCase=0 Attr=0 Access=00020019 Status=00000000 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=0 Attr=0 Access=00000000 Status=c0000022 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=0 Attr=0 Access=02000000 Status=00000000 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=0 Attr=0 Access=00020219 Status=00000000 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=0 Attr=0 Access=00020119 Status=00000000 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=0 Attr=1 Access=00020019 Status=00000000 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=0 Attr=1 Access=00000000 Status=c0000022 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=0 Attr=1 Access=02000000 Status=00000000 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=0 Attr=1 Access=00020219 Status=00000000 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=0 Attr=1 Access=00020119 Status=00000000 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=1 Attr=0 Access=00020019 Status=00000000 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=1 Attr=0 Access=00000000 Status=c0000022 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=1 Attr=0 Access=02000000 Status=00000000 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=1 Attr=0 Access=00020219 Status=00000000 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=1 Attr=0 Access=00020119 Status=00000000 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=1 Attr=1 Access=00020019 Status=00000000 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=1 Attr=1 Access=00000000 Status=c0000022 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=1 Attr=1 Access=02000000 Status=00000000 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=1 Attr=1 Access=00020219 Status=00000000 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=1 Attr=1 Access=00020119 Status=00000000 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=2 Attr=0 Access=00020019 Status=c0000034 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=2 Attr=0 Access=00000000 Status=c0000034 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=2 Attr=0 Access=02000000 Status=c0000034 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=2 Attr=0 Access=00020219 Status=c0000034 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=2 Attr=0 Access=00020119 Status=c0000034 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=2 Attr=1 Access=00020019 Status=c0000034 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=2 Attr=1 Access=00000000 Status=c0000034 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=2 Attr=1 Access=02000000 Status=c0000034 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=2 Attr=1 Access=00020219 Status=c0000034 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=2 Attr=1 Access=00020119 Status=c0000034 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=3 Attr=0 Access=00020019 Status=00000000 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=3 Attr=0 Access=00000000 Status=c0000022 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=3 Attr=0 Access=02000000 Status=00000000 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=3 Attr=0 Access=00020219 Status=00000000 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=3 Attr=0 Access=00020119 Status=00000000 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=3 Attr=1 Access=00020019 Status=00000000 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=3 Attr=1 Access=00000000 Status=c0000022 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=3 Attr=1 Access=02000000 Status=00000000 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=3 Attr=1 Access=00020219 Status=00000000 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=3 Attr=1 Access=00020119 Status=00000000 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=4 Attr=0 Access=00020019 Status=00000000 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=4 Attr=0 Access=00000000 Status=c0000022 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=4 Attr=0 Access=02000000 Status=00000000 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=4 Attr=0 Access=00020219 Status=00000000 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=4 Attr=0 Access=00020119 Status=00000000 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=4 Attr=1 Access=00020019 Status=00000000 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=4 Attr=1 Access=00000000 Status=c0000022 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=4 Attr=1 Access=02000000 Status=00000000 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=4 Attr=1 Access=00020219 Status=00000000 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=4 Attr=1 Access=00020119 Status=00000000 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=5 Attr=0 Access=00020019 Status=c0000005 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=5 Attr=0 Access=00000000 Status=c0000005 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=5 Attr=0 Access=02000000 Status=c0000005 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=5 Attr=0 Access=00020219 Status=c000000d Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=5 Attr=0 Access=00020119 Status=c0000005 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=5 Attr=1 Access=00020019 Status=c0000005 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=5 Attr=1 Access=00000000 Status=c0000005 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=5 Attr=1 Access=02000000 Status=c0000005 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=5 Attr=1 Access=00020219 Status=c000000d Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=5 Attr=1 Access=00020119 Status=c0000005 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=6 Attr=0 Access=00020019 Status=c000000d Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=6 Attr=0 Access=00000000 Status=c000000d Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=6 Attr=0 Access=02000000 Status=c000000d Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=6 Attr=0 Access=00020219 Status=c000000d Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=6 Attr=0 Access=00020119 Status=c000000d Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=6 Attr=1 Access=00020019 Status=c000000d Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=6 Attr=1 Access=00000000 Status=c000000d Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=6 Attr=1 Access=02000000 Status=c000000d Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=6 Attr=1 Access=00020219 Status=c000000d Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=6 Attr=1 Access=00020119 Status=c000000d Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=7 Attr=0 Access=00020019 Status=c0000005 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=7 Attr=0 Access=00000000 Status=c0000005 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=7 Attr=0 Access=02000000 Status=c0000005 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=7 Attr=0 Access=00020219 Status=c0000005 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=7 Attr=0 Access=00020119 Status=c0000005 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=7 Attr=1 Access=00020019 Status=c0000005 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=7 Attr=1 Access=00000000 Status=c0000005 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=7 Attr=1 Access=02000000 Status=c0000005 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=7 Attr=1 Access=00020219 Status=c0000005 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=7 Attr=1 Access=00020119 Status=c0000005 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=8 Attr=0 Access=00020019 Status=c0000005 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=8 Attr=0 Access=00000000 Status=c0000005 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=8 Attr=0 Access=02000000 Status=c0000005 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=8 Attr=0 Access=00020219 Status=c0000005 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=8 Attr=0 Access=00020119 Status=c0000005 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=8 Attr=1 Access=00020019 Status=c0000005 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=8 Attr=1 Access=00000000 Status=c0000005 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=8 Attr=1 Access=02000000 Status=c0000005 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=8 Attr=1 Access=00020219 Status=c0000005 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=8 Attr=1 Access=00020119 Status=c0000005 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=9 Attr=0 Access=00020019 Status=c0000005 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=9 Attr=0 Access=00000000 Status=c0000005 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=9 Attr=0 Access=02000000 Status=c0000005 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=9 Attr=0 Access=00020219 Status=c0000005 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=9 Attr=0 Access=00020119 Status=c0000005 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=9 Attr=1 Access=00020019 Status=c0000005 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=9 Attr=1 Access=00000000 Status=c0000005 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=9 Attr=1 Access=02000000 Status=c0000005 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=9 Attr=1 Access=00020219 Status=c0000005 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=9 Attr=1 Access=00020119 Status=c0000005 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=10 Attr=0 Access=00020019 Status=c0000005 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=10 Attr=0 Access=00000000 Status=c0000005 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=10 Attr=0 Access=02000000 Status=c0000005 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=10 Attr=0 Access=00020219 Status=c0000005 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=10 Attr=0 Access=00020119 Status=c0000005 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=10 Attr=1 Access=00020019 Status=c0000005 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=10 Attr=1 Access=00000000 Status=c0000005 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=10 Attr=1 Access=02000000 Status=c0000005 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=10 Attr=1 Access=00020219 Status=c0000005 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=10 Attr=1 Access=00020119 Status=c0000005 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=11 Attr=0 Access=00020019 Status=00000000 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=11 Attr=0 Access=00000000 Status=c0000022 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=11 Attr=0 Access=02000000 Status=00000000 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=11 Attr=0 Access=00020219 Status=00000000 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=11 Attr=0 Access=00020119 Status=00000000 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=11 Attr=1 Access=00020019 Status=00000000 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=11 Attr=1 Access=00000000 Status=c0000022 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=11 Attr=1 Access=02000000 Status=00000000 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=11 Attr=1 Access=00020219 Status=00000000 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=11 Attr=1 Access=00020119 Status=00000000 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=12 Attr=0 Access=00020019 Status=c0000005 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=12 Attr=0 Access=00000000 Status=c0000005 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=12 Attr=0 Access=02000000 Status=c0000005 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=12 Attr=0 Access=00020219 Status=c0000005 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=12 Attr=0 Access=00020119 Status=c0000005 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=12 Attr=1 Access=00020019 Status=c0000005 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=12 Attr=1 Access=00000000 Status=c0000005 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=12 Attr=1 Access=02000000 Status=c0000005 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=12 Attr=1 Access=00020219 Status=c0000005 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=12 Attr=1 Access=00020119 Status=c0000005 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=13 Attr=0 Access=00020019 Status=c0000008 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=13 Attr=0 Access=00000000 Status=c0000008 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=13 Attr=0 Access=02000000 Status=c0000008 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=13 Attr=0 Access=00020219 Status=c0000008 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=13 Attr=0 Access=00020119 Status=c0000008 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=13 Attr=1 Access=00020019 Status=c0000008 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=13 Attr=1 Access=00000000 Status=c0000008 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=13 Attr=1 Access=02000000 Status=c0000008 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=13 Attr=1 Access=00020219 Status=c0000008 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=13 Attr=1 Access=00020119 Status=c0000008 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nUnsupported=00000001 Status=c00000bb OutputUntouched=1\r\nUnsupported=00000004 Status=c00000bb OutputUntouched=1\r\nUnsupported=00000008 Status=c00000bb OutputUntouched=1\r\nUnsupported=0000000c Status=c00000bb OutputUntouched=1\r\nUnsupported=00000010 Status=c00000bb OutputUntouched=1\r\nUnsupported=00000018 Status=c00000bb OutputUntouched=1\r\nUnsupported=00000020 Status=c00000bb OutputUntouched=1\r\nUnsupported=ffffffff Status=c00000bb OutputUntouched=1\r\nRepeated=1000 HandleDelta=0\r\nFailures=0 Result=PASS\r\n"
+      },
+      {
+        "Architecture": "x64",
+        "Passed": true,
+        "FixtureSHA256": "A1BA7099539016638F6621D01399E8F4BD9261807B0BA396CC30DAD016D9B816",
+        "Output": "StaticImportEqual=1 EarlyKexDllLoaded=1\r\nProvider=C:\\Windows\\system32\\kxnt.dll\r\nImplementation=C:\\Windows\\system32\\kexdll.dll NativePresent=0 AliasEqual=1\r\nCase=0 Attr=0 Access=00020019 Status=00000000 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=0 Attr=0 Access=00000000 Status=c0000022 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=0 Attr=0 Access=02000000 Status=00000000 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=0 Attr=0 Access=00020219 Status=00000000 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=0 Attr=0 Access=00020119 Status=00000000 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=0 Attr=1 Access=00020019 Status=00000000 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=0 Attr=1 Access=00000000 Status=c0000022 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=0 Attr=1 Access=02000000 Status=00000000 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=0 Attr=1 Access=00020219 Status=00000000 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=0 Attr=1 Access=00020119 Status=00000000 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=1 Attr=0 Access=00020019 Status=00000000 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=1 Attr=0 Access=00000000 Status=c0000022 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=1 Attr=0 Access=02000000 Status=00000000 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=1 Attr=0 Access=00020219 Status=00000000 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=1 Attr=0 Access=00020119 Status=00000000 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=1 Attr=1 Access=00020019 Status=00000000 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=1 Attr=1 Access=00000000 Status=c0000022 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=1 Attr=1 Access=02000000 Status=00000000 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=1 Attr=1 Access=00020219 Status=00000000 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=1 Attr=1 Access=00020119 Status=00000000 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=2 Attr=0 Access=00020019 Status=c0000034 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=2 Attr=0 Access=00000000 Status=c0000034 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=2 Attr=0 Access=02000000 Status=c0000034 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=2 Attr=0 Access=00020219 Status=c0000034 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=2 Attr=0 Access=00020119 Status=c0000034 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=2 Attr=1 Access=00020019 Status=c0000034 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=2 Attr=1 Access=00000000 Status=c0000034 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=2 Attr=1 Access=02000000 Status=c0000034 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=2 Attr=1 Access=00020219 Status=c0000034 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=2 Attr=1 Access=00020119 Status=c0000034 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=3 Attr=0 Access=00020019 Status=00000000 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=3 Attr=0 Access=00000000 Status=c0000022 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=3 Attr=0 Access=02000000 Status=00000000 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=3 Attr=0 Access=00020219 Status=00000000 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=3 Attr=0 Access=00020119 Status=00000000 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=3 Attr=1 Access=00020019 Status=00000000 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=3 Attr=1 Access=00000000 Status=c0000022 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=3 Attr=1 Access=02000000 Status=00000000 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=3 Attr=1 Access=00020219 Status=00000000 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=3 Attr=1 Access=00020119 Status=00000000 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=4 Attr=0 Access=00020019 Status=00000000 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=4 Attr=0 Access=00000000 Status=c0000022 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=4 Attr=0 Access=02000000 Status=00000000 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=4 Attr=0 Access=00020219 Status=00000000 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=4 Attr=0 Access=00020119 Status=00000000 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=4 Attr=1 Access=00020019 Status=00000000 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=4 Attr=1 Access=00000000 Status=c0000022 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=4 Attr=1 Access=02000000 Status=00000000 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=4 Attr=1 Access=00020219 Status=00000000 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=4 Attr=1 Access=00020119 Status=00000000 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=5 Attr=0 Access=00020019 Status=c0000005 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=5 Attr=0 Access=00000000 Status=c0000005 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=5 Attr=0 Access=02000000 Status=c0000005 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=5 Attr=0 Access=00020219 Status=c0000005 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=5 Attr=0 Access=00020119 Status=c0000005 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=5 Attr=1 Access=00020019 Status=c0000005 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=5 Attr=1 Access=00000000 Status=c0000005 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=5 Attr=1 Access=02000000 Status=c0000005 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=5 Attr=1 Access=00020219 Status=c0000005 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=5 Attr=1 Access=00020119 Status=c0000005 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=6 Attr=0 Access=00020019 Status=c000000d Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=6 Attr=0 Access=00000000 Status=c000000d Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=6 Attr=0 Access=02000000 Status=c000000d Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=6 Attr=0 Access=00020219 Status=c000000d Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=6 Attr=0 Access=00020119 Status=c000000d Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=6 Attr=1 Access=00020019 Status=c000000d Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=6 Attr=1 Access=00000000 Status=c000000d Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=6 Attr=1 Access=02000000 Status=c000000d Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=6 Attr=1 Access=00020219 Status=c000000d Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=6 Attr=1 Access=00020119 Status=c000000d Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=7 Attr=0 Access=00020019 Status=c0000005 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=7 Attr=0 Access=00000000 Status=c0000005 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=7 Attr=0 Access=02000000 Status=c0000005 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=7 Attr=0 Access=00020219 Status=c0000005 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=7 Attr=0 Access=00020119 Status=c0000005 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=7 Attr=1 Access=00020019 Status=c0000005 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=7 Attr=1 Access=00000000 Status=c0000005 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=7 Attr=1 Access=02000000 Status=c0000005 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=7 Attr=1 Access=00020219 Status=c0000005 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=7 Attr=1 Access=00020119 Status=c0000005 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=8 Attr=0 Access=00020019 Status=c0000005 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=8 Attr=0 Access=00000000 Status=c0000005 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=8 Attr=0 Access=02000000 Status=c0000005 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=8 Attr=0 Access=00020219 Status=c0000005 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=8 Attr=0 Access=00020119 Status=c0000005 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=8 Attr=1 Access=00020019 Status=c0000005 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=8 Attr=1 Access=00000000 Status=c0000005 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=8 Attr=1 Access=02000000 Status=c0000005 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=8 Attr=1 Access=00020219 Status=c0000005 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=8 Attr=1 Access=00020119 Status=c0000005 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=9 Attr=0 Access=00020019 Status=c0000005 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=9 Attr=0 Access=00000000 Status=c0000005 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=9 Attr=0 Access=02000000 Status=c0000005 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=9 Attr=0 Access=00020219 Status=c0000005 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=9 Attr=0 Access=00020119 Status=c0000005 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=9 Attr=1 Access=00020019 Status=c0000005 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=9 Attr=1 Access=00000000 Status=c0000005 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=9 Attr=1 Access=02000000 Status=c0000005 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=9 Attr=1 Access=00020219 Status=c0000005 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=9 Attr=1 Access=00020119 Status=c0000005 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=10 Attr=0 Access=00020019 Status=c0000005 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=10 Attr=0 Access=00000000 Status=c0000005 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=10 Attr=0 Access=02000000 Status=c0000005 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=10 Attr=0 Access=00020219 Status=c0000005 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=10 Attr=0 Access=00020119 Status=c0000005 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=10 Attr=1 Access=00020019 Status=c0000005 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=10 Attr=1 Access=00000000 Status=c0000005 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=10 Attr=1 Access=02000000 Status=c0000005 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=10 Attr=1 Access=00020219 Status=c0000005 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=10 Attr=1 Access=00020119 Status=c0000005 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=11 Attr=0 Access=00020019 Status=80000002 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=11 Attr=0 Access=00000000 Status=80000002 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=11 Attr=0 Access=02000000 Status=80000002 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=11 Attr=0 Access=00020219 Status=80000002 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=11 Attr=0 Access=00020119 Status=80000002 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=11 Attr=1 Access=00020019 Status=80000002 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=11 Attr=1 Access=00000000 Status=80000002 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=11 Attr=1 Access=02000000 Status=80000002 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=11 Attr=1 Access=00020219 Status=80000002 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=11 Attr=1 Access=00020119 Status=80000002 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=12 Attr=0 Access=00020019 Status=c0000005 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=12 Attr=0 Access=00000000 Status=c0000005 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=12 Attr=0 Access=02000000 Status=c0000005 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=12 Attr=0 Access=00020219 Status=c0000005 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=12 Attr=0 Access=00020119 Status=c0000005 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=12 Attr=1 Access=00020019 Status=c0000005 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=12 Attr=1 Access=00000000 Status=c0000005 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=12 Attr=1 Access=02000000 Status=c0000005 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=12 Attr=1 Access=00020219 Status=c0000005 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=12 Attr=1 Access=00020119 Status=c0000005 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=13 Attr=0 Access=00020019 Status=c0000008 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=13 Attr=0 Access=00000000 Status=c0000008 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=13 Attr=0 Access=02000000 Status=c0000008 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=13 Attr=0 Access=00020219 Status=c0000008 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=13 Attr=0 Access=00020119 Status=c0000008 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=13 Attr=1 Access=00020019 Status=c0000008 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=13 Attr=1 Access=00000000 Status=c0000008 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=13 Attr=1 Access=02000000 Status=c0000008 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=13 Attr=1 Access=00020219 Status=c0000008 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nCase=13 Attr=1 Access=00020119 Status=c0000008 Match=1 Granted=00000000 Error=13579bdf TLS=c0000022\r\nUnsupported=00000001 Status=c00000bb OutputUntouched=1\r\nUnsupported=00000004 Status=c00000bb OutputUntouched=1\r\nUnsupported=00000008 Status=c00000bb OutputUntouched=1\r\nUnsupported=0000000c Status=c00000bb OutputUntouched=1\r\nUnsupported=00000010 Status=c00000bb OutputUntouched=1\r\nUnsupported=00000018 Status=c00000bb OutputUntouched=1\r\nUnsupported=00000020 Status=c00000bb OutputUntouched=1\r\nUnsupported=ffffffff Status=c00000bb OutputUntouched=1\r\nRepeated=1000 HandleDelta=0\r\nFailures=0 Result=PASS\r\n"
+      }
+    ],
+    "Scope": "Disposable Server 2008 clone, native x64 and WOW64; real install/KexCfg/AVRF/static ntdll import rewrite/ordinary-open comparison and teardown; no native x86 OS, Vista IFEO, other API integration or UTF resource completion"
+  },
+  "EarlierAttempts": [
+    {
+      "Run": "first",
+      "ReceiptSHA256": "C04CD757999E342269C986D26A3A8CD0D6D7E968A73D9EB1EE9219BF172E3161",
+      "DriverOutput": "PASS exact disposable VM marker Error=0\r\nPASS elevated operator Error=0\r\nPASS fresh deployment required Error=2\r\nPASS never adopt existing IFEO fixture Error=2\r\nPASS never adopt existing IFEO fixture Error=2\r\nPASS capture actual operator token Error=2\r\nPASS loaded operator SID Error=0\r\nChild=C:\\VxKexProbe\\KxNtIfeo\\KxNtIfeoOpen-x64.exe PID=2224 Wait=00000000 Exit=c0000139\r\nPASS unregistered static import fails before main Error=0\r\nChild=C:\\VxKexProbe\\KxNtIfeo\\KxNtIfeoOpen-x86.exe PID=3028 Wait=00000000 Exit=c0000139\r\nPASS unregistered static import fails before main Error=1812\r\nChild=C:\\VxKexProbe\\KxNtIfeo\\Package\\VistaSetup.exe PID=936 Wait=00000000 Exit=00000000\r\nPASS install full candidate using real setup Error=1812\r\nPASS installed KexDll/KxNt byte-identical to candidate Error=0\r\nFAIL installed KexDll/KxNt byte-identical to candidate Error=2\r\nPASS installed KexDll/KxNt byte-identical to candidate Error=0\r\nPASS installed KexDll/KxNt byte-identical to candidate Error=0\r\nChild=C:\\VxKexProbe\\KxNtIfeo\\Package\\VistaSetup.exe PID=464 Wait=00000000 Exit=00000000\r\nPASS remove diagnostic installation Error=0\r\nPASS fresh deployment state restored Error=2\r\nPASS owned IFEO key absent after cleanup Error=2\r\nPASS owned IFEO key absent after cleanup Error=2\r\nFailures=1 Result=FAIL\r\n",
+      "Interpretation": "Harness assumed absent Kex64/KxNt; stopped before profile activation; install/teardown passed"
+    },
+    {
+      "Run": "second",
+      "ReceiptSHA256": "DBAE05183EDA894FDC0CF97EEE46AC3CC8BE30B09747CBF4AEA20C9C3542E61C",
+      "DriverOutput": "PASS exact disposable VM marker Error=0\r\nPASS elevated operator Error=0\r\nPASS fresh deployment required Error=2\r\nPASS never adopt existing IFEO fixture Error=2\r\nPASS never adopt existing IFEO fixture Error=2\r\nPASS capture actual operator token Error=2\r\nPASS loaded operator SID Error=0\r\nChild=C:\\VxKexProbe\\KxNtIfeo\\KxNtIfeoOpen-x64.exe PID=3004 Wait=00000000 Exit=c0000139\r\nPASS unregistered static import fails before main Error=0\r\nChild=C:\\VxKexProbe\\KxNtIfeo\\KxNtIfeoOpen-x86.exe PID=1588 Wait=00000000 Exit=c0000139\r\nPASS unregistered static import fails before main Error=1812\r\nChild=C:\\VxKexProbe\\KxNtIfeo\\Package\\VistaSetup.exe PID=916 Wait=00000000 Exit=00000000\r\nPASS install full candidate using real setup Error=1812\r\nPASS installed KexDll/KxNt byte-identical to candidate Error=0\r\nPASS installed KexDll/KxNt byte-identical to candidate Error=0\r\nPASS installed KexDll/KxNt byte-identical to candidate Error=0\r\nPASS installed KexDll/KxNt byte-identical to candidate Error=0\r\nChild=C:\\VxKexProbe\\KxNtIfeo\\Package\\KexCfg.exe PID=2848 Wait=00000000 Exit=00000000\r\nPASS enable exact diagnostic image through real KexCfg Error=0\r\nChild=C:\\VxKexProbe\\KxNtIfeo\\KxNtIfeoOpen-x64.exe PID=2284 Wait=00000000 Exit=00000000\r\nPASS registered static import and full ordinary-open comparisons Error=0\r\nChild=C:\\VxKexProbe\\KxNtIfeo\\Package\\KexCfg.exe PID=2220 Wait=00000000 Exit=00000000\r\nPASS enable exact diagnostic image through real KexCfg Error=0\r\nChild=C:\\VxKexProbe\\KxNtIfeo\\KxNtIfeoOpen-x86.exe PID=2360 Wait=00000000 Exit=00000000\r\nPASS registered static import and full ordinary-open comparisons Error=1812\r\nChild=C:\\VxKexProbe\\KxNtIfeo\\Package\\KexCfg.exe PID=768 Wait=00000000 Exit=00000000\r\nPASS remove owned IFEO fixture Error=1812\r\nChild=C:\\VxKexProbe\\KxNtIfeo\\Package\\KexCfg.exe PID=1712 Wait=00000000 Exit=00000000\r\nPASS remove owned IFEO fixture Error=1812\r\nChild=C:\\VxKexProbe\\KxNtIfeo\\Package\\VistaSetup.exe PID=2000 Wait=00000000 Exit=00000000\r\nPASS remove diagnostic installation Error=1812\r\nPASS fresh deployment state restored Error=2\r\nPASS owned IFEO key absent after cleanup Error=2\r\nPASS owned IFEO key absent after cleanup Error=2\r\nFailures=0 Result=PASS\r\n",
+      "Interpretation": "Driver and both actual probes passed; runner rejected real WOW64 Kex32 module path; overall receipt retained as Incomplete, not retroactively changed"
+    }
+  ],
+  "StaticImportTables": [
+    {
+      "Architecture": "x86",
+      "SHA256": "164C70C90CBAEC5DCA7F3E1CD69625D67625BCC54BF91ED0DD377E46A882BEFC",
+      "Output": "Microsoft (R) COFF/PE Dumper Version 10.00.30319.01\nCopyright (C) Microsoft Corporation.  All rights reserved.\n\n\nDump of file C:\\Users\\YamaR\\Desktop\\AI_Datas\\VxKex_Vista_KxNt\\audit\\KxNtParity\\x86\\KxNtIfeoOpen-x86.exe\n\nFile Type: EXECUTABLE IMAGE\n\n  Section contains the following imports:\n\n    KERNEL32.dll\n                40C000 Import Address Table\n                40E0F8 Import Name Table\n                     0 time date stamp\n                     0 Index of first forwarder reference\n\n                   52 CloseHandle\n                  202 GetLastError\n                  473 SetLastError\n                  4EC VirtualFree\n                  249 GetProcessHandleCount\n                  1C0 GetCurrentProcess\n                  4EF VirtualProtect\n                  4E9 VirtualAlloc\n                  216 GetModuleHandleExA\n                  213 GetModuleFileNameA\n                  245 GetProcAddress\n                  218 GetModuleHandleW\n                  186 GetCommandLineA\n                  2D3 HeapSetInformation\n                  304 IsProcessorFeaturePresent\n                  4C0 TerminateProcess\n                  4D3 UnhandledExceptionFilter\n                  4A5 SetUnhandledExceptionFilter\n                  300 IsDebuggerPresent\n                  2CF HeapFree\n                   EA EncodePointer\n                   CA DecodePointer\n                   EE EnterCriticalSection\n                  339 LeaveCriticalSection\n                  46F SetHandleCount\n                  264 GetStdHandle\n                  2E3 InitializeCriticalSectionAndSpinCount\n                  1F3 GetFileType\n                  263 GetStartupInfoW\n                   D1 DeleteCriticalSection\n                  418 RtlUnwind\n                  119 ExitProcess\n                  525 WriteFile\n                  214 GetModuleFileNameW\n                  161 FreeEnvironmentStringsW\n                  511 WideCharToMultiByte\n                  1DA GetEnvironmentStringsW\n                  4C5 TlsAlloc\n                  4C7 TlsGetValue\n                  4C8 TlsSetValue\n                  4C6 TlsFree\n                  2EF InterlockedIncrement\n                  1C5 GetCurrentThreadId\n                  2EB InterlockedDecrement\n                  2CD HeapCreate\n                  3A7 QueryPerformanceCounter\n                  293 GetTickCount\n                  1C1 GetCurrentProcessId\n                  279 GetSystemTimeAsFileTime\n                  487 SetStdHandle\n                  19A GetConsoleCP\n                  1AC GetConsoleMode\n                  157 FlushFileBuffers\n                  4B2 Sleep\n                  172 GetCPInfo\n                  168 GetACP\n                  237 GetOEMCP\n                  30A IsValidCodePage\n                   88 CreateFileA\n                  33F LoadLibraryW\n                  524 WriteConsoleW\n                  367 MultiByteToWideChar\n                  466 SetFilePointer\n                  2CB HeapAlloc\n                  2D2 HeapReAlloc\n                  32D LCMapStringW\n                  269 GetStringTypeW\n                  453 SetEndOfFile\n                  24A GetProcessHeap\n                  3C0 ReadFile\n                  2D4 HeapSize\n                   8F CreateFileW\n\n    ntdll.dll\n                40C124 Import Address Table\n                40E21C Import Name Table\n                     0 time date stamp\n                     0 Index of first forwarder reference\n\n                    0 NtOpenKeyEx\n\n  Summary\n\n        3000 .data\n        3000 .rdata\n        1000 .reloc\n        B000 .text\r\n"
+    },
+    {
+      "Architecture": "x64",
+      "SHA256": "58786A1D7A4E1FEDEE6779879366FA75FB852DEF218ACEF6178690E935A37A94",
+      "Output": "Microsoft (R) COFF/PE Dumper Version 10.00.30319.01\nCopyright (C) Microsoft Corporation.  All rights reserved.\n\n\nDump of file C:\\Users\\YamaR\\Desktop\\AI_Datas\\VxKex_Vista_KxNt\\audit\\KxNtParity\\x64\\KxNtIfeoOpen-x64.exe\n\nFile Type: EXECUTABLE IMAGE\n\n  Section contains the following imports:\n\n    ntdll.dll\n             14000C250 Import Address Table\n             14000EBB0 Import Name Table\n                     0 time date stamp\n                     0 Index of first forwarder reference\n\n                           0 NtOpenKeyEx\n\n    KERNEL32.dll\n             14000C000 Import Address Table\n             14000E960 Import Name Table\n                     0 time date stamp\n                     0 Index of first forwarder reference\n\n                         1CB GetCurrentThreadId\n                          52 CloseHandle\n                         208 GetLastError\n                         480 SetLastError\n                         4FB VirtualFree\n                         250 GetProcessHandleCount\n                         1C6 GetCurrentProcess\n                         4FE VirtualProtect\n                         4F8 VirtualAlloc\n                         21C GetModuleHandleExA\n                         219 GetModuleFileNameA\n                         24C GetProcAddress\n                         21E GetModuleHandleW\n                         18C GetCommandLineA\n                         4CE TerminateProcess\n                         4E2 UnhandledExceptionFilter\n                         4B3 SetUnhandledExceptionFilter\n                         302 IsDebuggerPresent\n                         426 RtlVirtualUnwind\n                         41F RtlLookupFunctionEntry\n                         418 RtlCaptureContext\n                         2D7 HeapFree\n                          EE EncodePointer\n                          CB DecodePointer\n                         425 RtlUnwindEx\n                          F2 EnterCriticalSection\n                         33B LeaveCriticalSection\n                         47C SetHandleCount\n                         26B GetStdHandle\n                         2EB InitializeCriticalSectionAndSpinCount\n                         1FA GetFileType\n                         26A GetStartupInfoW\n                          D2 DeleteCriticalSection\n                         11F ExitProcess\n                         534 WriteFile\n                         21A GetModuleFileNameW\n                         167 FreeEnvironmentStringsW\n                         520 WideCharToMultiByte\n                         1E1 GetEnvironmentStringsW\n                         15A FlsGetValue\n                         15B FlsSetValue\n                         159 FlsFree\n                         158 FlsAlloc\n                         2DB HeapSetInformation\n                         2AA GetVersion\n                         2D5 HeapCreate\n                         3A9 QueryPerformanceCounter\n                         29A GetTickCount\n                         1C7 GetCurrentProcessId\n                         280 GetSystemTimeAsFileTime\n                         494 SetStdHandle\n                         1A0 GetConsoleCP\n                         1B2 GetConsoleMode\n                         15D FlushFileBuffers\n                         4C0 Sleep\n                         178 GetCPInfo\n                         16E GetACP\n                         23E GetOEMCP\n                         30C IsValidCodePage\n                          88 CreateFileA\n                         341 LoadLibraryW\n                         533 WriteConsoleW\n                         369 MultiByteToWideChar\n                         474 SetFilePointer\n                         2D3 HeapAlloc\n                         2DA HeapReAlloc\n                         32F LCMapStringW\n                         270 GetStringTypeW\n                         461 SetEndOfFile\n                         251 GetProcessHeap\n                         3C3 ReadFile\n                         2DC HeapSize\n                          8F CreateFileW\n\n  Summary\n\n        4000 .data\n        1000 .pdata\n        4000 .rdata\n        1000 .reloc\n        B000 .text\r\n"
+    }
+  ],
+  "UserVMRebootLaunch": "ProcessBits=64 KexDllLoaded=0\r\nNativeExport=NtAlertThreadByThreadId Present=0\r\nNativeExport=NtWaitForAlertByThreadId Present=0\r\nNativeExport=RtlQueryPerformanceCounter Present=0\r\nNativeExport=RtlQueryPerformanceFrequency Present=0\r\nNativeExport=RtlGetSystemTimePrecise Present=0\r\nNativeExport=RtlReportSilentProcessExit Present=0\r\nNativeExport=NtWriteFile Present=1\r\nCreationFlags=00000000\r\nCommandLine=\"C:\\Windows\\System32\\cmd.exe\" /d /c exit 0\r\nExplicitNulStdio=0 StartupFlags=00000000\r\nCreateProcess=1 Error=0\r\nChildWait=00000000 ChildExitCode=00000000\r\nResult=MEASURED\r\n",
+  "Interpretation": "Direct vmrun cmd exit1 does not prove REST failure; owned native launcher cmd normal flags0 naturally exited0. Loader proof is limited to NtOpenKeyEx ordinary-open static import on disposable NT6.0 Server clone and WOW64, not all KxNt APIs."
+}
