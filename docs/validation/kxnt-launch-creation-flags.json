@@ -1,0 +1,98 @@
+[
+  {
+    "Architecture": "x86",
+    "VMX": "C:\\Users\\YamaR\\Documents\\Virtual Machines\\Vista\\Windows Vista x64 Edition.vmx",
+    "GuestUser": "Vista",
+    "Mode": "normal",
+    "Outcome": "NaturalExit0",
+    "Output": "ProcessBits=32 KexDllLoaded=0\r\nNativeExport=NtAlertThreadByThreadId Present=0\r\nNativeExport=NtWaitForAlertByThreadId Present=0\r\nNativeExport=RtlQueryPerformanceCounter Present=0\r\nNativeExport=RtlQueryPerformanceFrequency Present=0\r\nNativeExport=RtlGetSystemTimePrecise Present=0\r\nNativeExport=RtlReportSilentProcessExit Present=0\r\nNativeExport=NtWriteFile Present=1\r\nCreationFlags=00000000\r\nCommandLine=\"C:\\Windows\\System32\\cmd.exe\" /d /c exit 0\r\nCreateProcess=1 Error=0\r\nChildWait=00000000 ChildExitCode=00000000\r\nResult=MEASURED\r\n",
+    "ProbeSHA256": "A7A2E2C2EEF691FCC8E257020518C89EAFA3C3A1EDB26CA64D281F0A45B4B9E1",
+    "SourceSHA256": "D84B905A2D4733148372137917483AA2FF1B59F743F87B45153AB11C925F28D6",
+    "RunnerSHA256": "5892FCC558A7AF8DDA89A6108989F01596585286246095D64489CD3343FDB58C",
+    "Scope": "Native-parent command launch reference; optional CREATE_NO_WINDOW; timeout kills only the owned child; no inference about child KexDll loading or root cause"
+  },
+  {
+    "Architecture": "x86",
+    "VMX": "C:\\Users\\YamaR\\Documents\\Virtual Machines\\Vista\\Windows Vista x64 Edition.vmx",
+    "GuestUser": "Vista",
+    "Mode": "no-console",
+    "Outcome": "NaturalExit0",
+    "Output": "ProcessBits=32 KexDllLoaded=0\r\nNativeExport=NtAlertThreadByThreadId Present=0\r\nNativeExport=NtWaitForAlertByThreadId Present=0\r\nNativeExport=RtlQueryPerformanceCounter Present=0\r\nNativeExport=RtlQueryPerformanceFrequency Present=0\r\nNativeExport=RtlGetSystemTimePrecise Present=0\r\nNativeExport=RtlReportSilentProcessExit Present=0\r\nNativeExport=NtWriteFile Present=1\r\nCreationFlags=08000000\r\nCommandLine=\"C:\\Windows\\System32\\cmd.exe\" /d /c exit 0\r\nCreateProcess=1 Error=0\r\nChildWait=00000000 ChildExitCode=00000000\r\nResult=MEASURED\r\n",
+    "ProbeSHA256": "A7A2E2C2EEF691FCC8E257020518C89EAFA3C3A1EDB26CA64D281F0A45B4B9E1",
+    "SourceSHA256": "D84B905A2D4733148372137917483AA2FF1B59F743F87B45153AB11C925F28D6",
+    "RunnerSHA256": "5892FCC558A7AF8DDA89A6108989F01596585286246095D64489CD3343FDB58C",
+    "Scope": "Native-parent command launch reference; optional CREATE_NO_WINDOW; timeout kills only the owned child; no inference about child KexDll loading or root cause"
+  },
+  {
+    "Architecture": "x64",
+    "VMX": "C:\\Users\\YamaR\\Documents\\Virtual Machines\\Vista\\Windows Vista x64 Edition.vmx",
+    "GuestUser": "Vista",
+    "Mode": "normal",
+    "Outcome": "NaturalExit0",
+    "Output": "ProcessBits=64 KexDllLoaded=0\r\nNativeExport=NtAlertThreadByThreadId Present=0\r\nNativeExport=NtWaitForAlertByThreadId Present=0\r\nNativeExport=RtlQueryPerformanceCounter Present=0\r\nNativeExport=RtlQueryPerformanceFrequency Present=0\r\nNativeExport=RtlGetSystemTimePrecise Present=0\r\nNativeExport=RtlReportSilentProcessExit Present=0\r\nNativeExport=NtWriteFile Present=1\r\nCreationFlags=00000000\r\nCommandLine=\"C:\\Windows\\System32\\cmd.exe\" /d /c exit 0\r\nCreateProcess=1 Error=0\r\nChildWait=00000000 ChildExitCode=00000000\r\nResult=MEASURED\r\n",
+    "ProbeSHA256": "2E491DC35A30A783B9FBD5B286F8844ABAB46F2B67B723B2003E8E309328AAD8",
+    "SourceSHA256": "D84B905A2D4733148372137917483AA2FF1B59F743F87B45153AB11C925F28D6",
+    "RunnerSHA256": "5892FCC558A7AF8DDA89A6108989F01596585286246095D64489CD3343FDB58C",
+    "Scope": "Native-parent command launch reference; optional CREATE_NO_WINDOW; timeout kills only the owned child; no inference about child KexDll loading or root cause"
+  },
+  {
+    "Architecture": "x64",
+    "VMX": "C:\\Users\\YamaR\\Documents\\Virtual Machines\\Vista\\Windows Vista x64 Edition.vmx",
+    "GuestUser": "Vista",
+    "Mode": "no-console",
+    "Outcome": "TimedOutAndTerminatedOwnedChild",
+    "Output": "ProcessBits=64 KexDllLoaded=0\r\nNativeExport=NtAlertThreadByThreadId Present=0\r\nNativeExport=NtWaitForAlertByThreadId Present=0\r\nNativeExport=RtlQueryPerformanceCounter Present=0\r\nNativeExport=RtlQueryPerformanceFrequency Present=0\r\nNativeExport=RtlGetSystemTimePrecise Present=0\r\nNativeExport=RtlReportSilentProcessExit Present=0\r\nNativeExport=NtWriteFile Present=1\r\nCreationFlags=08000000\r\nCommandLine=\"C:\\Windows\\System32\\cmd.exe\" /d /c exit 0\r\nCreateProcess=1 Error=0\r\nOwnedChildPID=1032\r\nChildModule=cmd.exe Base=000000004A610000 Size=380928 Path=C:\\Windows\\System32\\cmd.exe\r\nChildModule=ntdll.dll Base=0000000077010000 Size=1597440 Path=C:\\Windows\\system32\\ntdll.dll\r\nChildModule=kernel32.dll Base=0000000076A90000 Size=1236992 Path=C:\\Windows\\system32\\kernel32.dll\r\nChildContext PC=0000000077055C8A SP=00000000002EE128\r\nChildStackBytes=256 0000000076AB1A6E 00000000002EE1C0 0000000000000000 000000004A6100E0 0000000000000000 0000000000000000 000000004A6100E0 0000000076A90000 00000000002EE8D0 0000000000052FE0 0000000076AB2043 0000000000000000 0000000000000680 0000000000000064 00000000002EE8D0 00000000002EE520 00000000002EE1C0 0000000000052F00 0000000000052F5B 0000000000980003 000000000000001C 0000000000000003 0000000000000007 000000000000000B 0000000000000010 0000000000000014 0000000000000000 0000000000200113 00000000002900F1 0000000000000000 0000000000F50007 00190050012C0050\r\nChildWait=00000102 ChildExitCode=0000dead\r\nResult=MEASURED\r\n",
+    "ProbeSHA256": "2E491DC35A30A783B9FBD5B286F8844ABAB46F2B67B723B2003E8E309328AAD8",
+    "SourceSHA256": "D84B905A2D4733148372137917483AA2FF1B59F743F87B45153AB11C925F28D6",
+    "RunnerSHA256": "5892FCC558A7AF8DDA89A6108989F01596585286246095D64489CD3343FDB58C",
+    "Scope": "Native-parent command launch reference; optional CREATE_NO_WINDOW; timeout kills only the owned child; no inference about child KexDll loading or root cause"
+  },
+  {
+    "Architecture": "x86",
+    "VMX": "C:\\Users\\YamaR\\Documents\\Virtual Machines\\W2k8\\Windows Server 2008.vmx",
+    "GuestUser": "Administrator",
+    "Mode": "normal",
+    "Outcome": "NaturalExit0",
+    "Output": "ProcessBits=32 KexDllLoaded=0\r\nNativeExport=NtAlertThreadByThreadId Present=0\r\nNativeExport=NtWaitForAlertByThreadId Present=0\r\nNativeExport=RtlQueryPerformanceCounter Present=0\r\nNativeExport=RtlQueryPerformanceFrequency Present=0\r\nNativeExport=RtlGetSystemTimePrecise Present=0\r\nNativeExport=RtlReportSilentProcessExit Present=0\r\nNativeExport=NtWriteFile Present=1\r\nCreationFlags=00000000\r\nCommandLine=\"C:\\Windows\\System32\\cmd.exe\" /d /c exit 0\r\nCreateProcess=1 Error=0\r\nChildWait=00000000 ChildExitCode=00000000\r\nResult=MEASURED\r\n",
+    "ProbeSHA256": "A7A2E2C2EEF691FCC8E257020518C89EAFA3C3A1EDB26CA64D281F0A45B4B9E1",
+    "SourceSHA256": "D84B905A2D4733148372137917483AA2FF1B59F743F87B45153AB11C925F28D6",
+    "RunnerSHA256": "5892FCC558A7AF8DDA89A6108989F01596585286246095D64489CD3343FDB58C",
+    "Scope": "Native-parent command launch reference; optional CREATE_NO_WINDOW; timeout kills only the owned child; no inference about child KexDll loading or root cause"
+  },
+  {
+    "Architecture": "x86",
+    "VMX": "C:\\Users\\YamaR\\Documents\\Virtual Machines\\W2k8\\Windows Server 2008.vmx",
+    "GuestUser": "Administrator",
+    "Mode": "no-console",
+    "Outcome": "TimedOutAndTerminatedOwnedChild",
+    "Output": "ProcessBits=32 KexDllLoaded=0\r\nNativeExport=NtAlertThreadByThreadId Present=0\r\nNativeExport=NtWaitForAlertByThreadId Present=0\r\nNativeExport=RtlQueryPerformanceCounter Present=0\r\nNativeExport=RtlQueryPerformanceFrequency Present=0\r\nNativeExport=RtlGetSystemTimePrecise Present=0\r\nNativeExport=RtlReportSilentProcessExit Present=0\r\nNativeExport=NtWriteFile Present=1\r\nCreationFlags=08000000\r\nCommandLine=\"C:\\Windows\\System32\\cmd.exe\" /d /c exit 0\r\nCreateProcess=1 Error=0\r\nOwnedChildPID=6612\r\nChildModule=cmd.exe Base=4ABC0000 Size=327680 Path=C:\\Windows\\SysWOW64\\cmd.exe\r\nChildModule=ntdll.dll Base=77670000 Size=1441792 Path=C:\\Windows\\SysWOW64\\ntdll.dll\r\nChildModule=kernel32.dll Base=768E0000 Size=1114112 Path=C:\\Windows\\syswow64\\kernel32.dll\r\nChildContext PC=7690D06A SP=001EE840\r\nChildStackBytes=128 7690D00B 001EF0DC 001EE85C 001EE85B 7EFDE000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000\r\nChildWait=00000102 ChildExitCode=0000dead\r\nResult=MEASURED\r\n",
+    "ProbeSHA256": "A7A2E2C2EEF691FCC8E257020518C89EAFA3C3A1EDB26CA64D281F0A45B4B9E1",
+    "SourceSHA256": "D84B905A2D4733148372137917483AA2FF1B59F743F87B45153AB11C925F28D6",
+    "RunnerSHA256": "5892FCC558A7AF8DDA89A6108989F01596585286246095D64489CD3343FDB58C",
+    "Scope": "Native-parent command launch reference; optional CREATE_NO_WINDOW; timeout kills only the owned child; no inference about child KexDll loading or root cause"
+  },
+  {
+    "Architecture": "x64",
+    "VMX": "C:\\Users\\YamaR\\Documents\\Virtual Machines\\W2k8\\Windows Server 2008.vmx",
+    "GuestUser": "Administrator",
+    "Mode": "normal",
+    "Outcome": "NaturalExit0",
+    "Output": "ProcessBits=64 KexDllLoaded=0\r\nNativeExport=NtAlertThreadByThreadId Present=0\r\nNativeExport=NtWaitForAlertByThreadId Present=0\r\nNativeExport=RtlQueryPerformanceCounter Present=0\r\nNativeExport=RtlQueryPerformanceFrequency Present=0\r\nNativeExport=RtlGetSystemTimePrecise Present=0\r\nNativeExport=RtlReportSilentProcessExit Present=0\r\nNativeExport=NtWriteFile Present=1\r\nCreationFlags=00000000\r\nCommandLine=\"C:\\Windows\\System32\\cmd.exe\" /d /c exit 0\r\nCreateProcess=1 Error=0\r\nChildWait=00000000 ChildExitCode=00000000\r\nResult=MEASURED\r\n",
+    "ProbeSHA256": "2E491DC35A30A783B9FBD5B286F8844ABAB46F2B67B723B2003E8E309328AAD8",
+    "SourceSHA256": "D84B905A2D4733148372137917483AA2FF1B59F743F87B45153AB11C925F28D6",
+    "RunnerSHA256": "5892FCC558A7AF8DDA89A6108989F01596585286246095D64489CD3343FDB58C",
+    "Scope": "Native-parent command launch reference; optional CREATE_NO_WINDOW; timeout kills only the owned child; no inference about child KexDll loading or root cause"
+  },
+  {
+    "Architecture": "x64",
+    "VMX": "C:\\Users\\YamaR\\Documents\\Virtual Machines\\W2k8\\Windows Server 2008.vmx",
+    "GuestUser": "Administrator",
+    "Mode": "no-console",
+    "Outcome": "TimedOutAndTerminatedOwnedChild",
+    "Output": "ProcessBits=64 KexDllLoaded=0\r\nNativeExport=NtAlertThreadByThreadId Present=0\r\nNativeExport=NtWaitForAlertByThreadId Present=0\r\nNativeExport=RtlQueryPerformanceCounter Present=0\r\nNativeExport=RtlQueryPerformanceFrequency Present=0\r\nNativeExport=RtlGetSystemTimePrecise Present=0\r\nNativeExport=RtlReportSilentProcessExit Present=0\r\nNativeExport=NtWriteFile Present=1\r\nCreationFlags=08000000\r\nCommandLine=\"C:\\Windows\\System32\\cmd.exe\" /d /c exit 0\r\nCreateProcess=1 Error=0\r\nOwnedChildPID=6112\r\nChildModule=cmd.exe Base=000000004A700000 Size=380928 Path=C:\\Windows\\System32\\cmd.exe\r\nChildModule=ntdll.dll Base=00000000774B0000 Size=1597440 Path=C:\\Windows\\system32\\ntdll.dll\r\nChildModule=kernel32.dll Base=0000000076F30000 Size=1236992 Path=C:\\Windows\\system32\\kernel32.dll\r\nChildContext PC=00000000774F5B4A SP=000000000020E008\r\nChildStackBytes=256 0000000076F52CDE 000000000020E0A0 0000000000000000 000000004A7000E0 0000000000000000 0000000000000000 000000004A7000E0 0000000076F30000 000000000020E7B0 00000000002135E0 0000000076F53513 0000000000000000 0000000000000680 0000000000000064 000000000020E7B0 000000000020E400 000000000020E0A0 0000000000213500 000000000021355B 0000000001830004 000000000000001C 0000000000000003 0000000000000007 000000000000000B 0000000000000010 0000000000000014 0000000000000000 00000000010900DD 0000000000CF00E1 0000000000000000 0000000000F50007 00190050012C0050\r\nChildWait=00000102 ChildExitCode=0000dead\r\nResult=MEASURED\r\n",
+    "ProbeSHA256": "2E491DC35A30A783B9FBD5B286F8844ABAB46F2B67B723B2003E8E309328AAD8",
+    "SourceSHA256": "D84B905A2D4733148372137917483AA2FF1B59F743F87B45153AB11C925F28D6",
+    "RunnerSHA256": "5892FCC558A7AF8DDA89A6108989F01596585286246095D64489CD3343FDB58C",
+    "Scope": "Native-parent command launch reference; optional CREATE_NO_WINDOW; timeout kills only the owned child; no inference about child KexDll loading or root cause"
+  }
+]

@@ -675,3 +675,16 @@ Vista VMのWOW64 / x64でtests/run_kxnt_silent_exit_vm.ps1を実行し、既存�
 - DLL / EXE hash、native / VM raw結果を保存。runnerはKxNtを専用絶対パスで渡すが、forward先KexDllの実module pathをログ・gateにしていないため、その限定も証跡に明示した。
 
 証跡: docs/validation/kxnt-silent-exit-vista-client.json。再実行はtests/run_kxnt_silent_exit_vm.ps1にVista VMX / GuestUser / GuestPassword / GuestDirectoryを指定。配布DLL、システムDLL、Releasesは変更していない。実際のWER、通常IFEO、任意process tokenの全面検証へ成功範囲を拡張しない。
+## 2026-10-03: コンソール初期化を避ける条件で起動停止と実行間の差を検出
+
+UTF cold資源測定のconime影響を切り離すため、[Microsoftのprocess creation flags仕様](https://learn.microsoft.com/en-us/windows/win32/procthread/process-creation-flags) にあるCREATE_NO_WINDOW条件を試した。APIの変換caseを省略する案ではなく、同じ試験を異なるconsole起動条件で測定する診断である。**この環境では安定した測定に到達しておらず、UTFの成功条件として採用していない。** 元のUTF resource gateの失敗は維持する。
+
+- tests/kxnt_native_launch_probe.cに明示的なno-console引数を追加。既存引数ではcreation flags=0を維持し、指定時だけ08000000を使用。実際のcommand lineとflagsを記録した。timeout時には、自分で作成した子だけのDLL一覧、主thread context PC / SP、stackの32pointer分を取得。主threadをresumeしてから、所有する子を終了する。他のアプリやsystem processを停止しない。
+- UTF probeをこの条件で起動した初期試行は、CreateProcess成功後10秒でtimeoutし、子の試験logを取得できなかった。この試行だけでUTF処理が原因とは判断しない。
+- tests/run_kxnt_launch_creation_flags.ps1を追加し、cmd.exe /d /c exit 0を対照にした。Vista client / Server 2008、WOW64 / x64、flags0 / CREATE_NO_WINDOWの8実行。通常4実行は自然終了0。初期の対照試行ではno-console両形式が両VMで時間切れになったが、context採取を追加して再実行した最新セットでは、Vista WOW64のno-consoleだけは自然終了0、残る3条件はtimeoutだった。この差を隠さず保存した。恒常的なハングやOS非対応を断定しない。
+- ParentはKexDllLoaded=0。timeout3件ではcmd.exe / ntdll.dll / kernel32.dllのsnapshot、PC / SPとstackを採取できた。snapshotにKexDllは記録されていないが、子の全初期化・IFEO設定や将来のmodule読込みを証明する観測ではない。現在の証跡だけでOS、VMware Tools、互換レイヤーのどれが原因かを決めない。
+- SDK7.1のToolhelp ANSI APIはModule32First / NextとMODULEENTRY32であり、最初に使ったA suffixの宣言はビルドエラーだった。修正し、VS2010で両形式を再ビルドしてから最終8実行を採取した。失敗したbuildを実行成功として使っていない。
+
+証跡: docs/validation/kxnt-launch-creation-flags.json（最新8 raw結果、VMX / user、source / EXE / runner hash、自然終了とtimeoutの区別）。再実行はtests/build_kxnt_probes.ps1を両形式で実行し、tests/run_kxnt_launch_creation_flags.ps1に各VMX / GuestUser / GuestPassword / 専用GuestDirectoryを指定する。10秒は診断上限であり、永続ハングの証明ではない。MEASUREDとtimeoutを動作成功としない。正常終了したno-console例もエラーに置換しない。
+
+次の解析ではPC / return addressのsymbol・module offset、子の初期化と標準handle条件を調べる。conime由来と推測した全handleの作成stack・lifecycle、計測介入の影響、通常console条件のUTF cold差分、通常IFEO統合は未解決。配布DLL、システムDLL、Installerは変更していない。
