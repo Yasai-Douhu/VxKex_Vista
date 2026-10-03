@@ -7,10 +7,12 @@ param(
  [switch]$EventTrace,
  [switch]$RuntimeSuite,
  [switch]$Utf8Trace,
+ [switch]$ConDrvSuite,
  [string]$VMRun='C:\Program Files\VMware\VMware Workstation\vmrun.exe'
 )
 $ErrorActionPreference='Stop'
 if($Utf8Trace){$RuntimeSuite=$true;$EventTrace=$true}
+if($ConDrvSuite){if($RuntimeSuite -or $EventTrace -or $Utf8Trace){throw 'Select one integration mode'};$Suite=$true}
 if($RuntimeSuite){if($EventTrace -and !$Utf8Trace){throw 'Select one diagnostic mode'};$Suite=$true}
 if($EventTrace -and !$Suite){throw 'EventTrace uses the static-import suite fixtures; also specify Suite'}
 $root=Split-Path $PSScriptRoot
@@ -23,10 +25,12 @@ $state='Incomplete';$results=@();$suiteResults=@();$eventResults=@();$debuggerFi
 $kinds=@('processor-feature','domain','device-family','persisted-state','sid-package','sid-capability','membership','compare','file-information','alert','performance','srw')
 if($RuntimeSuite){$kinds=@('utf8','silent-exit')}
 if($Utf8Trace){$kinds=@('utf8')}
+if($ConDrvSuite){$kinds=@('condrv')}
 function Guest([string[]]$Arguments){& $VMRun -T ws -gu $GuestUser -gp $GuestPassword @Arguments;if($LASTEXITCODE){throw "VMware failed: $($Arguments[0])"}}
 try {
  foreach($source in @('tests/kxnt_open_key_adapter_probe.c','tests/kxnt_ifeo_deployment_probe.c','tests/kxnt_ifeo_imports.def','tests/build_kxnt_ifeo_probe.ps1','tests/run_kxnt_ifeo_vm.ps1')){$sources[$source]=(Get-FileHash "$root\$source").Hash}
  if($Suite){
+  if($ConDrvSuite){foreach($source in @('00-Common-Headers/ZigNtIoProfile.h','KexDll/ntcondrv.c','tests/kxnt_zig_console_smoke.zig')){$sources[$source]=(Get-FileHash "$root\$source").Hash}}
   foreach($source in @('tests/kxnt_ifeo_suite_provider.h','tests/kxnt_ifeo_suite_imports.def','tests/kxnt_utf8_trace.h')){$sources[$source]=(Get-FileHash "$root\$source").Hash}
   if($EventTrace){$sources['tests/kxnt_ifeo_event_trace.cdb']=(Get-FileHash "$PSScriptRoot\kxnt_ifeo_event_trace.cdb").Hash}
   foreach($kind in $kinds){$source=if($kind -like 'sid-*'){'sid_class'}else{$kind.Replace('-','_')};$source="tests/kxnt_${source}_probe.c";$sources[$source]=(Get-FileHash "$root\$source").Hash}
@@ -46,6 +50,11 @@ try {
   $files+=[pscustomobject]@{Path=$relative;SHA256=(Get-FileHash $file.FullName).Hash;Bytes=$file.Length}
  }
  foreach($arch in @('x86','x64')){
+  if($ConDrvSuite){
+   $zig="$root\audit\KxNtParity\$arch\zig-console-smoke-vista.exe"
+   Guest @('copyFileFromHostToGuest',$VMX,$zig,"$guest\KxNtIfeo-Zig-$arch.exe")
+   $files+=[pscustomobject]@{Path="KxNtIfeo-Zig-$arch.exe";SHA256=(Get-FileHash $zig).Hash;Bytes=(Get-Item $zig).Length}
+  }
   $image="$root\audit\KxNtParity\$arch\KxNtIfeoOpen-$arch.exe"
   Guest @('copyFileFromHostToGuest',$VMX,$image,"$guest\KxNtIfeoOpen-$arch.exe")
   if($Suite){foreach($kind in $kinds){$image="$root\audit\KxNtParity\IfeoSuite\$arch\KxNtIfeo-$kind-$arch.exe";Guest @('copyFileFromHostToGuest',$VMX,$image,"$guest\KxNtIfeo-$kind-$arch.exe")}}
@@ -63,12 +72,12 @@ try {
   if((Get-FileHash "$archive\native-ntdll-x86.dll").Hash -ne 'A3D767B53F36E97DFEFCAD305AE050C98D5282D0107B7D51A36825C25F544506'){throw 'Internal CDB offsets are diagnostic-only and require this exact verified clone ntdll image'}
  }
  # Capture a failing driver too, including cleanup results, before interpreting exit.
- [string[]]$driverArgs=@('runProgramInGuest',$VMX,"$guest\deployment.exe");if($Utf8Trace){$driverArgs+='--utf8-trace'}elseif($RuntimeSuite){$driverArgs+='--runtime-suite'}elseif($EventTrace){$driverArgs+='--event-trace'}elseif($Suite){$driverArgs+='--suite'}
+ [string[]]$driverArgs=@('runProgramInGuest',$VMX,"$guest\deployment.exe");if($ConDrvSuite){$driverArgs+='--condrv-suite'}elseif($Utf8Trace){$driverArgs+='--utf8-trace'}elseif($RuntimeSuite){$driverArgs+='--runtime-suite'}elseif($EventTrace){$driverArgs+='--event-trace'}elseif($Suite){$driverArgs+='--suite'}
  & $VMRun -T ws -gu $GuestUser -gp $GuestPassword @driverArgs
  $driverExit=$LASTEXITCODE
  Guest @('copyFileFromGuestToHost',$VMX,"$guest\deployment.txt","$archive\deployment.txt")
  $driver=[IO.File]::ReadAllText("$archive\deployment.txt")
- foreach($arch in @(if(!$EventTrace -and !$RuntimeSuite){'x86';'x64'})){
+ foreach($arch in @(if(!$EventTrace -and !$RuntimeSuite -and !$ConDrvSuite){'x86';'x64'})){
   & $VMRun -T ws -gu $GuestUser -gp $GuestPassword copyFileFromGuestToHost $VMX "$guest\applied-$arch.txt" "$archive\applied-$arch.txt"
   if(!$LASTEXITCODE){
    $text=[IO.File]::ReadAllText("$archive\applied-$arch.txt")
@@ -93,6 +102,13 @@ try {
   $passed=$text -match 'Result=PASS' -and $text -notmatch 'Failures=[1-9]|Result=FAIL' -and $binding -match [regex]::Escape("Provider=$provider") -and $binding -match 'Implementation=C:\\Windows\\System32\\KexDll\.dll' -and $binding -match 'StaticBindingCount=26 Matches=26 EarlyKexDllLoaded=1 Result=PASS' -and [regex]::Matches($binding,'(?m)^Import=.*Equal=1 Owner=.+').Count -eq 26
   $referenceHash=$null;$reference=$null;$control=$null
   switch($kind){
+   'condrv' {
+    Guest @('copyFileFromGuestToHost',$VMX,"$guest\control-condrv-$arch.txt","$archive\control-condrv-$arch.txt")
+    $control=[IO.File]::ReadAllText("$archive\control-condrv-$arch.txt")
+    $cold=[regex]::Match($text,'Phase=0 NativeControl=0 HandleDelta=(-?\d+)')
+    $coldControl=[regex]::Match($control,'Phase=0 NativeControl=1 HandleDelta=(-?\d+)')
+    $passed=$passed -and $control -match 'Failures=0 Result=PASS' -and $cold.Success -and $coldControl.Success -and $cold.Groups[1].Value -eq $coldControl.Groups[1].Value -and $text -match 'Phase=1 NativeControl=0 HandleDelta=0' -and $control -match 'Phase=1 NativeControl=1 HandleDelta=0' -and $text -match 'Case=concurrent-handle-identities Pass=1' -and $control -match 'Case=concurrent-handle-identities Pass=1' -and [regex]::Matches($text,'ZigConsole Exit=00000000 ReadUnits=39').Count -eq 2 -and [regex]::Matches($text,'ZigRedirect Pipe=[01] Exit=00000000 Bytes=40').Count -eq 2 -and $text -match 'PartialCompletion Injection=owned-KexDll-IAT Calls=6'
+   }
    'silent-exit' {
     $native="$archive\native-silent-exit-$arch.txt";$image="$root\audit\KxNtParity\IfeoSuite\$arch\KxNtIfeo-silent-exit-$arch.exe"
     & $image ntdll.dll $native
@@ -143,9 +159,9 @@ try {
   Write-Host "$arch $kind integration Passed=$passed"
  }}}
  $state='Failed'
- if($Suite -and !$EventTrace -and ($suiteResults.Count -ne $(if($RuntimeSuite){4}else{24}) -or ($suiteResults|Where-Object {!$_.Passed}))){throw 'Detailed suite failed; preserve actual output, bindings and teardown'}
- if($driverExit -ne 0 -or $driver -match '(?m)^FAIL ' -or $driver -notmatch 'Failures=0 Result=PASS' -or (!$EventTrace -and !$RuntimeSuite -and ($results.Count -ne 2 -or ($results|Where-Object {!$_.Passed})))){throw 'IFEO integration or deployment cleanup failed; preserve raw logs'}
+ if($Suite -and !$EventTrace -and ($suiteResults.Count -ne $(if($ConDrvSuite){2}elseif($RuntimeSuite){4}else{24}) -or ($suiteResults|Where-Object {!$_.Passed}))){throw 'Detailed suite failed; preserve actual output, bindings and teardown'}
+ if($driverExit -ne 0 -or $driver -match '(?m)^FAIL ' -or $driver -notmatch 'Failures=0 Result=PASS' -or (!$EventTrace -and !$RuntimeSuite -and !$ConDrvSuite -and ($results.Count -ne 2 -or ($results|Where-Object {!$_.Passed})))){throw 'IFEO integration or deployment cleanup failed; preserve raw logs'}
  if($EventTrace){if($eventResults.Count -ne $(if($Utf8Trace){1}else{2}) -or ($eventResults|Where-Object {!$_.Measured})){throw 'Incomplete event trace'};$state='Measured'}else{$state='Passed'}
 } finally {
- [pscustomobject]@{State=$state;VMX=$VMX;GuestUser=$GuestUser;RunName=$RunName;SourceSHA256=$sources;PackageFiles=$files;DriverSHA256=(Get-FileHash "$root\audit\KxNtParity\x64\ifeo-deployment.exe").Hash;DriverExit=$driverExit;DriverOutput=$driver;Results=$results;SuiteIncluded=[bool]$Suite;RuntimeSuite=[bool]$RuntimeSuite;Utf8Trace=[bool]$Utf8Trace;SuiteResults=$suiteResults;EventTrace=[bool]$EventTrace;EventResults=$eventResults;DebuggerFiles=$debuggerFiles;Scope='Disposable Server 2008 clone, native x64 and WOW64; real install/KexCfg/AVRF/static ntdll import rewrite/ordinary-open comparison and optional detailed suite with exact import-slot equality; event trace is observation under CDB and never replaces failed resource gates; no native x86 OS, Vista IFEO or UTF resource completion; binding an API is not proof of its behavior unless covered by the executed detailed probe'}|ConvertTo-Json -Depth 8|Set-Content -Encoding UTF8 "$archive\receipt.json"
+ [pscustomobject]@{State=$state;VMX=$VMX;GuestUser=$GuestUser;RunName=$RunName;SourceSHA256=$sources;PackageFiles=$files;DriverSHA256=(Get-FileHash "$root\audit\KxNtParity\x64\ifeo-deployment.exe").Hash;DriverExit=$driverExit;DriverOutput=$driver;Results=$results;SuiteIncluded=[bool]$Suite;RuntimeSuite=[bool]$RuntimeSuite;Utf8Trace=[bool]$Utf8Trace;ConDrvSuite=[bool]$ConDrvSuite;SuiteResults=$suiteResults;EventTrace=[bool]$EventTrace;EventResults=$eventResults;DebuggerFiles=$debuggerFiles;Scope='Disposable Server 2008 clone, native x64 and WOW64; real install/KexCfg/AVRF/static ntdll import rewrite/ordinary-open comparison and optional detailed suite with exact import-slot equality; event trace is observation under CDB and never replaces failed resource gates; no native x86 OS, Vista IFEO or UTF resource completion; binding an API is not proof of its behavior unless covered by the executed detailed probe'}|ConvertTo-Json -Depth 8|Set-Content -Encoding UTF8 "$archive\receipt.json"
 }

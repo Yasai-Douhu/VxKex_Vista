@@ -49,15 +49,28 @@ static DWORD WINAPI stressWorker(PVOID argument) {
 }
 static DWORD partialLimit,partialCalls;
 static WCHAR partialInput[8];static DWORD partialInputCount;
+static HMODULE partialBase;
+static FARPROC (WINAPI *partialResolver)(HMODULE,LPCSTR);
 static BOOL WINAPI partialWrite(HANDLE h,LPCVOID text,DWORD count,LPDWORD written,LPVOID reserved) {
     ++partialCalls;
     partialInputCount=count;ZeroMemory(partialInput,sizeof(partialInput));memcpy(partialInput,text,(count<8?count:8)*sizeof(WCHAR));
     return WriteConsoleW(h,text,count>partialLimit?partialLimit:count,written,reserved);
 }
-static PVOID *consoleImport(HMODULE module) {
+static FARPROC WINAPI partialGetProc(HMODULE module,LPCSTR name) {
+    if(module==partialBase && (ULONG_PTR)name>0xffff && !strcmp(name,"WriteConsoleW"))return (FARPROC)partialWrite;
+    return partialResolver(module,name);
+}
+static PVOID *namedImport(HMODULE module,const char *name) {
     BYTE *image=(BYTE*)module;IMAGE_NT_HEADERS *nt=(IMAGE_NT_HEADERS*)(image+((IMAGE_DOS_HEADER*)image)->e_lfanew);
     IMAGE_IMPORT_DESCRIPTOR *d=(IMAGE_IMPORT_DESCRIPTOR*)(image+nt->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_IMPORT].VirtualAddress);
-    for(;d->Name;++d){IMAGE_THUNK_DATA *t=(IMAGE_THUNK_DATA*)(image+d->FirstThunk);for(;t->u1.Function;++t)if((PVOID)(ULONG_PTR)t->u1.Function==(PVOID)WriteConsoleW)return (PVOID*)&t->u1.Function;}
+    // Normal IFEO redirects this probe's WriteConsoleW to KxBase, while the
+    // owned KexDll IAT still uses kernel32. Identify its slot by import name.
+    for(;d->Name;++d){IMAGE_THUNK_DATA *t=(IMAGE_THUNK_DATA*)(image+d->FirstThunk),*names;
+        if(!d->OriginalFirstThunk)continue;names=(IMAGE_THUNK_DATA*)(image+d->OriginalFirstThunk);
+        for(;names->u1.AddressOfData;++names,++t){ULONG_PTR rva=(ULONG_PTR)names->u1.AddressOfData;
+            if(rva & IMAGE_ORDINAL_FLAG)continue;
+            if(rva<=MAXDWORD-2 && ZigIoName(image,nt->OptionalHeader.SizeOfImage,(ULONG)rva+2,name))return (PVOID*)&t->u1.Function;
+        }}
     return NULL;
 }
 static void check(const char *name,BOOL ok) {
@@ -120,6 +133,13 @@ static void profile_bounds(void) {
         imports->Name=4090;check("profile-dll-bound",!ZigNtIoImage(image,sizeof(image)));imports->Name=1400;
         strcpy((char*)image+1400,"other.dll");check("profile-other-dll",!ZigNtIoImage(image,sizeof(image)));strcpy((char*)image+1400,"KxNt.dll");
         check("profile-rewritten-import",ZigNtIoImage(image,sizeof(image)));
+        strcpy((char*)image+1400,"kXnT");check("profile-rewritten-basename",ZigNtIoImage(image,sizeof(image)));
+        strcpy((char*)image+1400,"kxntX");check("profile-basename-suffix-rejected",!ZigNtIoImage(image,sizeof(image)));
+        strcpy((char*)image+1400,"kxnt.dllX");check("profile-extension-suffix-rejected",!ZigNtIoImage(image,sizeof(image)));
+        strcpy((char*)image+1400,"NTDLL");check("profile-native-basename",ZigNtIoImage(image,sizeof(image)));
+        strcpy((char*)image+1400,"KxNt.dll");
+        memcpy(image+4091,"kxnt",5);imports->Name=4091;check("profile-basename-tail",ZigNtIoImage(image,sizeof(image)));
+        image[4095]='X';check("profile-unterminated-tail",!ZigNtIoImage(image,sizeof(image)));imports->Name=1400;
         *(ULONG*)(opt+dirs+12)=20;check("profile-no-end-descriptor",!ZigNtIoImage(image,sizeof(image)));*(ULONG*)(opt+dirs+12)=40;
         file->NumberOfSections=65535;check("profile-section-table-bound",!ZigNtIoImage(image,sizeof(image)));file->NumberOfSections=1;
         dos->e_lfanew=0x7fffffff;check("profile-header-bound",!ZigNtIoImage(image,sizeof(image)));dos->e_lfanew=128;
@@ -227,13 +247,17 @@ static void partial_cases(HMODULE kex,HANDLE screen) {
     const BYTE bytes[]={0x41,0xe6,0x97,0xa5,0xf0,0x9f,0x98,0x80};
     const WCHAR prefix[]={L'A',0x65e5},whole[]={L'A',0x65e5,0xd83d,0xde00};WCHAR reference[16],actual[16];
     COORD origin={0,0};IOS ios;DWORD oldprotect,fill,written;UINT oldcp=GetConsoleOutputCP();
-    PVOID *slot=consoleImport(kex);PVOID old;unsigned alias;LONG s;
+    PVOID *slot;PVOID old;unsigned alias;LONG s;
+    partialBase=GetModuleHandleW(L"KxBase.dll");
+    slot=namedImport(kex,partialBase?"GetProcAddress":"WriteConsoleW");
     check("partial-import-found",slot!=NULL);if(!slot)return;
     SetConsoleOutputCP(CP_UTF8);
     FillConsoleOutputCharacterW(screen,L' ',16,origin,&fill);SetConsoleCursorPosition(screen,origin);
     WriteConsoleW(screen,prefix,2,&written,NULL);cells(screen,reference);
     old=*slot;check("partial-protect",VirtualProtect(slot,sizeof(*slot),PAGE_READWRITE,&oldprotect));
-    *slot=(PVOID)partialWrite;partialLimit=2;partialCalls=0;
+    if(partialBase){partialResolver=(FARPROC (WINAPI*)(HMODULE,LPCSTR))*slot;*slot=(PVOID)partialGetProc;}
+    else *slot=(PVOID)partialWrite;
+    partialLimit=2;partialCalls=0;
     for(alias=0;alias<2;++alias){
         FillConsoleOutputCharacterW(screen,L' ',16,origin,&fill);SetConsoleCursorPosition(screen,origin);
         s=adapted[alias](screen,NULL,NULL,NULL,&ios,(PVOID)bytes,sizeof(bytes),NULL,NULL);
@@ -316,6 +340,15 @@ int main(int argc,char **argv) {
     kx=LoadLibraryA(argv[2]);kex=GetModuleHandleW(L"KexDll.dll");
     if(!kx || !kex)return 4;
     {char modulepath[MAX_PATH];GetModuleFileNameA(kx,modulepath,sizeof(modulepath));fprintf(out,"KxNtPath=%s\n",modulepath);GetModuleFileNameA(kex,modulepath,sizeof(modulepath));fprintf(out,"KexDllPath=%s\n",modulepath);}
+#ifdef KXNT_IFEO_SUITE_PROVIDER_H
+    {BYTE *image=(BYTE*)GetModuleHandleW(NULL);IMAGE_NT_HEADERS *nt=(IMAGE_NT_HEADERS*)(image+((IMAGE_DOS_HEADER*)image)->e_lfanew);
+     ULONG size=nt->OptionalHeader.SizeOfImage,rva=nt->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_IMPORT].VirtualAddress,j;
+     for(j=0;j<nt->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_IMPORT].Size/sizeof(IMAGE_IMPORT_DESCRIPTOR);++j){IMAGE_IMPORT_DESCRIPTOR *d;
+      if(!ZigIoRange(size,rva+j*sizeof(IMAGE_IMPORT_DESCRIPTOR),sizeof(IMAGE_IMPORT_DESCRIPTOR)))break;
+      d=(IMAGE_IMPORT_DESCRIPTOR*)(image+rva+j*sizeof(IMAGE_IMPORT_DESCRIPTOR));if(!d->Name)break;
+      if(ZigIoRange(size,d->Name,1))fprintf(out,"MappedImport Name=%.*s OriginalFirstThunk=%08lx\n",(int)min(size-d->Name,64),image+d->Name,d->OriginalFirstThunk);
+     }}
+#endif
     adapted[0]=(WRITE_NT)GetProcAddress(kx,"NtWriteFile");adapted[1]=(WRITE_NT)GetProcAddress(kx,"ZwWriteFile");
     native=(WRITE_NT)GetProcAddress(GetModuleHandleW(L"ntdll.dll"),"NtWriteFile");
     query=(QUERY_OBJECT)GetProcAddress(GetModuleHandleW(L"ntdll.dll"),"NtQueryObject");

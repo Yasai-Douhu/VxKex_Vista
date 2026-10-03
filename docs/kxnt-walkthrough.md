@@ -852,3 +852,19 @@ tests/kxnt_open_key_adapter_probe.c に KXNT_IFEO_IMPORT 時だけ有効な静�
 - tests/analyze_kxnt_ifeo_utf8_event.ps1を追加。4phase順序と同一slot、empty初期値、cold区間内の作成・return・成功CAS、全phaseへのhandle保持、実parallel delta、native値比較を要求する。archive / NativeReference / 未使用Outputを指定する。native imageとreceipt / reference / analyzer hashを記録し、元FAILと今回の観測を別資料として保存する。
 
 証跡: docs/validation/kxnt-ifeo-utf8-event-server.json（raw receipt / trace / main binding / lookup control / 全変換raw / sources・candidate・debugger hash）とkxnt-ifeo-utf8-event-analysis.json。再現はbuild_kxnt_ifeo_probe.ps1 -Architecture x86 -RuntimeSuite -EventPhaseTrace、x64 -RuntimeSuiteでdriverをbuildし、runner -Utf8Traceへ使い捨てVMX / credentials / 未使用RunNameを渡す。CDBは実行timingを変える。このWOW64 processのcold増加をloader lockへ帰属できたが、過去nondebug warm増加、x64の作成元、全Eventのprocess終了時cleanup、一般的なUTF資源gateの完成は未証明。production DLL / Installer / Releasesを変更していない。元監査の未完了範囲は継続する。
+
+## 2026-10-04: ConDrv 内容プロファイルの通常 DLL 書換えに対応
+
+通常IFEOのConDrv詳細試験を追加したところ、private import書換えの以前の成功とは異なり、両形式でprofile-selectedが0だった。実install / KexCfg起動のmapped importは拡張子なしのkxnt。KexDll/redirects.hのDLL_REDIRECT("ntdll","kxnt")とdllrewrt.cのin-place変換がこの表記を生成する。一方、ZigNtIoProfile.hはntdll.dll / KxNt.dllだけを許可していた。この内容判定を修正した。
+
+- boundedかつcase-insensitiveな完全名（NULを含む）の照合でntdll / ntdll.dll / kxnt / kxnt.dllを認める。名前・製品・バージョン・固定addressによるアプリ特例は追加していない。.buildid、元import thunkのNT-I/O3signature、PE構造体bounds、descriptor終端の条件を維持した。名称末尾の余分な文字、画像末尾の未終端文字列は拒否する。拡張子なし5byteの名前が画像末尾へ正しく収まるケースも許可する。
+- both PE形式のfixtureにbasename / mixed-case / suffix / tail / unterminated caseを追加。通常IFEOで両形式のmapped kxntとprofile-selected1を確認した。IAT26slotのaddress一致と早期KexDllも確認。候補8copyのbyte一致、native negative control（親2 / 実Zig child2）のc0000139、実KexCfgによる4owned profileの登録・除去、install / uninstallとfresh状態回復を測定した。
+- 初回はprofile不選択で広範囲に失敗（WOW64 Failures62 / x64 Failures68）。PowerShell7でのbuild script呼出しがquoted source pathでC1083となり、旧DLLを含む二回目の試行も発生した。そのreceiptは名前fixedだが修正buildの証明ではない。旧DLL hash、コンパイル失敗log、試験FAILをすべて保存し、結果を成功扱いしない。Windows PowerShellで再buildし、成功marker / fatal error不在 / 新DLL hashを確認して配備した。
+- 通常起動でKxBaseが先に読み込まれるため、部分書込みを強制する旧診断のKexDll!WriteConsoleW IAT hookは実際の選択経路に届かなかった。診断をimport名でslotを探す方式へ変更し、KxBase読込み時はowned KexDllのGetProcAddress IATだけをhookして、そのmoduleのWriteConsoleW取得だけpartialWriteへ返す。それ以外は元resolverへ委譲し、試験後に元slot / protectionを復元する。fallbackでは従来のWriteConsoleW IATを使用する。productionへの注入hookや成功stubは追加していない。
+- 最終resolver試行のWOW64は全詳細試験と通常IFEOの実Zig stdioがPASS。console全39UTF16 units、file / pipe全40bytes、各Zig child終了0を確認した。x64は親のprofile・通常console・file / pipe・guard・衝突拒否・部分6call（UTF8 / DBCS / split-surrogate）・VT・4000並列書込2phase・warm handle delta0 / identity維持が成功。ただし実Zig childのconsoleだけ2回ともexit1 / 内容不一致で、Failures4 / FAILのまま。file / pipe childは両方成功。全体receiptはFailed / driver exit1のまま。
+- cold handle deltaは両形式ともadapter1 / unprofiled native control1で一致。warm0とidentity維持を確認した。native controlのcold Event作成stackをこの試験で追跡したとは主張しない。
+- KexDllを両形式buildし、作業ブランチInstallerを更新。122named exportsの旧ordinal変更0（最高ordinal318、gapsあり）。ReleaseとInstallerのhash一致を確認し、build由来obj / res / lib / pdbの変更を整理した。原作業ツリーのInstaller、ユーザーVMのsystem DLL、Releasesは変更していない。
+
+証跡: docs/validation/kxnt-ifeo-condrv-server.json（4試行の原receipt、Failed build logs、native Zig import表 / hashと解析）、kxnt-condrv-basename-ordinals.json。tests/analyze_kxnt_ifeo_condrv.ps1は初回 / 最終receiptを比較し、判定修正・両PEの境界・部分注入・資源gateを検査し、x64 childの4失敗を明示する。再現はbuild_kexdll.ps1 / build_kexdll_x86.ps1をWindows PowerShellで実行して成功を確認し、Installer2DLLを更新、build_kxnt_ifeo_probe.ps1の両形式-Suite、runner -ConDrvSuiteへ使い捨てVMX / credentials / 未使用RunNameを指定。childは保存されたZig0.16 smokeのNTDLL importを保持したPE6.0版で、private KxNt import差替え版を使用していない。
+
+この工程で修正・検証できたのは通常書換え名への内容判定とWOW64通常IFEOの詳細動作。x64実Zig console childの失敗は未解決。handle数値のFile / console衝突、子のprofile状態、import経路等は実際のchildで次に測定する必要があり、原因としてまだ断定しない。Vista IFEO / native32bit OS、UTF資源gate、拡張registry flags、WNFなど元監査の残りは未完了。

@@ -21,7 +21,7 @@ if($Suite -or $RuntimeSuite){
  New-Item -ItemType Directory -Force $suiteOut|Out-Null
  & lib.exe /nologo "/def:$PSScriptRoot\kxnt_ifeo_suite_imports.def" "/machine:$Architecture" "/out:$suiteOut\suite-imports.lib"
  if($LASTEXITCODE){throw 'Suite import library failed'}
- foreach($kind in @('processor-feature','domain','device-family','persisted-state','sid-package','sid-capability','membership','compare','file-information','alert','performance','srw','utf8','silent-exit')){
+ foreach($kind in @('processor-feature','domain','device-family','persisted-state','sid-package','sid-capability','membership','compare','file-information','alert','performance','srw','utf8','silent-exit','condrv')){
   $source=if($kind -like 'sid-*'){'sid_class'}else{$kind.Replace('-','_')}
   [string[]]$libs=@(if($kind -eq 'membership'){'advapi32.lib'})
   [string[]]$trace=@(if($kind -eq 'srw' -and !$UninstrumentedSrw){'/DKXNT_IFEO_SRW_RESOURCE_TRACE'})

@@ -12,6 +12,11 @@ static BOOL ZigIoName(PBYTE Image, ULONG Size, ULONG Rva, const char *Name) {
     return ZigIoRange(Size, Rva, Length) && !memcmp(Image + Rva, Name, Length);
 }
 
+static BOOL ZigIoModuleName(PBYTE Image, ULONG Size, ULONG Rva, const char *Name) {
+    ULONG Length = (ULONG)strlen(Name) + 1;
+    return ZigIoRange(Size, Rva, Length) && !_strnicmp((LPCSTR)Image+Rva, Name, Length);
+}
+
 static BOOL ZigNtIoImage(PBYTE Image, ULONG Size) {
     PIMAGE_DOS_HEADER Dos;
     PIMAGE_FILE_HEADER File;
@@ -51,9 +56,13 @@ static BOOL ZigNtIoImage(PBYTE Image, ULONG Size) {
         PIMAGE_IMPORT_DESCRIPTOR D = (PIMAGE_IMPORT_DESCRIPTOR)(Image+ImportRva+I);
         ULONG Rva;
         if (!D->Name && !D->FirstThunk && !D->OriginalFirstThunk) { End = TRUE; break; }
-        if (!ZigIoRange(Size, D->Name, 9)) return FALSE;
-        if (!(ZigIoRange(Size,D->Name,10) && !_strnicmp((LPCSTR)Image+D->Name,"ntdll.dll",10)) &&
-            _strnicmp((LPCSTR)Image+D->Name,"KxNt.dll",9)) continue;
+        if (!ZigIoRange(Size, D->Name, 1)) return FALSE;
+        // The normal VxKex rewrite mapper emits "kxnt" without an extension.
+        // Require the complete bounded name, including NUL, in either form.
+        if (!ZigIoModuleName(Image,Size,D->Name,"ntdll.dll") &&
+            !ZigIoModuleName(Image,Size,D->Name,"ntdll") &&
+            !ZigIoModuleName(Image,Size,D->Name,"kxnt.dll") &&
+            !ZigIoModuleName(Image,Size,D->Name,"kxnt")) continue;
         if (!D->OriginalFirstThunk) continue; // IAT may already contain relocated addresses.
         Rva = D->OriginalFirstThunk;
         for (J=0; ZigIoRange(Size, Rva, Bits); ++J) {
