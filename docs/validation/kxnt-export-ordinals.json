@@ -54,6 +54,7 @@
         "KexRtlIsProcessorFeaturePresent": 301,
         "KexRtlQueryPerformanceCounter": 310,
         "KexRtlQueryPerformanceFrequency": 311,
+        "KexRtlReportSilentProcessExit": 312,
         "NtAlertThreadByThreadId": 308,
         "NtWaitForAlertByThreadId": 309
       }
@@ -73,6 +74,7 @@
         "KexRtlIsProcessorFeaturePresent": 301,
         "KexRtlQueryPerformanceCounter": 310,
         "KexRtlQueryPerformanceFrequency": 311,
+        "KexRtlReportSilentProcessExit": 312,
         "NtAlertThreadByThreadId": 308,
         "NtWaitForAlertByThreadId": 309
       }

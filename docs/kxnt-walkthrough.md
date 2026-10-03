@@ -18,6 +18,7 @@
 | 拡張 rename / delete | 実装済み（通常操作。追加フラグは拒否） | Server 2008 x86 / x64、Nt / Zw 双方96ケース・各1,000回反復成功 |
 | スレッド通知・待機 / Zw 別名 | 実装済み（プロセス内の状態管理） | Server 2008 x86 / x64、Nt / Zw の native 比較・4,096スレッド反復・実 ID 再利用・終了後回収成功 |
 | RtlQueryPerformanceCounter / Frequency（既存の未解決転送） | 実装済み | Server 2008 x86 / x64、native 参照・未整列出力・例外・並列照会成功 |
+| RtlReportSilentProcessExit（起動時のリンク依存） | 入口のみ追加。NT 6.0 の終了監視は未対応 | 不正ハンドル9ケース比較・未対応エラー・反復・Zig インポート解決を検証。WER の報告成功とは扱わない |
 | ConDrv 向け NtWriteFile | 実装前調査 | Server 2008 x86 / x64 でハンドルの数値衝突・判定方法の制約を実測。実アプリの呼出し経路を調査中 |
 | WNF / ZwQueryWnfStateData | 調査段階 | 本家にも未実装があるため実機能の対応を判断する必要あり |
 | 既存の未解決 native 転送 | 調査段階 | 呼び出すアプリと API ごとに検証予定 |
@@ -377,3 +378,43 @@ VS2010 / SDK 7.1 の x86 / x64 ビルド成功。`tests/kxnt_performance_probe.c
 証跡: `docs/validation/kxnt-performance.json`（VMログ、DLL / プローブ SHA256）、`docs/validation/kxnt-performance-reference.json`（host native、VM の native 不在と Win32 の差）、`docs/validation/kxnt-export-ordinals.json`。再実行: `tests/build_kxnt_parity.ps1` → `tests/run_kxnt_performance_reference.ps1 -VMX <VMX> -GuestPassword <パスワード>` → 参照 receipt を docs/validation に保存 → `tests/run_kxnt_processor_feature_vm.ps1 -Probe performance -VMX <VMX> -GuestPassword <パスワード>`。診断終了コードを無視せず、参照 runner 内で予定した5 / 1を明示的に照合する。
 
 Vista クライアント、native 32bit OS、標準ユーザー、実アプリ全体の回帰、OS の時計照会自体が失敗する状況は未検証。システム DLL の配備と Releases 公開は行わず、作業ブランチの Installer と専用 VM フォルダーに配置した。Zig 標準 I/O プログラムには RtlReportSilentProcessExit 等の依存が残るため、今回の API 単体成功を Zig や ConDrv 全体の起動成功とは扱わない。
+
+## 2026-10-03: Zig の残る依存と終了監視の扱い
+
+`tests/kxnt_import_resolution_probe.c` を追加し、Zig 標準 I/O プログラムの全インポートを現在の KxNt 経由で実際に GetProcAddress した。x86は61、x64は63インポート。性能カウンタ修正後に残る未解決名は両アーキテクチャとも RtlReportSilentProcessExit の1件だけだった。プローブは自作の診断 EXE を SEC_IMAGE で直接マップし、実行やディスクの編集はしない。最初の DONT_RESOLVE_DLL_REFERENCES 方式では KexDll のロード通知が x86 マップのインポート名を書き換えたため、純粋な SEC_IMAGE マップへ修正し、元の ntdll.dll / KERNEL32.dll 名を使って再測定した。
+
+### 移植の判断と限定した入口
+
+Zig 0.16.0 の `childKillWindows` は RtlReportSilentProcessExit の返却値を無視してから NtTerminateProcess を呼ぶ。通常の標準 I/O だけのプログラムでも backend vtable を通じて静的インポートに含まれ、ロード時の欠落で先に終了する。
+
+[Microsoft の終了監視仕様](https://learn.microsoft.com/en-us/windows-hardware/drivers/debugger/registry-entries-for-silent-process-exit) は Windows 7 以降の WER / SilentProcessExit 設定を前提にする。Vista に同じサービス・プロトコルはなく、本家の native 転送のコピーでは成立しない。**終了監視・レポートの実機能は移植完了と扱わない。** 成功するだけの stub を作らず、任意のプロセスを終了させたり、監視設定を書き換えたりもしない。
+
+- KexDll に KexRtlReportSilentProcessExit（ordinal312）の入口を追加。KxNt の既存 ordinal1136 / 1155 を保持したまま転送先を変更した。
+- native の API がある OS は、その API に処理を委譲する。native 委譲前の関数探索で変化する LastError / LastStatus を復元し、native 自体の結果を変更しない。
+- NT 6.0 では NULL は INVALID_PARAMETER、無効・閉じたハンドルは INVALID_HANDLE、Thread / Event 型は INVALID_PARAMETER。NtQueryObject の型情報で Process であることを確認するため、権限ゼロのプロセスハンドルも分類できる。
+- 有効な Process ハンドルには STATUS_NOT_SUPPORTED を返す。**報告成功の代用ではなく、呼出し元が明示的な未対応結果を扱えるようにする ABI の入口。** レジストリ・WER 報告・プロセス状態は変更しない。NT 6.0 の入口は LastError / LastStatus を保持する。
+
+今後、終了監視を実際に要求するアプリに対応する場合は、WER への通知または独立した監視基盤の設計と検証が必要。今回のバインド成功だけを機能対応数に加えない。
+
+### 検証
+
+`tests/kxnt_silent_exit_probe.c` でホスト native と Server 2008 x86 WOW64 / x64 の入口を比較した。NULL、不正、self、thread、event、実 self、closed、権限ゼロ self、QUERY_LIMITED self の9ケース。不正ハンドルの NTSTATUS / 例外なし / LastError は native に一致し、有効なプロセス4ケースは NT 6.0 の方針として SUCCESS ではなく NOT_SUPPORTED を要求した。自プロセスが STILL_ACTIVE のままであることも確認。
+
+NT 6.0 の有効な Process の未対応返却を1,000回反復、計測ハンドル増加0。cold 起動時の全資源の作成スタックまで分類したものではない。native の正常プロセスに対する SUCCESS は参照値として取得したが、ホストでの WER レポート実作成の検証は行っていない。LastStatus の専用照合はこのプローブにはまだない（実装で保存・復元する）。
+
+Zig の全インポートも再検査し、両アーキテクチャで未解決0になった。KxNt / KexDll は VM 専用フォルダーの新しい DLL、kernel32 は system の DLL であることをログのパスで確認した。これだけではプログラムの動作成功にならない。
+
+証跡: `docs/validation/kxnt-silent-exit.json`（native / VM 生ログ、インポート解決、DLL / プローブ / Zig EXE SHA256）。再実行は `tests/build_kxnt_parity.ps1` → `tests/run_kxnt_silent_exit_vm.ps1 -VMX <VMX> -GuestPassword <パスワード>`。Zig のテスト EXE は事前に `tests/run_kxnt_zig_native_reference.ps1` でビルドする。性能カウンタの x86 / x64 回帰試験を再実行し成功、全4配布 DLL の既存 ordinal 変更0も再確認した。
+
+### ConDrv の実際の失敗へ到達
+
+`tests/prepare_kxnt_private_image.py` で自作の Zig 診断 EXE の別コピーだけを用意し、ntdll の import descriptor を KxNt.dll へ変更した。元 EXE、ユーザーのアプリ、IFEO、システム配備は変更していない。この私設ロード経路は通常の VxKex 有効化経路全体の回帰試験の代わりではない。
+
+VM の native launch probe から x86 / x64 のコピーを実際に起動すると、元の ENTRYPOINT_NOT_FOUND ではなく子の終了1になった。さらに x64 の CDB 6.12 で診断コピーを起動し、最初の互換性関連ブレークを捕捉した。
+
+- 新しい専用 KxNt / KexDll がロード済み。
+- NtWriteFile の入口で RCX=7（標準出力）、RDX=0（イベントなし）、Length=0x28（40バイト）。Zig の標準 I/O 呼出しスタックを記録した。
+- `gu` で関数から戻るまで実行し、RAX=c0000024（STATUS_OBJECT_TYPE_MISMATCH）を取得。先の Vista stdout が NT 側で Key と見える測定と整合する。
+- RtlReportSilentProcessExit にも breakpoint を設定し、最初に止まったのは NtWriteFile。戻り値取得後は全 breakpoint を解除して終了させたので、終了後まで report 関数が一切呼ばれないことをこのログだけで主張しない。
+
+証跡: `docs/validation/kxnt-zig-console-trace.json`（元と私設 EXE のハッシュ、CDB コマンド、CP932で読んだ生ログ、debugger 終了ログ）。拡張 DLL と PDB が不足する警告はあるが、native export の breakpoint・レジスタ・戻り値の取得は成功した。コンソール表示や文字符号の成功はまだ確認していない。次はこの実際の呼出しに対し、適用プロファイルとコンソール判定を実装する。

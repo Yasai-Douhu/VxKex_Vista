@@ -433,6 +433,8 @@ KEXAPI BOOLEAN NTAPI KexRtlIsProcessorFeaturePresent(
 
 KEXAPI ULONG NTAPI KexRtlQueryPerformanceCounter(OUT PLARGE_INTEGER Counter);
 KEXAPI ULONG NTAPI KexRtlQueryPerformanceFrequency(OUT PLARGE_INTEGER Frequency);
+KEXAPI NTSTATUS NTAPI KexRtlReportSilentProcessExit(
+	IN HANDLE ProcessHandle, IN NTSTATUS ExitStatus);
 
 KEXAPI BOOLEAN NTAPI KexRtlIsPackageSid(IN PSID Sid);
 KEXAPI BOOLEAN NTAPI KexRtlIsCapabilitySid(IN PSID Sid);

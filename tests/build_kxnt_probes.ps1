@@ -40,3 +40,7 @@ if ($LASTEXITCODE) { throw "Console classification probe build failed ($Architec
 if ($LASTEXITCODE) { throw "Native launch probe build failed ($Architecture)" }
 & cl.exe /nologo /MT /O1 /W4 "/Fo$out\performance.obj" "/Fe$out\performance.exe" "$PSScriptRoot\kxnt_performance_probe.c" /link /SUBSYSTEM:CONSOLE,6.0
 if ($LASTEXITCODE) { throw "Performance counter probe build failed ($Architecture)" }
+& cl.exe /nologo /MT /O1 /W4 "/Fo$out\silent-exit.obj" "/Fe$out\silent-exit.exe" "$PSScriptRoot\kxnt_silent_exit_probe.c" /link /SUBSYSTEM:CONSOLE,6.0
+if ($LASTEXITCODE) { throw "Silent exit probe build failed ($Architecture)" }
+& cl.exe /nologo /MT /O1 /W4 "/Fo$out\import-resolution.obj" "/Fe$out\import-resolution.exe" "$PSScriptRoot\kxnt_import_resolution_probe.c" /link /SUBSYSTEM:CONSOLE,6.0
+if ($LASTEXITCODE) { throw "Import resolution probe build failed ($Architecture)" }

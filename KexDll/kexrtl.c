@@ -23,6 +23,51 @@
 #include "kexdllp.h"
 #include <limits.h>
 
+// Silent-exit monitoring needs the Windows 7+ WER service protocol. NT 6.0
+// cannot submit such a report. Keep optional instrumentation bindable without
+// claiming that a report was made: validate the process handle, then report
+// NOT_SUPPORTED. On systems with the real API, delegate all behavior to it.
+KEXAPI NTSTATUS NTAPI KexRtlReportSilentProcessExit(
+	IN HANDLE ProcessHandle, IN NTSTATUS ExitStatus)
+{
+	typedef NTSTATUS (NTAPI *REPORT_FUNCTION)(HANDLE, NTSTATUS);
+	REPORT_FUNCTION Native;
+	PTEB Teb = NtCurrentTeb();
+	ULONG OldError = Teb->LastErrorValue;
+	NTSTATUS OldStatus = Teb->LastStatusValue;
+	NTSTATUS Status;
+	union {
+		ULONG_PTR Alignment;
+		BYTE Bytes[512];
+	} TypeBuffer;
+	POBJECT_TYPE_INFORMATION Type;
+	UNICODE_STRING ProcessType;
+	ULONG Required;
+	try {
+		Native = (REPORT_FUNCTION) GetProcAddress(
+			GetModuleHandleW(L"ntdll.dll"), "RtlReportSilentProcessExit");
+	} finally {
+		Teb->LastErrorValue = OldError;
+		Teb->LastStatusValue = OldStatus;
+	}
+	if (Native) return Native(ProcessHandle, ExitStatus);
+	try {
+		if (!ProcessHandle) return STATUS_INVALID_PARAMETER;
+		Status = NtQueryObject(ProcessHandle, ObjectTypeInformation,
+			TypeBuffer.Bytes, sizeof(TypeBuffer.Bytes), &Required);
+		if (!NT_SUCCESS(Status)) return Status;
+		Type = (POBJECT_TYPE_INFORMATION) TypeBuffer.Bytes;
+		RtlInitConstantUnicodeString(&ProcessType, L"Process");
+		if (!RtlEqualUnicodeString(&Type->TypeName, &ProcessType, FALSE)) {
+			return STATUS_INVALID_PARAMETER;
+		}
+		return STATUS_NOT_SUPPORTED;
+	} finally {
+		Teb->LastErrorValue = OldError;
+		Teb->LastStatusValue = OldStatus;
+	}
+}
+
 // NT 6.0 has the underlying clocks, but not these RTL exports. Query into a
 // local aligned value: the old Win32 wrappers reject unaligned user pointers
 // and translate kernel probing failures to LastError. Modern RTL instead
