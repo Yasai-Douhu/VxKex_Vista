@@ -24,6 +24,7 @@
 | ConDrv 向け NtWriteFile / ZwWriteFile | NT-I/O 内容プロファイルに限定した同期書込みを実装 | Server 2008 x86 / x64、実 Zig 標準出力・ファイル・パイプ、境界・衝突・並行・VT 成功。native の UTF-8 描画制限、通常 IFEO 起動の統合検証は残る |
 | WNF / ZwQueryWnfStateData | 調査段階 | 本家にも未実装があるため実機能の対応を判断する必要あり |
 | 既存の未解決 native 転送 | 調査段階 | 呼び出すアプリと API ごとに検証予定 |
+| NtOpenKeyEx（既存の未解決転送） | 実装前の契約・代替基盤を調査 | Server 2008 WOW64 / x64のOBJ_OPENLINKによるリンク自身のopenを確認。backup / restoreは未対応・未検証 |
 
 ## 2026-10-02: RtlIsProcessorFeaturePresent
 
@@ -528,3 +529,26 @@ VS2010 / SDKの両ビルド成功。ホストnative、ホストKxNtからnative�
 証跡: `docs/validation/kxnt-utf8.json` と更新した `kxnt-utf8-reference.json`（native / VM / lookup対照 / source・DLL・EXE SHA256）、回帰receipt。再実行: `tests/build_kxnt_parity.ps1` → `tests/run_kxnt_utf8_vm.ps1 -VMX <VMX> -GuestPassword <パスワード>`。参照採取もrunner内で順番に行い、native不在の終了5以外の失敗を無視しない。
 
 作業ブランチInstallerとVM専用フォルダーへの配備。Vistaクライアント、native32bit OS、標準ユーザー、通常IFEO起動、全scheduler interleaving、4GB入力、全overlap、不正pointerの全配置は未検証。システムDLL / Releasesは変更していない。KxNt移植全体は継続中。
+
+## 2026-10-03: 残る native 転送の再集計とレジストリopenの測定
+
+VMのSystem32 / SysWOW64からnative ntdllを改めて取得し、machine種別を照合して現在のInstallerを検査した。`tests/audit_kxnt_native_forwarders.py` は明示したDLL snapshotと基準コミット24a03aeに対し、公開名、ordinal転送、native named転送先を解析して再現可能なJSONを出力する。対象DLLのSHA256も保存した。
+
+| 形式 | 基準のnamed export数 | 現在 | native未解決: 基準 → 現在 |
+|---|---:|---:|---:|
+| x86 WOW64 | 2,055 | 2,067 | 175 → 168 |
+| x64 | 2,015 | 2,027 | 191 → 184 |
+
+基準の公開名 / ordinal名の削除は0、新たな未解決native named転送も0。減少した7件はPerformanceCounter / Frequency、SilentProcessExit、SRW試行取得2件、UTF変換2件。これは**リンク先が存在することの検査**であり、SilentProcessExitの終了監視機能や、全アプリ・全呼出しの成功を意味しない。残り168 / 184件の全てが必要な移植対象だと判断したものでもない。資料: `docs/validation/kxnt-native-forwarders.json`。元の移植可能性調査は基準時点の記録として維持した。
+
+### NtOpenKeyEx の読み取り専用プローブ
+
+[Microsoft の ZwOpenKeyEx 仕様](https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/wdm/nf-wdm-zwopenkeyex) でWindows 7以降の追加とOpenOptionsの契約を確認した。`tests/kxnt_open_key_reference_probe.c` / runnerを追加し、ホストnativeのOpenOptionsと旧NtOpenKeyの挙動、およびServer 2008の旧NtOpenKeyを比較した。HKLM SYSTEM、既存のCurrentControlSetリンク、存在しないキー名を読取りで開く試験であり、キーや値を作成・削除・変更していない。privilegeも変更していない。
+
+- Server 2008のWOW64 / x64でNtOpenKeyExは不在（終了5を明示照合）。旧NtOpenKeyでは通常指定でCurrentControlSetのリンク先ControlSet001を開き、OBJECT_ATTRIBUTESのOBJ_OPENLINK（0x100）を付けるとリンク自身CurrentControlSetを開く。実handleをNtQueryKeyで照会して区別し、全handleを閉じた。
+- ホストnativeのNtOpenKeyEx options0 / 8と旧NtOpenKeyの属性0x40 / 0x140で、それぞれ通常open / リンク自身openを確認。この基盤ならREG_OPTION_OPEN_LINKを扱える見込みがある。まだ互換関数・転送先変更は実装していない。
+- ホストの通常キーにbackup / restore（4 / 12）を指定するとACCESS_DENIED、通常openは成功。欠落キーはどちらもOBJECT_NAME_NOT_FOUND。権限の差と検証順序を無視して旧APIへそのまま転送してはならない。
+- ホストの不正options1 / 2 / 0xffffffffはINVALID_PARAMETER_4で出力handleがsentinelのまま。既存キー・欠落キーの通常エラーはhandleを変更した。追加測定では現在のnativeはoptions0x10を受理したが、意味とVistaでの代替は未確認。Windows 7の全options契約を確定したものではない。
+- 全試験でLastError / LastStatus維持、取得成功handleの型をキー名照会で確認。通常キー3種類の読み取り・TLSの測定であり、standard user、backup権限を有効化したtoken、保護キー、アクセス拒否ACL、削除競合、不正pointer、相対RootDirectory、WOW64 view指定は未検証。
+
+証跡: `docs/validation/kxnt-open-key-reference.json`（native / legacy / VM rawログ、source・EXE SHA256）。ビルドは両アーキテクチャの `tests/build_kxnt_probes.ps1`、実行は `tests/run_kxnt_open_key_reference.ps1 -VMX <VMX> -GuestPassword <パスワード>`。静的再集計は `tests/audit_kxnt_native_forwarders.py --native-x86 <SysWOW64のsnapshot> --native-x64 <System32のsnapshot>`。今回の追加は診断EXE / 検査ツール / 記録のみで、配布DLLやシステムDLL、Releasesは変更していない。

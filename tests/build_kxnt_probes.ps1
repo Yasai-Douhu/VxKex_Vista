@@ -52,3 +52,5 @@ if ($LASTEXITCODE) { throw "ConDrv probe build failed ($Architecture)" }
 if ($LASTEXITCODE) { throw "SRW lock probe build failed ($Architecture)" }
 & cl.exe /nologo /MT /O1 /W4 "/Fo$out\utf8.obj" "/Fe$out\utf8.exe" "$PSScriptRoot\kxnt_utf8_probe.c" /link /SUBSYSTEM:CONSOLE,6.0
 if ($LASTEXITCODE) { throw "UTF conversion probe build failed ($Architecture)" }
+& cl.exe /nologo /MT /O1 /W4 "/Fo$out\open-key-reference.obj" "/Fe$out\open-key-reference.exe" "$PSScriptRoot\kxnt_open_key_reference_probe.c" /link /SUBSYSTEM:CONSOLE,6.0
+if ($LASTEXITCODE) { throw "Registry open reference probe build failed ($Architecture)" }
