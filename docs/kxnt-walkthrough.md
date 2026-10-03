@@ -14,7 +14,7 @@
 | RtlIsPackageSid | 完了 | Server 2008 x86 / x64、native 参照との比較成功 |
 | RtlIsCapabilitySid | 完了 | Server 2008 x86 / x64、native 参照との比較成功 |
 | RtlCheckTokenMembershipEx | 完了（NT 6.0 の通常トークン） | Server 2008 x86 / x64、native 比較と反復検証成功 |
-| ZwCompareObjects / NtCompareObjects 精度改善 | 実装済み | Server 2008 x86 / x64 native 比較・並列検証成功。初回初期化の資源増加は継続確認 |
+| ZwCompareObjects / NtCompareObjects 精度改善 | 実装済み | Server 2008 x86 / x64 native 比較・並列検証成功。DLL 未読込みの対照でもコンソール初期化資源の増加を確認 |
 | 拡張 rename / delete | 未着手 | 未実施 |
 | スレッド通知・待機 / Zw 別名 | 未着手 | 未実施 |
 | ConDrv 向け NtWriteFile | 未着手 | 未実施 |
@@ -226,8 +226,20 @@ Server 2008 x86 WOW64 / x64 で次を検証した。
 
 ### 継続確認する事項
 
-初回の並列処理ではプロセス内ハンドルが増えた（保存した最新ログは x86 6、x64 7）。比較処理を実行しない対照の thread 起動・終了でも増加 1 を観測した。初期化後の計測区間では数・識別情報・型が一致したが、初回増加の発生元の完全な分類は未完了。これを初回から資源増加ゼロと解釈しない。配布前の確認事項として保持する。
+初回の並列処理ではプロセス内ハンドルが増えた（当初の保存ログは x86 6、x64 7）。以下の対照テストを追加し、比較 API を呼ばず KexDll も読み込まないプロセスでも、コンソール初期化資源が増えることを確認した。初回から資源増加ゼロとは扱わない。個々のイベントの作成スタックまで特定したものではない。
 
 Vista クライアント、native 32bit OS、標準ユーザー / 制限トークン、大規模なハンドル表、native ntdll が 4GB 以上にある配置、他スレッドによる入力ハンドルの close / 再利用競合は未検証。複製後のオブジェクトは保持する設計だが、複製前の入力変更まで atomic な native syscall と同じに扱えると主張しない。
 
 参照結果: `docs/validation/kxnt-compare-reference.json`。VM 出力・DLL / プローブ SHA256: `docs/validation/kxnt-compare.json`。再実行: `tests/run_kxnt_processor_feature_vm.ps1 -Probe compare`。diagnostic 行はポインターや環境固有の初期化を記録し、native 参照の固定値比較から除く。計測前後の識別情報・型は別途 runner 内で厳密に比較している。
+
+### 初期化資源の対照検証
+
+`tests/run_kxnt_compare_controls_vm.ps1` で x86 / x64 の各6モードを実行し、初期・計測前・計測後のハンドル集合、キー名、取得できるプロセスイメージを保存した。
+
+- NoQuery: worker は比較処理を呼ばない。LookupOnly: native エクスポートの検索のみ。AllocateOnly: ヒープ確保と解放のみ。SystemOnly: ヒープ上のバッファへ native NtQuerySystemInformation のみ。
+- IdleOnly: worker は各区間で2秒待機。ConsoleOnly: 同じ待機を行い、KxNt の LoadLibrary 自体を省略する。ConsoleOnly は KexDllLoaded=0、CompareCases=0 をスクリプトで検査する。
+- ConsoleOnly の x86 でも SysWOW64 の conime.exe、Nls\\CustomLocale キーが追加された。x64 では System32 の conime.exe と CurrentVersion / AppCompatFlags のキーが追加された。互換 DLL と比較 API がなくても再現するため、これらの増加を今回の比較用複製ハンドルの漏れとは扱わない。
+- ConsoleOnly を含め診断用の native 情報照会は行う。他5モードは資源計測を終えた後に共通の16ケースを検証するため、プロセスの全期間で比較 API 未使用という意味ではない。
+- 保存した12モードの終了コードはすべて0、計測前後の集合変化も0。本検証も再実行し、Nt / Zw の16ケースと並列計測800回が両アーキテクチャで成功した。
+
+ログとバイナリ・プローブ SHA256 は `docs/validation/kxnt-compare-controls.json`。短い区間では非同期初期化のタイミングが変わるため、対照スクリプトは非ゼロ結果も記録する。本検証の native 比較・資源不変ゲートを置き換えたり緩和したりしない。コンソール作成の背景: [Microsoft](https://learn.microsoft.com/en-us/windows/console/creation-of-a-console)、Vista の conime に関する開発者資料: [ConEmu](https://conemu.github.io/en/FAQ-8.html)。OS の IME 設定変更や conime 無効化は実施していない。

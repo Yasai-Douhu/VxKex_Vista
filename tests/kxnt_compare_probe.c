@@ -13,13 +13,16 @@ static unsigned cases, failures;
 static void diagnosticHandles(const char *phase)
 {
     typedef LONG (WINAPI *OBJECT_FN)(HANDLE,ULONG,PVOID,ULONG,PULONG);
+    typedef LONG (WINAPI *PROCESS_FN)(HANDLE,ULONG,PVOID,ULONG,PULONG);
     struct { USHORT length,maximum; WCHAR *buffer; } *name;
     QUERY_FN query=(QUERY_FN)GetProcAddress(GetModuleHandleA("ntdll.dll"),"NtQuerySystemInformation");
     OBJECT_FN object=(OBJECT_FN)GetProcAddress(GetModuleHandleA("ntdll.dll"),"NtQueryObject");
+    PROCESS_FN process=(PROCESS_FN)GetProcAddress(GetModuleHandleA("ntdll.dll"),"NtQueryInformationProcess");
     ULONG bytes=4*1024*1024,needed;
     TABLE *table=(TABLE*)malloc(bytes);
     ULONG_PTR i;
     BYTE buffer[4096];
+    BYTE nameBuffer[4096];
     if(table && query(64,table,bytes,&needed)>=0){
         for(i=0;i<table->count && i<(bytes-2*sizeof(ULONG_PTR))/sizeof(ENTRY);++i){
             ENTRY *entry=&table->entries[i];
@@ -27,11 +30,20 @@ static void diagnosticHandles(const char *phase)
             if(object((HANDLE)entry->handle,2,buffer,sizeof(buffer),&needed)<0)continue;
             name=(void*)buffer;
             fprintf(out,"Diagnostic %s Handle=%Ix Object=%p Type=%.*ls\n",phase,entry->handle,entry->object,name->length/2,name->buffer);
+            if(name->length==6 && memcmp(name->buffer,L"Key",6)==0 &&
+               object((HANDLE)entry->handle,1,nameBuffer,sizeof(nameBuffer),&needed)>=0){
+                name=(void*)nameBuffer;
+                fprintf(out,"Diagnostic %s Key=%.*ls\n",phase,name->length/2,name->buffer);
+            } else if(name->length==14 && memcmp(name->buffer,L"Process",14)==0 &&
+               process((HANDLE)entry->handle,27,nameBuffer,sizeof(nameBuffer),&needed)>=0){
+                name=(void*)nameBuffer;
+                fprintf(out,"Diagnostic %s ProcessImage=%.*ls\n",phase,name->length/2,name->buffer);
+            }
         }
     }
     free(table);
 }
-typedef struct { HANDLE gate,run,done,exit,first,duplicate,other; unsigned failures; int noQuery; } WORKER;
+typedef struct { HANDLE gate,run,done,exit,first,duplicate,other; unsigned failures; int mode; } WORKER;
 static DWORD WINAPI worker(void *argument)
 {
     WORKER *context=(WORKER*)argument;
@@ -39,8 +51,27 @@ static DWORD WINAPI worker(void *argument)
     if(WaitForSingleObject(context->gate,10000)!=WAIT_OBJECT_0){++context->failures;return 1;}
     for(phase=0;phase<2;++phase){
         if(phase && WaitForSingleObject(context->run,10000)!=WAIT_OBJECT_0){++context->failures;return 1;}
+        if(context->mode==5 || context->mode==6)Sleep(2000);
         for(i=0;i<100;++i){
-            if(context->noQuery)continue;
+            if(context->mode==1 || context->mode==5 || context->mode==6)continue;
+            if(context->mode==2){
+                GetProcAddress(GetModuleHandleW(L"ntdll.dll"),"NtCompareObjects");
+                GetProcAddress(GetModuleHandleW(L"ntdll.dll"),"NtWow64QueryInformationProcess64");
+                GetProcAddress(GetModuleHandleW(L"ntdll.dll"),"NtWow64ReadVirtualMemory64");
+                continue;
+            }
+            if(context->mode==3 || context->mode==4){
+                void *memory=HeapAlloc(GetProcessHeap(),0,65536);
+                if(!memory){++context->failures;continue;}
+                if(context->mode==4){
+                    QUERY_FN query=(QUERY_FN)GetProcAddress(GetModuleHandleW(L"ntdll.dll"),"NtQuerySystemInformation");
+                    ULONG returned;
+                    LONG status=query(64,memory,65536,&returned);
+                    if(status<0 && (ULONG)status!=0xc0000004)++context->failures;
+                }
+                HeapFree(GetProcessHeap(),0,memory);
+                continue;
+            }
             if(compare(context->first,context->duplicate)!=0)++context->failures;
             if((ULONG)alias(context->first,context->other)!=0xc00001ac)++context->failures;
         }
@@ -70,13 +101,18 @@ int main(int argc,char **argv)
     LONG status;
     TABLE *table;
     ULONG_PTR i;
+    int consoleOnly;
     if (argc < 3 || argc > 4) return 2;
+    consoleOnly=argc==4 && strcmp(argv[3],"ConsoleOnly")==0;
     out=fopen(argv[2],"w"); if(!out)return 3;
     fprintf(out,"ProcessBits=%u\n",(unsigned)(sizeof(void*)*8));
-    module=LoadLibraryA(argv[1]); if(!module)return 4;
-    compare=(COMPARE_FN)GetProcAddress(module,"NtCompareObjects");
-    alias=(COMPARE_FN)GetProcAddress(module,"ZwCompareObjects");
-    if(!compare || (!alias && argc != 4)){fprintf(out,"ExportMissing\n");fclose(out);return 5;}
+    if(!consoleOnly){
+        module=LoadLibraryA(argv[1]); if(!module)return 4;
+        compare=(COMPARE_FN)GetProcAddress(module,"NtCompareObjects");
+        alias=(COMPARE_FN)GetProcAddress(module,"ZwCompareObjects");
+        if(!compare || (!alias && argc != 4)){fprintf(out,"ExportMissing\n");fclose(out);return 5;}
+    }
+    fprintf(out,"Diagnostic KexDllLoaded=%u\n",GetModuleHandleW(L"KexDll.dll")!=NULL);
     first=CreateEvent(NULL,TRUE,FALSE,NULL); second=CreateEvent(NULL,TRUE,FALSE,NULL);
     mutex=CreateMutex(NULL,FALSE,NULL);
     swprintf(name,80,L"Local\\KxNtParityCompare-%lu",GetCurrentProcessId());
@@ -92,13 +128,14 @@ int main(int argc,char **argv)
     file2=CreateFileW(path,GENERIC_READ|GENERIC_WRITE,FILE_SHARE_READ|FILE_SHARE_WRITE|FILE_SHARE_DELETE,NULL,OPEN_EXISTING,0,NULL);
     if(file1==INVALID_HANDLE_VALUE || file2==INVALID_HANDLE_VALUE ||
        !DuplicateHandle(GetCurrentProcess(),file1,GetCurrentProcess(),&fileDup,0,FALSE,DUPLICATE_SAME_ACCESS))return 8;
-    if(alias){
+    if(alias || consoleOnly){
         HANDLE workers[4], done[4], gate=CreateEvent(NULL,TRUE,FALSE,NULL);
         HANDLE run=CreateEvent(NULL,TRUE,FALSE,NULL),exit=CreateEvent(NULL,TRUE,FALSE,NULL);
         WORKER contexts[4];
         DWORD before,after,initial;
         unsigned threadIndex;
         if(!gate || !run || !exit || !GetProcessHandleCount(GetCurrentProcess(),&initial))return 10;
+        diagnosticHandles("initial");
         for(threadIndex=0;threadIndex<4;++threadIndex){
             contexts[threadIndex].gate=gate;contexts[threadIndex].first=first;
             done[threadIndex]=CreateEvent(NULL,TRUE,FALSE,NULL);
@@ -106,7 +143,10 @@ int main(int argc,char **argv)
             contexts[threadIndex].run=run;contexts[threadIndex].done=done[threadIndex];contexts[threadIndex].exit=exit;
             contexts[threadIndex].duplicate=dup;contexts[threadIndex].other=second;
             contexts[threadIndex].failures=0;
-            contexts[threadIndex].noQuery=argc==4 && strcmp(argv[3],"NoQuery")==0;
+            contexts[threadIndex].mode=argc!=4?0:strcmp(argv[3],"NoQuery")==0?1:
+                strcmp(argv[3],"LookupOnly")==0?2:strcmp(argv[3],"AllocateOnly")==0?3:
+                strcmp(argv[3],"SystemOnly")==0?4:strcmp(argv[3],"IdleOnly")==0?5:
+                strcmp(argv[3],"ConsoleOnly")==0?6:0;
             workers[threadIndex]=CreateThread(NULL,0,worker,&contexts[threadIndex],0,NULL);
             if(!workers[threadIndex])return 11;
         }
@@ -119,11 +159,12 @@ int main(int argc,char **argv)
         if(!GetProcessHandleCount(GetCurrentProcess(),&after))return 13;
         diagnosticHandles("after");
         if(before!=after)++failures;
-        fprintf(out,"ConcurrentCalls=800 HandleDelta=%ld\n",(LONG)(after-before));
+        fprintf(out,"ConcurrentCalls=%u HandleDelta=%ld\n",contexts[0].mode?0:800,(LONG)(after-before));
         if(!SetEvent(exit) || WaitForMultipleObjects(4,workers,TRUE,60000)!=WAIT_OBJECT_0)return 12;
         for(threadIndex=0;threadIndex<4;++threadIndex){failures+=contexts[threadIndex].failures;CloseHandle(workers[threadIndex]);CloseHandle(done[threadIndex]);}
         CloseHandle(gate);CloseHandle(run);CloseHandle(exit);
     }
+    if(!consoleOnly){
     test("same-handle",first,first,0);
     test("duplicate",first,dup,0);
     test("distinct-unnamed-events",first,second,0xc00001ac);
@@ -141,6 +182,7 @@ int main(int argc,char **argv)
     test("invalid-same",(HANDLE)(ULONG_PTR)0x123456,(HANDLE)(ULONG_PTR)0x123456,0xc0000008);
     closed=CreateEvent(NULL,TRUE,FALSE,NULL); CloseHandle(closed);
     test("closed-handle",closed,first,0xc0000008);
+    }
     // Diagnostic only: compare the WOW64/native layouts without treating a
     // truncated kernel pointer as proof of complete object identity.
     query=(QUERY_FN)GetProcAddress(GetModuleHandleA("ntdll.dll"),"NtQuerySystemInformation");
