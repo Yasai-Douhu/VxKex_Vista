@@ -30,3 +30,5 @@ if ($LASTEXITCODE) { throw "SID classification probe build failed ($Architecture
 if ($LASTEXITCODE) { throw "Token membership probe build failed ($Architecture)" }
 & cl.exe /nologo /MT /O1 /W4 "/Fo$out\compare.obj" "/Fe$out\compare.exe" "$PSScriptRoot\kxnt_compare_probe.c" /link /SUBSYSTEM:CONSOLE,6.0
 if ($LASTEXITCODE) { throw "Object comparison probe build failed ($Architecture)" }
+& cl.exe /nologo /MT /O1 /W4 "/Fo$out\file-information.obj" "/Fe$out\file-information.exe" "$PSScriptRoot\kxnt_file_information_probe.c" /link /SUBSYSTEM:CONSOLE,6.0
+if ($LASTEXITCODE) { throw "File information probe build failed ($Architecture)" }

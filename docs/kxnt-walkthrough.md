@@ -15,7 +15,7 @@
 | RtlIsCapabilitySid | 完了 | Server 2008 x86 / x64、native 参照との比較成功 |
 | RtlCheckTokenMembershipEx | 完了（NT 6.0 の通常トークン） | Server 2008 x86 / x64、native 比較と反復検証成功 |
 | ZwCompareObjects / NtCompareObjects 精度改善 | 実装済み | Server 2008 x86 / x64 native 比較・並列検証成功。DLL 未読込みの対照でもコンソール初期化資源の増加を確認 |
-| 拡張 rename / delete | 未着手 | 未実施 |
+| 拡張 rename / delete | 実装済み（通常操作。追加フラグは拒否） | Server 2008 x86 / x64、Nt / Zw 双方96ケース・各1,000回反復成功 |
 | スレッド通知・待機 / Zw 別名 | 未着手 | 未実施 |
 | ConDrv 向け NtWriteFile | 未着手 | 未実施 |
 | WNF / ZwQueryWnfStateData | 調査段階 | 本家にも未実装があるため実機能の対応を判断する必要あり |
@@ -243,3 +243,33 @@ Vista クライアント、native 32bit OS、標準ユーザー / 制限トー�
 - 保存した12モードの終了コードはすべて0、計測前後の集合変化も0。本検証も再実行し、Nt / Zw の16ケースと並列計測800回が両アーキテクチャで成功した。
 
 ログとバイナリ・プローブ SHA256 は `docs/validation/kxnt-compare-controls.json`。短い区間では非同期初期化のタイミングが変わるため、対照スクリプトは非ゼロ結果も記録する。本検証の native 比較・資源不変ゲートを置き換えたり緩和したりしない。コンソール作成の背景: [Microsoft](https://learn.microsoft.com/en-us/windows/console/creation-of-a-console)、Vista の conime に関する開発者資料: [ConEmu](https://conemu.github.io/en/FAQ-8.html)。OS の IME 設定変更や conime 無効化は実施していない。
+
+## 2026-10-03: 拡張 rename / delete
+
+### 実施内容
+
+- NEXT の Ext_NtSetInformationFile を基に、FileDispositionInformationEx (64) / FileRenameInformationEx (65) を NT 6.0 の旧情報クラス13 / 10へ変換する実装を追加した。Server 2008 の native では両拡張クラスが STATUS_INVALID_INFO_CLASS となることも実測した。
+- 削除フラグ0 / DELETE (1)、rename フラグ0 / REPLACE_IF_EXISTS (1) を扱う。POSIX、readonly 属性無視、ON_CLOSE、その他の追加フラグは STATUS_NOT_SUPPORTED。NEXT のように無視して成功させない。新しいファイルシステム機能を再現したものではない。
+- rename はヘッダーと名前だけをヒープに取り込み、入力バッファを変更しない。名前長と入力長を減算で検査し、整数オーバーフローを避ける。奇数・空・不足した名前は拒否、65,534バイトを超える名前は STATUS_NAME_TOO_LONG。入力長に比例するスタック確保や、不要な末尾バイトの読み取りをしない。
+- RootDirectory と可変長 Unicode 名を保持する。通常の情報クラスは native NtSetInformationFile へ委譲する。NTSTATUS / IO_STATUS_BLOCK を返し、Win32 LastError を保持する。
+- KexDll ordinal 307 で公開。KxNt の既存 NtSetInformationFile / ZwSetInformationFile をこの関数へ転送し、x86 / x64 双方の既存 ordinal を維持した。全4配布 DLL の公開番号検査は変更0件。
+
+仕様と導入時期: [Microsoft FILE_INFORMATION_CLASS](https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/wdm/ne-wdm-_file_information_class)、[rename のレイアウトとフラグ](https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/ns-ntifs-_file_rename_information)、[拡張削除の意味](https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-fscc/2e860264-018a-47b3-8555-565a13b35a45)。拡張クラスは Windows 10 世代の機能であり、旧操作の API 自体が Vista にないという意味ではない。
+
+### 検証範囲
+
+`tests/kxnt_file_information_probe.c` を VS2010 / SDK 7.1 でビルドし、Server 2008 x86 WOW64 / x64 の実際の KxNt → KexDll 経路を検証した。各アーキテクチャ96ケース、失敗0。通常操作は別々に作成したファイルへ拡張クラスと同じ VM の native 旧クラスを適用し、返却値・IO_STATUS_BLOCK・元と先のファイル存在・内容を比較する。成功すべきケースは STATUS_SUCCESS と実際の移動・削除も必須条件にする。
+
+- 絶対名、Unicode 名、RootDirectory 相対名、衝突・置換、readonly の置換先、DELETE 権限なし。
+- 削除設定・解除、readonly ファイル、DELETE 権限なし。FILE_FLAG_OVERLAPPED で開いたハンドルも通常操作を確認（今回のローカル NTFS では同期的に完了）。
+- 追加フラグ、短い・長い削除構造、短い rename ヘッダー、NULL、空・奇数・不足・オーバーフローする名前長、長すぎる名前。
+- ヘッダー・名前・削除フラグのガードページ、書き込み不可の IO_STATUS_BLOCK。拒否後も元ファイルと置換先の内容が維持される。
+- readonly 入力と直後のガードページに、0xffffffff の入力長と短い実名を指定。巨大確保・末尾読み取りをせず成功し、入力は不変。
+- 通常の FilePositionInformation と不正ハンドルの結果を native と比較。全呼び出しで LastError を確認。
+- Nt / Zw ごとに1,000回の交互 rename を行い、計測ハンドル増加0、最後のファイル内容も維持。初回の短い計測は x86 で増加5、続く Zw 区間は0だった。先のコンソール初期化対照を踏まえ、成功呼び出し後に2秒待機してから測定するようにした。初期資源の個々の作成スタックを、このファイルプローブで分類したものではない。
+
+ホストの native ntdll でも通常操作34ケースを Nt / Zw 双方で実行し、x86 / x64 成功。未対応フラグの拒否などは Vista 版の明示的な方針を検証しており、現行 Windows の拡張機能すべてとの結果一致を主張しない。
+
+VM 出力と DLL / プローブ SHA256: `docs/validation/kxnt-file-information.json`。ホスト native 出力: `docs/validation/kxnt-file-information-reference.json`。再実行は `tests/build_kxnt_parity.ps1` → `tests/run_kxnt_processor_feature_vm.ps1 -Probe file-information`。ホストの通常操作参照は `file-information.exe ntdll.dll <出力ファイル> Native`。
+
+残る範囲: Vista クライアント、native 32bit OS、標準ユーザー、実アプリ、ネットワーク・他ファイルシステム、実際に pending となる I/O、同時 rename / delete 競合、追加フラグの意味の実装。新 DLL は作業ブランチの Installer と VM の専用検証フォルダーへ配置し、システム配備や Releases 公開は行っていない。

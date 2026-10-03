@@ -3,7 +3,7 @@ param(
     [Parameter(Mandatory=$true)][string]$GuestPassword,
     [string]$GuestUser = 'Administrator',
     [string]$GuestDirectory = 'C:\KxNtParity',
-    [ValidateSet('processor-feature','domain','device-family','persisted-state','sid-package','sid-capability','membership','compare')][string]$Probe = 'processor-feature',
+    [ValidateSet('processor-feature','domain','device-family','persisted-state','sid-package','sid-capability','membership','compare','file-information')][string]$Probe = 'processor-feature',
     [string]$VMRun = 'C:\Program Files\VMware\VMware Workstation\vmrun.exe'
 )
 $ErrorActionPreference = 'Stop'
@@ -59,6 +59,9 @@ foreach ($arch in @('x86','x64')) {
         if (!$before.Count -or !$after.Count -or (Compare-Object $before $after)) {
             throw "Comparison changed live handle identities/types during measured calls ($arch)"
         }
+    }
+    if ($Probe -eq 'file-information' -and ($text -notmatch 'FileInformationCases=96 Failures=0' -or ([regex]::Matches($text,'RepeatCalls=1000 HandleDelta=0')).Count -ne 2)) {
+        throw "File information checks missing ($arch)"
     }
     if ($Probe -eq 'domain' -or $Probe -eq 'persisted-state' -or $Probe -like 'sid-*' -or $Probe -eq 'membership' -or $Probe -eq 'compare') {
         $reference = Get-Content -Raw "$root\docs\validation\kxnt-$Probe-reference.json" | ConvertFrom-Json

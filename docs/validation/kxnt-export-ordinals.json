@@ -36,6 +36,7 @@
       "BaselineNames": 103,
       "OrdinalChanges": {},
       "NewExports": {
+        "Ext_NtSetInformationFile": 307,
         "KexRtlCanonicalizeDomainName": 300,
         "KexRtlCheckTokenMembershipEx": 306,
         "KexRtlGetDeviceFamilyInfoEnum": 302,
@@ -50,6 +51,7 @@
       "BaselineNames": 103,
       "OrdinalChanges": {},
       "NewExports": {
+        "Ext_NtSetInformationFile": 307,
         "KexRtlCanonicalizeDomainName": 300,
         "KexRtlCheckTokenMembershipEx": 306,
         "KexRtlGetDeviceFamilyInfoEnum": 302,

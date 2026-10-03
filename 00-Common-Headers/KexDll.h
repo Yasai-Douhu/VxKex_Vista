@@ -286,6 +286,13 @@ typedef PVOID TYPEDEF_TYPE_NAME(DLL_DIRECTORY_COOKIE);
 
 #pragma region Nt* functions
 
+KEXAPI NTSTATUS NTAPI Ext_NtSetInformationFile(
+	IN HANDLE FileHandle,
+	OUT PIO_STATUS_BLOCK IoStatusBlock,
+	IN PVOID FileInformation,
+	IN ULONG FileInformationLength,
+	IN FILE_INFORMATION_CLASS FileInformationClass);
+
 KEXAPI NTSTATUS NTAPI NtCompareObjects(
 	IN	HANDLE	FirstObjectHandle,
 	IN	HANDLE	SecondObjectHandle);
