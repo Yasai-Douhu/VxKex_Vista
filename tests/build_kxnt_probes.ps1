@@ -48,3 +48,5 @@ if ($LASTEXITCODE) { throw "Import resolution probe build failed ($Architecture)
 if ($LASTEXITCODE) { throw "Console profile import library failed ($Architecture)" }
 & cl.exe /nologo /MT /O1 /W4 "/Fo$out\condrv.obj" "/Fe$out\condrv.exe" "$PSScriptRoot\kxnt_condrv_probe.c" /link /SUBSYSTEM:CONSOLE,6.0 "$out\condrv-imports.lib"
 if ($LASTEXITCODE) { throw "ConDrv probe build failed ($Architecture)" }
+& cl.exe /nologo /MT /O1 /W4 "/Fo$out\srw.obj" "/Fe$out\srw.exe" "$PSScriptRoot\kxnt_srw_probe.c" /link /SUBSYSTEM:CONSOLE,6.0
+if ($LASTEXITCODE) { throw "SRW lock probe build failed ($Architecture)" }

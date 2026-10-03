@@ -1,5 +1,7 @@
 LIBRARY "KexDll.dll"
 EXPORTS
+	KexRtlTryAcquireSRWLockExclusive @314
+	KexRtlTryAcquireSRWLockShared @315
 	Ext_NtWriteFile @313
 	KexRtlReportSilentProcessExit @312
 	KexRtlQueryPerformanceCounter @310

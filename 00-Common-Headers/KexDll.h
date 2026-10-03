@@ -318,6 +318,9 @@ KEXAPI NTSTATUS NTAPI KexDataInitialize(
 
 #pragma region KexRtl* functions
 
+KEXAPI BOOLEAN NTAPI KexRtlTryAcquireSRWLockExclusive(PRTL_SRWLOCK Lock);
+KEXAPI BOOLEAN NTAPI KexRtlTryAcquireSRWLockShared(PRTL_SRWLOCK Lock);
+
 KEXAPI INT NTAPI KexRtlOperatingSystemBitness(
 	VOID);
 

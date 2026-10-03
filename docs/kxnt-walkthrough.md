@@ -18,6 +18,7 @@
 | 拡張 rename / delete | 実装済み（通常操作。追加フラグは拒否） | Server 2008 x86 / x64、Nt / Zw 双方96ケース・各1,000回反復成功 |
 | スレッド通知・待機 / Zw 別名 | 実装済み（プロセス内の状態管理） | Server 2008 x86 / x64、Nt / Zw の native 比較・4,096スレッド反復・実 ID 再利用・終了後回収成功 |
 | RtlQueryPerformanceCounter / Frequency（既存の未解決転送） | 実装済み | Server 2008 x86 / x64、native 参照・未整列出力・例外・並列照会成功 |
+| RtlTryAcquireSRWLockExclusive / Shared（既存の未解決転送） | NT 6.0 の native SRW と併用する試行取得を実装 | Server 2008 WOW64 / x64、待機者・条件変数・並行取得・例外・native 参照を検証 |
 | RtlReportSilentProcessExit（起動時のリンク依存） | 入口のみ追加。NT 6.0 の終了監視は未対応 | 不正ハンドル9ケース比較・未対応エラー・反復・Zig インポート解決を検証。WER の報告成功とは扱わない |
 | ConDrv 向け NtWriteFile / ZwWriteFile | NT-I/O 内容プロファイルに限定した同期書込みを実装 | Server 2008 x86 / x64、実 Zig 標準出力・ファイル・パイプ、境界・衝突・並行・VT 成功。native の UTF-8 描画制限、通常 IFEO 起動の統合検証は残る |
 | WNF / ZwQueryWnfStateData | 調査段階 | 本家にも未実装があるため実機能の対応を判断する必要あり |
@@ -456,3 +457,31 @@ VS2010 / SDK の x86 / x64 ビルド成功。`tests/kxnt_condrv_probe.c` と run
 証跡: `docs/validation/kxnt-condrv.json`（VM 生ログ、対照、source / DLL / EXE SHA256、明示した制約）、`docs/validation/kxnt-export-ordinals.json`。再実行は `tests/build_kxnt_parity.ps1` → Zig 診断 EXE をビルド・私設コピーを用意 → `tests/run_kxnt_condrv_vm.ps1 -VMX <VMX> -GuestPassword <パスワード>`。私設コピーの用意は前節の `tests/prepare_kxnt_private_image.py` を使う。
 
 今回の配備先は作業ブランチの Installer と VM の `C:\KxNtParity`。システム DLL や Releases は変更していない。Vista クライアント、native 32bit OS、標準ユーザー、通常の IFEO 有効化経路、全コードページ、native での真の部分完了、非同期 console I/O、UTF-8 描画基盤の改善は未検証 / 未対応。移植フェーズ全体は継続中。
+
+## 2026-10-03: SRW ロックの試行取得
+
+本家と現行 KxNt は RtlTryAcquireSRWLockExclusive / Shared を native ntdll に転送していたが、Server 2008 の WOW64 / x64 双方で転送先が未公開だった。SRW の通常の取得・解放は Vista に存在する。公開 Win32 の [TryAcquireSRWLockExclusive](https://learn.microsoft.com/en-us/windows/win32/api/synchapi/nf-synchapi-tryacquiresrwlockexclusive) / [Shared](https://learn.microsoft.com/en-us/windows/win32/api/synchapi/nf-synchapi-tryacquiresrwlockshared) は Windows 7 / Server 2008 R2 以降。
+
+### 実装
+
+- `KexDll/srwtry.c` に BOOLEAN / NTAPI の2入口を追加（ordinal314 / 315）。KxNt の既存 ordinal1228 / 1229（x64）、1246 / 1247（x86）を維持して転送先だけ変更した。KxBase の既存 Win32 実装は変更していない。
+- native API がある OS は native に委譲。遅延探索・atomic cache の初期化で変化する LastError / LastStatus を復元し、native 自体の結果を変えない。native がない場合は実 OS バージョン NT 6.0 のみに限定し、未知の形式を推測して使用しない。
+- NT 6.0 の native 共有所有者数（0x11 / 0x21）、排他所有（1）、待機者フラグを実測して実装。排他は空状態への compare-exchange、共有は待機者・排他・未知の状態を拒否して所有者数を compare-exchange で追加する。共有数の桁溢れを拒否する。OS の待機者リストを作成・変更しない。
+- 失敗は FALSE を返し、blocking acquire を呼ばない。共有の再試行は他スレッドが word を変更した場合のみ行う。競合下での時間上限を数学的に保証する wait-free 実装ではない。
+- NULL / guard / readonly storage のアクセス違反は成功や FALSE に置換しない。初版では共有 word の読取りに通常 load を使ったが、readonly の排他所有 word でも native はアクセス違反となることを両アーキテクチャの参照で確認したため、atomic read に修正した。SRW は書込み可能で自然整列した storage が前提。壊れた lock、所有権違反、再帰取得の対応を保証しない。
+
+### 検証
+
+VS2010 / SDK の x86 / x64 ビルド成功。`tests/kxnt_srw_probe.c` をホスト native ntdll、ホスト KxNt → KexDll の native 委譲、Server 2008 の実 KxNt → KexDll 経路で実行し、失敗0。環境に依存する path を除いた固定ログを runner で比較した。
+
+- 空状態、排他所有中、複数共有所有者、native shared acquire と試行取得の混在。native release 後の空状態を確認。
+- shared owner → exclusive waiter、exclusive owner → shared / exclusive waiter の3ケース。待機者が実際に enqueue されてから双方の try が FALSE、word 不変、native release 後に worker が取得・解放して終了することを確認。
+- 各関数で NULL、アドレス1、PAGE_NOACCESS、guard に跨がる storage。readonly の空・排他・共有の各状態。すべて参照と同じ ACCESS_VIOLATION、結果 sentinel 不変、LastError / LastStatus 維持。
+- 試行取得した exclusive / shared lock を native SleepConditionVariableSRW が解放・再取得できることを確認。別スレッドが排他取得して値を書き換え、WakeConditionVariable で正常復帰。
+- 4 worker が native blocking と try を交互に使い計4,000回取得。2,000回の更新、共有読取りの整合性、同時 writer / reader の排除、worker 終了、最終空状態、計測ハンドル増加0を確認。永久競合、強制終了中の回収、全ての scheduler interleaving を証明したものではない。
+- VM native は2 export が不在、診断終了5を意図した対照として要求。owned probe には15秒 watchdog があり、停止時は自分のプロセスだけ終了する。ユーザーのアプリを終了させない。
+- 同じビルドで実 Zig 標準 I/O / ConDrv と性能カウンタの両アーキテクチャ回帰成功。全4配布 DLL の既存 ordinal 変更0、Installer は検証ビルドと同一。
+
+証跡: `docs/validation/kxnt-srw.json`（native / VM 生ログ、source / DLL / EXE SHA256）、更新した `kxnt-condrv.json` / `kxnt-performance.json` / `kxnt-export-ordinals.json`。再実行: `tests/build_kxnt_parity.ps1` → `tests/run_kxnt_srw_vm.ps1 -VMX <VMX> -GuestPassword <パスワード>`。
+
+今回も VM の `C:\KxNtParity` と作業ブランチの Installer の配備。Vista クライアント、native 32bit OS、標準ユーザー、通常 IFEO 経路全体の統合検証は残る。SRW の追加を KxNt 全体の移植完了とは扱わない。

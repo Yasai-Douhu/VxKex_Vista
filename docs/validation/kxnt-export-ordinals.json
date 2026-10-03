@@ -56,6 +56,8 @@
         "KexRtlQueryPerformanceCounter": 310,
         "KexRtlQueryPerformanceFrequency": 311,
         "KexRtlReportSilentProcessExit": 312,
+        "KexRtlTryAcquireSRWLockExclusive": 314,
+        "KexRtlTryAcquireSRWLockShared": 315,
         "NtAlertThreadByThreadId": 308,
         "NtWaitForAlertByThreadId": 309
       }
@@ -77,6 +79,8 @@
         "KexRtlQueryPerformanceCounter": 310,
         "KexRtlQueryPerformanceFrequency": 311,
         "KexRtlReportSilentProcessExit": 312,
+        "KexRtlTryAcquireSRWLockExclusive": 314,
+        "KexRtlTryAcquireSRWLockShared": 315,
         "NtAlertThreadByThreadId": 308,
         "NtWaitForAlertByThreadId": 309
       }
