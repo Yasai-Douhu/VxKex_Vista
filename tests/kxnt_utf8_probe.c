@@ -8,6 +8,9 @@ typedef LONG (WINAPI *GET_STATUS)(void);
 typedef VOID (WINAPI *SET_STATUS)(LONG);
 typedef struct {const char *Name;const void *Data;ULONG Bytes;} UTF_INPUT;
 static FILE *out;static GET_STATUS getstatus;static SET_STATUS seedstatus;static unsigned failures;
+#ifdef KXNT_UTF8_RESOURCE_TRACE
+#include "kxnt_utf8_trace.h"
+#endif
 static void call(const char *direction,CONVERT fn,const UTF_INPUT *input,ULONG cap,BOOL query,BOOL count) {
     BYTE destination[64];ULONG actual=0xdeadbeef,i;LONG status=0xdeadbeef,exception=0;DWORD error;LONG tls;
     memset(destination,0xa5,sizeof(destination));seedstatus((LONG)0xc0000022);SetLastError(0x13579bdf);
@@ -63,16 +66,27 @@ static DWORD WINAPI parallel_worker(PVOID ignored) {
 }
 static void parallel_cases(CONVERT from,CONVERT to,unsigned phase) {
     HANDLE threads[4];DWORD before,after,immediate,wait,errors,total=0;unsigned i;
-    parallelFrom=from;parallelTo=to;GetProcessHandleCount(GetCurrentProcess(),&before);
+    parallelFrom=from;parallelTo=to;
+#ifdef KXNT_UTF8_RESOURCE_TRACE
+    if(!phase)utf8_snapshot("before");
+#endif
+    GetProcessHandleCount(GetCurrentProcess(),&before);
     for(i=0;i<4;++i)threads[i]=CreateThread(NULL,0,parallel_worker,NULL,0,NULL);
     wait=WaitForMultipleObjects(4,threads,TRUE,10000);
     if(wait!=WAIT_OBJECT_0){fprintf(out,"Owned UTF workers failed to finish\n");fflush(out);TerminateProcess(GetCurrentProcess(),9);}
     for(i=0;i<4;++i){GetExitCodeThread(threads[i],&errors);total+=errors;CloseHandle(threads[i]);}
     GetProcessHandleCount(GetCurrentProcess(),&immediate);
+#ifdef KXNT_UTF8_RESOURCE_TRACE
+    if(!phase)utf8_snapshot("immediate");
+#endif
     Sleep(100);GetProcessHandleCount(GetCurrentProcess(),&after);
     fprintf(out,"HandleObservation Phase=%u ImmediateDelta=%ld After100msDelta=%ld Control=%d\n",phase,(LONG)immediate-(LONG)before,(LONG)after-(LONG)before,lookupControl);
     fprintf(out,"Parallel=4 Phase=%u Calls=%u Errors=%lu HandleDelta=%ld\n",phase,lookupControl?8000:16000,total,(LONG)after-(LONG)before);
     if(total || (phase && after!=before))++failures;
+#ifdef KXNT_UTF8_RESOURCE_TRACE
+    if(!phase){utf8_snapshot("after100ms");Sleep(900);utf8_snapshot("after1000ms");}
+    else utf8_snapshot("warm100ms");
+#endif
 }
 static void overlap_cases(const char *direction,CONVERT fn,const void *original,ULONG bytes) {
     BYTE buffer[128];int offset;ULONG actual,i;LONG status,exception;

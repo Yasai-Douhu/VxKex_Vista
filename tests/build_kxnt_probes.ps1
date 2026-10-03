@@ -54,6 +54,8 @@ if ($LASTEXITCODE) { throw "SRW lock probe build failed ($Architecture)" }
 if ($LASTEXITCODE) { throw "UTF conversion probe build failed ($Architecture)" }
 & cl.exe /nologo /MT /O1 /W4 "/Fo$out\utf8-windowless.obj" "/Fe$out\utf8-windowless.exe" "$PSScriptRoot\kxnt_utf8_probe.c" /link /SUBSYSTEM:WINDOWS,6.0 /ENTRY:mainCRTStartup
 if ($LASTEXITCODE) { throw "Windowless UTF conversion probe build failed ($Architecture)" }
+& cl.exe /nologo /MT /O1 /W4 /DKXNT_UTF8_RESOURCE_TRACE "/Fo$out\utf8-traced-windowless.obj" "/Fe$out\utf8-traced-windowless.exe" "$PSScriptRoot\kxnt_utf8_probe.c" /link /SUBSYSTEM:WINDOWS,6.0 /ENTRY:mainCRTStartup
+if ($LASTEXITCODE) { throw "Traced windowless UTF probe build failed ($Architecture)" }
 & cl.exe /nologo /MT /O1 /W4 "/Fo$out\open-key-reference.obj" "/Fe$out\open-key-reference.exe" "$PSScriptRoot\kxnt_open_key_reference_probe.c" /link /SUBSYSTEM:CONSOLE,6.0
 if ($LASTEXITCODE) { throw "Registry open reference probe build failed ($Architecture)" }
 & cl.exe /nologo /MT /O1 /W4 "/Fo$out\registry-transaction.obj" "/Fe$out\registry-transaction.exe" "$PSScriptRoot\kxnt_registry_transaction_probe.c" /link /SUBSYSTEM:CONSOLE,6.0 advapi32.lib KtmW32.lib

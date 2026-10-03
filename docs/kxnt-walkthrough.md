@@ -738,3 +738,17 @@ CDBでNtCreateEventのentry stackを採取した。最初はCDBが終了時break
 - 内部RVAは当該Server ntdllだけの診断用。互換DLLに固定アドレスやアプリ名の分岐を追加していない。再現用の正確なCDB commandsとmodule / probe hashを証跡内に保存した。別imageへこれらのRVAを無検証で適用しない。
 
 証跡: docs/validation/kxnt-native-loader-event-trace.json（成功traceと同じprocessのsnapshot、初回debugger timeoutの区別、commands / hashes / disassembly）。通常consoleの全cold差分、残るEventの帰属・lifecycle、通常IFEO統合は未完了。配布DLL、Installer、system DLL、Releasesは変更していない。
+
+## 2026-10-04: 全UTFケースと同じプロセス内で資源を追跡
+
+kxnt_utf8_probe.cにKXNT_UTF8_RESOURCE_TRACEでのみ有効なsnapshotを加え、buildにutf8-traced-windowless.exeを追加した。通常buildではsnapshotも追加待機も無効。新規kxnt_utf8_trace.hは既存の資源診断と同じhandle表 / 型 / 名前 / identityの採取を使う。traced buildはcold前・直後・100ms後・1000ms後・warm100msの5点を同じプロセスで採取する。4,850case、24pointer、全scalar、18overlap、4worker ×16,000callは維持し、snapshotと待機の介入を明示する。過去の初回失敗プロセスを遡って採取できたとの主張ではない。
+
+- run_kxnt_utf8_windowless_vm.ps1にTraceResourcesを追加。両VM / 両形式でlookupと全変換を実行し、同じnative固定行と全4組が一致した。SourceSHA256に追加headerを含めた。記録は両VMともFailedであり、Server / VistaのWOW64だけcold資源gate通過、x64は差分が残った。従来のgateは緩めない。
+- analyze_kxnt_handle_snapshots.pyにfull-utf receipt解析を追加し、全phaseの列挙数とidentity数を照合した。Server / VistaのWOW64ではlookup / 変換とも名前なしEventが一つ追加、x64ではlookupだけ一つ追加・変換では追加なし。warm後も全identityの差分を保存した。
+- 別のCDB実行でServer x64の全ケースEXEを追跡。内部RVAを使う前に当該VMのntdllを再取得し、前回のimage hashと一致することを要求した。lookupは自然に完了し、同じ実行でloader critical sectionのLockSemaphore=0x28とafter100msのEvent handle=0x28が一致した。これにより今回の実lookup対照のcold増加をnative loader lockに帰属できた。他VM / architectureや過去の全差分へ一般化しない。
+- 最初の変換debug実行ではwarm Eventが増え、その後、pointer試験の意図的なfirst-chance access violationでCDBが停止し、10秒のowned debugger timeoutとなった。この部分logは不完全として保存した。アプリの無処理AVや全試験の完了と扱わない。loader lockへのstoreとwarm Eventの対応はrawに残すが、完了実行の代わりには使わない。
+- sxd avを加えてfirst-chance AVを試験側へ渡すCDB commandsで別logへ再実行した。debugger自然終了0、4,850caseを含む全試験のFailures=0 / PASS、cold / warm delta0を確認した。デバッガーの成功終了だけからprobe成功を推測せず、probe最終行も確認した。どの実行でも必ずEventが増えるわけではなく、debug介入が競合を変える。
+
+証跡: docs/validation/kxnt-utf8-fulltrace-server.json / kxnt-utf8-fulltrace-vista.json、kxnt-utf8-fulltrace-identities.json、kxnt-utf8-fullcase-event-traces.json。再実行は両形式build後、windowless runnerにTraceResourcesと未使用RunNameを渡す。CDBの正確なcommands / module hash / 不完全実行との区別はevent-traces証跡に保存した。内部RVAは当該Server ntdll専用の診断であり、配布コードには追加していない。
+
+元のconsole cold差分、残るEventの全面帰属とlifecycle、通常IFEO統合、監査の他の未完了項目は引き続き未完了。配布DLL、Installer、system DLL、Releasesは変更していない。

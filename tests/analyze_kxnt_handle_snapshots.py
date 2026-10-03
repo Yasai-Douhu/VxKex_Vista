@@ -47,13 +47,20 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('receipts', nargs='+', type=Path)
     parser.add_argument('--output', required=True, type=Path)
+    parser.add_argument('--full-utf', action='store_true', help='Read instrumented full UTF receipts with lookup and conversion outputs')
     args = parser.parse_args()
     rows = []
     for path in args.receipts:
         data = json.loads(path.read_text(encoding='utf-8-sig'))
-        if data['State'] != 'Measured' or len(data['Results']) != 5:
-            raise ValueError('Resource observation is incomplete')
-        for row in data['Results']:
+        if args.full_utf:
+            if not data.get('TraceResources') or data['Status'] not in ('Passed', 'Failed') or len(data['Results']) != 2 or not all(row['ContractGate'] for row in data['Results']):
+                raise ValueError('Instrumented full UTF observation is incomplete')
+            inputs = [dict(Architecture=row['Architecture'], VMX=row['VMX'], Windowless=True, Mode=mode, Output=row[key]) for row in data['Results'] for mode, key in (('lookup', 'ControlOutput'), ('conversion', 'Output'))]
+        else:
+            if data['State'] != 'Measured' or len(data['Results']) != 5:
+                raise ValueError('Resource observation is incomplete')
+            inputs = data['Results']
+        for row in inputs:
             result = analyze(row)
             rows.append(result)
             print(Path(row['VMX']).parent.name, row['Architecture'], row['Mode'],
