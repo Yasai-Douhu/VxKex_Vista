@@ -51,6 +51,9 @@ static void transaction(HKEY root,HKEY target,unsigned mode,BOOL missing) {
     HANDLE tx=CreateTransaction(NULL,NULL,0,0,0,5000,L"Owned VxKex registry opening test");HKEY key=NULL,check=NULL;
     DWORD disposition=0,value=0,beforeValue=0,writeValue=0x69133742;LONG create,before=0,after=0,write=0;LSTATUS absent;BOOL finished;ULONG mask=0;FILETIME beforeWrite,afterWrite;
     ATTRIBUTES attrs;USTRING name,marker;BYTE data[128];ULONG needed;
+    HANDLE reopened=NULL;USTRING empty;ATTRIBUTES reopenAttrs;ULONG reopenedDisposition=0,reopenedAccess=0;
+    LONG reopenStatus=(LONG)0xdeadbeef,reopenBefore=(LONG)0xdeadbeef,reopenAfter=(LONG)0xdeadbeef;
+    LONG postReopenStatus=(LONG)0xdeadbeef,postRead=(LONG)0xdeadbeef;ULONG postDisposition=0;
     if(tx==INVALID_HANDLE_VALUE){fprintf(out,"TransactionCreateError=%lu\n",GetLastError());FAIL();return;}
     ZeroMemory(&beforeWrite,sizeof(beforeWrite));if(RegQueryInfoKeyW(target,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,&beforeWrite))FAIL();
     name.Buffer=missing?L"Missing":L"Target";name.Length=(USHORT)(wcslen(name.Buffer)*2);name.MaximumLength=name.Length;
@@ -58,8 +61,33 @@ static void transaction(HKEY root,HKEY target,unsigned mode,BOOL missing) {
     marker.Buffer=L"Marker";marker.Length=12;marker.MaximumLength=12;
     create=createTx((PHANDLE)&key,KEY_READ,&attrs,0,NULL,REG_OPTION_BACKUP_RESTORE,tx,&disposition);
     if(!create){mask=access(key);before=queryValue(key,&marker,2,data,sizeof(data),&needed);if(before>=0 && *(ULONG*)(data+8)==4)beforeValue=*(ULONG*)(data+12);}
+    if(!create && disposition==REG_OPENED_EXISTING_KEY){
+        empty.Buffer=L"";empty.Length=empty.MaximumLength=0;reopenAttrs=attrs;reopenAttrs.Root=key;reopenAttrs.Name=&empty;
+        reopenStatus=createKey(&reopened,KEY_READ,&reopenAttrs,0,NULL,REG_OPTION_BACKUP_RESTORE,&reopenedDisposition);
+        if(reopenStatus>=0){
+            reopenedAccess=access(reopened);reopenBefore=queryValue(reopened,&marker,2,data,sizeof(data),&needed);
+            if(reopenedDisposition!=REG_OPENED_EXISTING_KEY)FAIL();
+            if(reopenBefore>=0 && (*(ULONG*)(data+8)!=4 || *(ULONG*)(data+12)!=0x69133742))FAIL();
+        }
+    }
     finished=!create && disposition==REG_OPENED_EXISTING_KEY?CommitTransaction(tx):RollbackTransaction(tx);
     if(!finished)FAIL();
+    if(reopened){
+        reopenAfter=queryValue(reopened,&marker,2,data,sizeof(data),&needed);
+        if(reopenAfter>=0 && (*(ULONG*)(data+8)!=4 || *(ULONG*)(data+12)!=0x69133742))FAIL();
+        if(!CloseHandle(reopened))FAIL();
+    }
+    if(!create && disposition==REG_OPENED_EXISTING_KEY){
+        reopened=NULL;postReopenStatus=createKey(&reopened,KEY_READ,&reopenAttrs,0,NULL,REG_OPTION_BACKUP_RESTORE,&postDisposition);
+        if(postReopenStatus>=0){
+            postRead=queryValue(reopened,&marker,2,data,sizeof(data),&needed);
+            if(postDisposition!=REG_OPENED_EXISTING_KEY)FAIL();
+            if(postRead>=0 && (*(ULONG*)(data+8)!=4 || *(ULONG*)(data+12)!=0x69133742))FAIL();
+            if(!CloseHandle(reopened))FAIL();
+        }
+    }
+    fprintf(out,"ReopenTransaction Mode=%u Missing=%d Create=%08lx Disposition=%lu Access=%08lx BeforeRead=%08lx AfterRead=%08lx\n",mode,missing,reopenStatus,reopenedDisposition,reopenedAccess,reopenBefore,reopenAfter);
+    fprintf(out,"PostCommitReopen Mode=%u Missing=%d Create=%08lx Disposition=%lu Read=%08lx\n",mode,missing,postReopenStatus,postDisposition,postRead);
     if(!create){after=queryValue(key,&marker,2,data,sizeof(data),&needed);if(after>=0 && *(ULONG*)(data+8)==4)value=*(ULONG*)(data+12);write=setValue(key,&marker,0,REG_DWORD,&writeValue,sizeof(writeValue));}
     absent=RegOpenKeyExW(root,L"Missing",0,KEY_READ,&check);if(check)RegCloseKey(check);
     ZeroMemory(&afterWrite,sizeof(afterWrite));if(RegQueryInfoKeyW(target,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,&afterWrite))FAIL();

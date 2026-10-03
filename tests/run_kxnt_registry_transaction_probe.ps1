@@ -25,10 +25,15 @@ foreach($arch in @('x86','x64')){
     foreach($mode in @(1,3)){
         if($output -notmatch "Mode=$mode Missing=0 Create=00000000 Disposition=2 .*BeforeQuery=00000000 AfterQuery=c0190003"){throw 'Read before/after commit behavior unproven'}
         if($output -notmatch "PostFinish Mode=$mode Missing=0 BeforeMarker=69133742"){throw 'Original marker not read'}
+        if($output -notmatch "ReopenTransaction Mode=$mode Missing=0 Create=00000000 Disposition=2 .*BeforeRead=00000000 AfterRead=c0190003"){throw 'Reopened handle transaction binding not proven'}
     }
     foreach($mode in @(2,3)){
         if($output -notmatch "PostFinish Mode=$mode Missing=0 .*WriteStatus=c0190003"){throw 'Write failure after commit unproven'}
     }
+    foreach($mode in @(1,2,3)){
+        if($output -notmatch "PostCommitReopen Mode=$mode Missing=0 Create=c0190003 Disposition=0 Read=deadbeef"){throw 'Post-commit reopen refusal not proven'}
+    }
+    if([regex]::Matches($output,'ReopenTransaction Mode=\d Missing=1 Create=deadbeef').Count -ne 4 -or [regex]::Matches($output,'PostCommitReopen Mode=\d Missing=1 Create=deadbeef').Count -ne 4){throw 'Created transactional leaf used as reopening root'}
     if([regex]::Matches($output,'MissingKeyOpen=2 TargetTimestampSame=1').Count -ne 8){throw 'Missing-key rollback/timestamp checks incomplete'}
     if([regex]::Matches($output,'(?m)^Pinned ').Count -ne 96){throw 'Pinned matrix incomplete'}
     if([regex]::Matches($output,'Pinned .* Missing=1 Open=c0000034 Create=deadbeef').Count -ne 48){throw 'Missing key opened/created by pinned path'}
@@ -49,6 +54,7 @@ foreach($arch in @('x86','x64')){
         HostOutput=[IO.File]::ReadAllText("$results\$arch\registry-transaction-host.txt")
         Output=$output;Conclusion='Committed transaction-bound key cannot directly replace the durable native NtOpenKeyEx handle'
         PinnedConclusion='Empty-relative-name create provides durable privileged handles if initial pin succeeds; OWNER RIGHTS denial blocks all tested pin masks even with backup/restore'
+        TransactionReopenConclusion='NtCreateKey with an empty name and transaction-bound root inherits binding; reads fail after commit; reopening after commit returns TRANSACTION_NOT_ACTIVE'
         Scope='Owned HKCU fixtures; private token; four privilege modes; three ACL states; four pin masks; missing-key refusal; effective ACL checks; marker read/write; native DELETE handle cleanup'
     }
     Write-Host "${arch}: transaction binding fails; pinned durable handles work conditionally; protected pin denied; owned fixture deleted"

@@ -596,3 +596,14 @@ NtOpenKeyEx の追加検討として、既存キーを native NtOpenKey で先�
 診断プローブとrunnerを更新。runnerは96件の網羅、48件の欠落拒否、16件のOWNER RIGHTS参照拒否、有効なprivilege別read/write、effective ACL、削除を明示gateにした。証跡は更新した docs/validation/kxnt-registry-transaction.json（source / EXE / runner SHA256とhost / VMのraw結果）。再実行方法は前節と同じ。
 
 VM再接続では専用native-launchからcmd.exe /d /c exit 0を起動し、CreateProcess成功・子終了0を確認した。配布DLL・システムDLL・Releasesは変更していない。任意root、symlink、view、削除競合、非所有者token、通常IFEO、Vistaクライアントの包括検証と、保護キーを扱える代替方式の検討は継続する。
+## 2026-10-03: transaction root から通常createで開き直す方式の検証
+
+保護キーの最初の参照をtransaction付きbackup / restore createで得た場合、通常のNtCreateKey（TransactionHandle引数なし）に空の相対名とそのrootを渡して、transactionから独立したhandleを得られるか検証した。**この方式もそのままでは採用できない。** Server 2008のWOW64 / x64とも、rootのtransactionへの結び付きを引き継いだ。
+
+- 通常ACLの専用Targetをtransactionで開いた後、commit前に通常NtCreateKeyで空名を開くとSTATUS_SUCCESS・disposition=2。Backup / 両privilegeではMarkerの読取りも成功し、内容を照合した。
+- 元のtransactionをcommitすると、通常createが返したhandleの読取りもc0190003（TRANSACTION_NOT_ACTIVE）となった。通常createを呼んだという事実だけでは独立性を保証しない。
+- commit後にtransaction-bound rootから空名createを行うと、Backup / Restore / 両方の3状態すべてでc0190003。戻るhandleの有効性を得られなかった。
+- Restoreだけの再openはQUERY_VALUE権限がないため前後ともACCESS_DENIED。これをtransaction終了後の有効性の証明とは扱わない。新しいhandleから書き込みは行っていない。
+- transaction内で新規作成されたMissingはreopenのrootとして使わず必ずrollback。marker内容、元Target timestamp、Missing不在、96件のACL/pin matrix、native DELETEによるfixture清掃、token復元を両形式で再確認。ホストfiltered tokenではprivilege有効状態は引き続き未確認。
+
+runnerはcommit前の再open成功・commit後の読取り失敗、commit後create拒否、Missing再open未実行をgateに追加。更新証跡: docs/validation/kxnt-registry-transaction.json。source / EXE / runner SHA256を保存した。配布DLL・native転送先は変更していない。別方式すべての不可能性を証明したものではない。保護キーを誤って作る方式、失効handleを成功として公開する方式へ置き換えない。
