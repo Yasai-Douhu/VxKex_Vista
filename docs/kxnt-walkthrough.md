@@ -635,3 +635,20 @@ Vista x64 VM（前節でnative 6.0.6002 / workstationを確認）のWOW64 / x64�
 証跡: docs/validation/kxnt-srw-vista-client.json。再実行はtests/run_kxnt_srw_vm.ps1にVista VMX、GuestUser、GuestPassword、GuestDirectoryを指定する。終了5はAPI不在の明示確認であり、try機能の試験失敗を無視するための扱いではない。
 
 通常IFEO起動、native32bit OS、任意スケジューラの全interleavingは依然として未検証。システムDLL・Installer・Releasesは変更していない。続いてUTF変換を測定したところ、x64のcold resource比較gateに差分があり停止した。これをSRWの成功やUTF変換の全面的な成功へ読み替えず、別途診断する。
+## 2026-10-03: UTF Vista試験のcold資源gate失敗とコンソールIMEの対照
+
+VistaのWOW64では既存UTF runnerのnative比較を通過したが、x64はcold resource差分のgateで停止した。対照の初回100ms後のhandle増加が8、互換変換は7。両方のwarm測定は0、個々のprobeの内容検査はFailures=0だった。**UTFの両形式に対する既存runner全体の成功とは記録しない。** 失敗した原データを上書き前に保存した。
+
+x64のfixed contract比較は、失敗gateより後にあるためその初回runnerでは実行されなかった。後で原データを使って同じ固定行の比較を別途行い、ホストnative / native委譲 / VMが一致することを確認した。4,850 conversion / size-queryケース、24 pointerケース、全1,112,064 scalarの全内容と往復、18 overlap、4worker ×16,000呼出しの2phaseが対象。cold handle数はこの比較から環境値として分離するが、別のresource gateは失敗のまま維持した。証跡: docs/validation/kxnt-utf8-vista-client-initial-failure.json（native参照、原VM / lookup対照、hash、失敗scope）。
+
+### 追加の資源診断
+
+- tests/kxnt_utf8_resource_probe.c / runnerを追加し、WOW64 / x64各5modeを別プロセスで実行。KexDllありのempty worker / native lookupだけ / 実変換、KexDllなしのempty worker / native lookupだけ。これは別の計測を加えた診断であり、初回失敗時の同一実行やstack採取ではない。
+- 同じ4workerをcold / warmで作成・join・close。変換modeの内容も検査。前、直後、100ms待機後、さらに900ms待機後、warm後のsystem handle表から、自PIDのhandle identity / kernel object / type / accessと個数を記録した。Key / Event / Directoryの名前、Threadの所有PID / ID / start、Processのimageも記録。型照会が失敗したhandleもstatusを隠さない。File名の照会は行っていない。
+- x64の各modeで、増えたProcess / Threadが別PIDのC:\Windows\System32\conime.exeを指すことを確認した。ConsoleIME_StartUp_Event、BaseNamedObjects、Windows NT CurrentVersion / AppCompatFlagsのKeyも観測した。
+- KexDllなしのmode3 / 4でも同種の増加が起き、初期10handleから16または17へ増えた。計測回によってempty modeでも6 / 7の差があり、warmでEventが追加される場合もあった。したがって異なるプロセスのcold countだけから変換関数の漏れと断定できない。コンソール初期化の非同期動作が比較を乱している可能性を示す証拠であり、すべての作成元を同定したとの主張ではない。
+- runnerは全5観測点、no-KexDll対照の実際のKexDllLoaded=0、互換modeのprovider / implementationの専用フォルダーパス、MEASURED終了を要求した。MEASUREDは診断完了であり、漏れゼロやcold差分解決の判定ではない。元のUTF resource gateを緩めていない。
+
+証跡: docs/validation/kxnt-utf8-vista-client-resources.json（両形式10実行のraw結果、source / EXE / runner / DLL hash）。再実行: tests/build_kxnt_probes.ps1を両形式で実行し、tests/run_kxnt_utf8_resource_probe.ps1にVMX / GuestUser / GuestPassword / GuestDirectoryとArchitectureを指定する。modeごとのrawログはaudit/KxNtParityに残る。
+
+初回差分のhandle作成stack、各Eventの完全なlifecycle、計測介入がない実行との帰属、通常IFEOの統合試験は未完了。配布DLL、Installer、システムDLLは変更していない。SRWのVista成功は別の記録としてコミット済みであり、今回のUTF資源比較の失敗を覆い隠さない。

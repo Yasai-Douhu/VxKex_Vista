@@ -56,3 +56,5 @@ if ($LASTEXITCODE) { throw "UTF conversion probe build failed ($Architecture)" }
 if ($LASTEXITCODE) { throw "Registry open reference probe build failed ($Architecture)" }
 & cl.exe /nologo /MT /O1 /W4 "/Fo$out\registry-transaction.obj" "/Fe$out\registry-transaction.exe" "$PSScriptRoot\kxnt_registry_transaction_probe.c" /link /SUBSYSTEM:CONSOLE,6.0 advapi32.lib KtmW32.lib
 if ($LASTEXITCODE) { throw "Registry transaction probe build failed ($Architecture)" }
+& cl.exe /nologo /MT /O1 /W4 "/Fo$out\utf8-resource.obj" "/Fe$out\utf8-resource.exe" "$PSScriptRoot\kxnt_utf8_resource_probe.c" /link /SUBSYSTEM:CONSOLE,6.0
+if ($LASTEXITCODE) { throw "UTF resource probe build failed ($Architecture)" }
