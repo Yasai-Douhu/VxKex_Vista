@@ -1,0 +1,25 @@
+{
+  "ReceiptSHA256": "7B22351BC0730C17649B28F0AC4AEBF8F47B8FACDA2E625063B93575F4C4E1EB",
+  "AnalyzerSHA256": "03F478386C2721C99AA8AF9147FB87C560FD512D1DFE4B4405084660A993E9D7",
+  "NativeImageSHA256": "A3D767B53F36E97DFEFCAD305AE050C98D5282D0107B7D51A36825C25F544506",
+  "NativeReferenceSHA256": "DFE2A6F6FC5C4287074C3970811E51465826C1F096A2A86C7E460BFFE3040ECD",
+  "NativeValueRowsEqual": true,
+  "Rows": 4893,
+  "LoaderLockBase": "77a90060",
+  "LockSemaphoreSlot": "77a90070",
+  "CreatedHandle": "00000078",
+  "PhaseSlots": [
+    "00000000",
+    "00000078",
+    "00000078",
+    "00000078"
+  ],
+  "CreatedDuringColdInterval": true,
+  "ColdHandleDelta": 1,
+  "WarmHandleDelta": 0,
+  "CreationStack": "KXNT_EVENT_CREATE32\r\nEffective machine: x86 compatible (x86)\r\n011bf520  779e97d8 011bf538 00100003 00000000\r\n011bf530  00000001 00000000 7efa6000\r\nChildEBP RetAddr  \r\nWARNING: Stack unwind information not available. Following frames may be wrong.\r\n011bf53c 779e97ae ntdll32!NtCreateEvent\r\n011bf598 779e95fc ntdll32!RtlpUnWaitCriticalSection+0x89\r\n011bf5c0 779e3437 ntdll32!RtlDeactivateActivationContext+0x1d1\r\n011bf654 77a1fdc3 ntdll32!RtlAllocateActivationContextStack+0xb6\r\n011bf6bc 779e3312 ntdll32!LdrInitShimEngineDynamic+0x292\r\n011bf6cc 00000000 ntdll32!LdrInitializeThunk+0x10\r\n",
+  "ReturnBlock": "KXNT_CS_EVENT_RETURN\r\neax=00000000\r\n011bf538  00000078\r\n011bf544  77a90060",
+  "StoreBlock": "KXNT_CS_EVENT_STORE\r\neax=00000000\r\necx=00000078\r\nedx=77a90070\r\n77a90070  00000078",
+  "ProbePassed": true,
+  "Limits": "One WOW64 process under CDB. Native loader-lock identity derives from LdrLockLoaderLock disassembly for the SHA-guarded image, not nearest-export stack labels. The event is retained through phase3; full process-exit cleanup is not traced. Debugger shifts contention: previous nondebug x86/x64 warm delta1 failures remain unexplained for those historical processes. No global UTF resource completion or x64 Event attribution."
+}

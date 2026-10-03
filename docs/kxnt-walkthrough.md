@@ -840,3 +840,15 @@ tests/kxnt_open_key_adapter_probe.c に KXNT_IFEO_IMPORT 時だけ有効な静�
 - 全4childは自然終了し、4owned IFEO profileを除去、実uninstall後directory / HKLM marker不在を確認した。cleanup自体は成功。次は、このIFEO変換processのphase0 / 1におけるobject identity・作成stack・native critical-sectionへの格納を採取し、過去の異なるprocessの結果と分けて検証する。
 
 証跡: docs/validation/kxnt-ifeo-runtime-server.json（原Failed receiptを保持、package / sources / EXE hash、main binding / native参考 / lookup control / 変換raw全件）。docs/validation/kxnt-ifeo-runtime-analysis.json。解析用tests/analyze_kxnt_ifeo_runtime.ps1はReceipt / 未使用Outputを指定し、値比較と資源gateとSilentExitの未対応を別々に検査する。NT6 Server cloneの両形式で通常IFEOに到達したことは示すが、Vista IFEO・native32bit OS・UTF資源問題の修正・WER報告機能の完成は示さない。配布DLL / Installer / Releasesは変更していない。拡張registry flags、ConDrv通常IFEO、WNF実利用・設計と監査の残りは引き続き未完了。
+
+## 2026-10-04: 通常 IFEO UTF の cold Event を同一processの native loader lock まで追跡
+
+前工程の通常IFEO UTF資源FAILを保持したまま、WOW64の専用診断buildへKXNT_IFEO_RESOURCE_PHASESを追加した。各parallel phaseのbefore計数直前とafter計数直後の4停止点で、native loader lockのLockSemaphoreを採取する。default UTF buildとproduction DLLにこの観測はない。run_kxnt_ifeo_vm.ps1 -Utf8Traceは実install / KexCfg / AVRFを経由し、同じfixtureのlookup-only controlとCDB下の変換probeを実行する。private native RVAは既存の正確なntdll hash guardを維持した。
+
+- 使い捨てcloneの前工程directoryを保存し、新しいarchiveで実行。native negative control1imageのc0000139、候補8copyのbyte一致、早期KexDllとIAT26slot一致、debugger自然終了、実uninstallとowned IFEO cleanupを確認した。driver exit0、receiptはMeasured（一般の資源gateのPassedへ昇格しない）。
+- このdebugged UTF processでは、loader CS base77a90060 / LockSemaphore slot77a90070のphase0値が0。測定中のx86 NtCreateEventからnative CS allocation return status0 / created handle78 / CS77a90060を採取し、CAS previous0 / ecx78 / edx77a90070 / slot78の一致を確認した。phase1 / 2 / 3もslot78で、二回の混合試験を通して保持された。CSがloader lockである根拠は、前工程で逆アセンブルした公開LdrLockLoaderLockがimage+e0060をRtlEnterCriticalSectionへ渡すことと、この測定imageのhash一致。
+- 作成stackにはLdrInitializeThunkが含まれる。ただしprivate symbolsはなくunwind警告もあるため、nearest-export名を精密なprivate関数名として断定しない。NtCreateEventの引数、native内部のreturnとCAS、同一processのslotを証拠の中心にする。
+- この試行はparallel phase0 delta1 / phase1 delta0、値errors0 / Failures0。lookup-onlyもphase0 delta1 / phase1 delta0。4850call +24pointer +18overlap +全scalar行の計4893行は前工程の保存host native参考と完全一致。元のnondebug実行は両形式ともphase0 delta0 / phase1 delta1でFAILだったため、今回の生成時期をそれらの過去processへ転用しない。
+- tests/analyze_kxnt_ifeo_utf8_event.ps1を追加。4phase順序と同一slot、empty初期値、cold区間内の作成・return・成功CAS、全phaseへのhandle保持、実parallel delta、native値比較を要求する。archive / NativeReference / 未使用Outputを指定する。native imageとreceipt / reference / analyzer hashを記録し、元FAILと今回の観測を別資料として保存する。
+
+証跡: docs/validation/kxnt-ifeo-utf8-event-server.json（raw receipt / trace / main binding / lookup control / 全変換raw / sources・candidate・debugger hash）とkxnt-ifeo-utf8-event-analysis.json。再現はbuild_kxnt_ifeo_probe.ps1 -Architecture x86 -RuntimeSuite -EventPhaseTrace、x64 -RuntimeSuiteでdriverをbuildし、runner -Utf8Traceへ使い捨てVMX / credentials / 未使用RunNameを渡す。CDBは実行timingを変える。このWOW64 processのcold増加をloader lockへ帰属できたが、過去nondebug warm増加、x64の作成元、全Eventのprocess終了時cleanup、一般的なUTF資源gateの完成は未証明。production DLL / Installer / Releasesを変更していない。元監査の未完了範囲は継続する。

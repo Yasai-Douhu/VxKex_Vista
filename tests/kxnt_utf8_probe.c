@@ -70,6 +70,9 @@ static void parallel_cases(CONVERT from,CONVERT to,unsigned phase) {
 #ifdef KXNT_UTF8_RESOURCE_TRACE
     if(!phase)utf8_snapshot("before");
 #endif
+#ifdef KXNT_IFEO_RESOURCE_PHASES
+    KxNtIfeoResourcePhase(phase*2);
+#endif
     GetProcessHandleCount(GetCurrentProcess(),&before);
     for(i=0;i<4;++i)threads[i]=CreateThread(NULL,0,parallel_worker,NULL,0,NULL);
     wait=WaitForMultipleObjects(4,threads,TRUE,10000);
@@ -80,6 +83,9 @@ static void parallel_cases(CONVERT from,CONVERT to,unsigned phase) {
     if(!phase)utf8_snapshot("immediate");
 #endif
     Sleep(100);GetProcessHandleCount(GetCurrentProcess(),&after);
+#ifdef KXNT_IFEO_RESOURCE_PHASES
+    KxNtIfeoResourcePhase(phase*2+1);
+#endif
     fprintf(out,"HandleObservation Phase=%u ImmediateDelta=%ld After100msDelta=%ld Control=%d\n",phase,(LONG)immediate-(LONG)before,(LONG)after-(LONG)before,lookupControl);
     fprintf(out,"Parallel=4 Phase=%u Calls=%u Errors=%lu HandleDelta=%ld\n",phase,lookupControl?8000:16000,total,(LONG)after-(LONG)before);
     if(total || (phase && after!=before))++failures;
