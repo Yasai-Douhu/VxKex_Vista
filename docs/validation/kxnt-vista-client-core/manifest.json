@@ -1,0 +1,30 @@
+{
+  "VMX": "C:\\Users\\YamaR\\Documents\\Virtual Machines\\Vista\\Windows Vista x64 Edition.vmx",
+  "GuestUser": "Vista",
+  "GuestDirectory": "C:\\Users\\Vista\\KxNtParity",
+  "ExpectedProductType": 1,
+  "Status": "Passed",
+  "Completed": [
+    "device-family",
+    "processor-feature",
+    "domain",
+    "persisted-state",
+    "sid-package",
+    "sid-capability",
+    "membership",
+    "compare",
+    "file-information",
+    "alert",
+    "performance"
+  ],
+  "CurrentProbe": null,
+  "BinarySHA256": {
+    "x86/KexDll": "AF00ACE418F67451250974D6D32ED1B260C8A9D8022FAA4AB5E03F7004CFE069",
+    "x64/KexDll": "FFCE0F6943D750005B5291C65936ED25483E8D7AAB031DACFA74544F9E550051",
+    "x64/KxNt": "7F23703A91B5606D6692924BC15D6811F1882C9F89D9B91782D18DAC1AC0F756",
+    "x86/KxNt": "CAEB26F65780293D92AD6CD7237764707820FF5B3ECA4F34D14D51081610F18D"
+  },
+  "RunnerSHA256": "250EE115221AA8DF073A835EF01409B97BDE07374E3BBE96735F05E72B70D50F",
+  "InnerRunnerSHA256": "7E3D4E6867987EA6C2F9D2873FBEAE3730D70B7A5C85DC38DD0D661FDD589F18",
+  "Scope": "Explicit scratch DLL loading; per-feature existing semantic gates and native references; no system deployment or IFEO verification"
+}

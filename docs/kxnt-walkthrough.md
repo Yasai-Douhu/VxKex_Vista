@@ -607,3 +607,19 @@ VM再接続では専用native-launchからcmd.exe /d /c exit 0を起動し、Cre
 - transaction内で新規作成されたMissingはreopenのrootとして使わず必ずrollback。marker内容、元Target timestamp、Missing不在、96件のACL/pin matrix、native DELETEによるfixture清掃、token復元を両形式で再確認。ホストfiltered tokenではprivilege有効状態は引き続き未確認。
 
 runnerはcommit前の再open成功・commit後の読取り失敗、commit後create拒否、Missing再open未実行をgateに追加。更新証跡: docs/validation/kxnt-registry-transaction.json。source / EXE / runner SHA256を保存した。配布DLL・native転送先は変更していない。別方式すべての不可能性を証明したものではない。保護キーを誤って作る方式、失効handleを成功として公開する方式へ置き換えない。
+## 2026-10-03: Vista クライアントで主要11項目を再検証
+
+停止中だったVista x64 VMを再開し、Vistaユーザーの専用フォルダーC:\Users\Vista\KxNtParityから既存プローブを実行した。device-familyの両形式の記録はReportedVersion=6.0.6002 ProductType=1。Server 2008のProductType=3の記録をクライアントの証明として流用していない。
+
+**主要11項目のWOW64 / x64、合計22の主実行が成功。** CPU機能、domain、device-family、persisted-state、Package SID、Capability SID、membership、object comparison、拡張file information、thread alert / wait、性能counter / frequency。追加実装や新しい配布バイナリの変更ではなく、既存機能のVista側の検証範囲を広げた。
+
+- tests/run_kxnt_core_suite.ps1を追加。既存の意味・native参照照合のgateを持つrunnerを順に実行し、各receiptを固有RunNameのフォルダーに保存する。旧アーカイブは上書きしない。途中失敗ならCompletedとCurrentProbe、Failedを保存して中止する。Passwordを証跡に記録しない。
+- 実行前にReleaseのKexDll / KxNtとInstaller（x86はKex32、x64はルート）のSHA256一致を4本とも要求した。rootやシステムディレクトリに配備せず、ユーザー専用scratchを使用した。
+- Device familyではclient / serverの区別、NULL出力8通り、PEBで偽装した3バージョンを再確認。家族情報を固定server値にしたテストではない。
+- domain / persisted-state / SID分類 / membership / comparisonは既存のnative参照との出力比較も再実行。比較では生きたhandle identity / typeの前後照合が成功。
+- File informationは各形式96ケース、2回の1,000反復でhandle増加0。Alertは通常試験に加え、Nt / Zw各aliasの待機thread終了ケースをVMware Toolsから別起動し、終了後timeoutとhandle増加0も両形式で成功。通常起動の子へのKexDLL伝播を証明したテストではない。
+- 性能counter / frequencyは出力のalignment16ケース、不正出力10ケース、4threadで各4,000呼出し、TLS維持、native RTLとの出力比較が成功。
+
+証跡: docs/validation/kxnt-vista-client-core/ の11 receiptとmanifest（VMX、GuestUser、GuestDirectory、client種別、EXE / DLL / runner SHA256、raw結果）。再実行: tests/run_kxnt_core_suite.ps1 -VMX <Vista VMX> -GuestUser <ユーザー> -GuestPassword <パスワード> -GuestDirectory <専用フォルダー> -RunName <新しい名前> -ExpectedProductType 1。Server用はExpectedProductType 3を指定する。
+
+この検証はscratchの明示DLL読込みであり、システムDLL配備、通常IFEO起動、native32bit OS、任意token、全競合・全不正入力の検証ではない。Vistaユーザーの名前から標準ユーザー / token elevation状態を推定していない。SRW、UTF変換、ConDrv、SilentProcessExitのVista側追加検証は継続する。既存の機能制約や未対応部分をこのPASSで解消したと扱わない。

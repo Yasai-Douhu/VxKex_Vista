@@ -1,0 +1,20 @@
+[
+  {
+    "Architecture": "x86",
+    "BinarySHA256": {
+      "KexDll": "AF00ACE418F67451250974D6D32ED1B260C8A9D8022FAA4AB5E03F7004CFE069",
+      "KxNt": "CAEB26F65780293D92AD6CD7237764707820FF5B3ECA4F34D14D51081610F18D"
+    },
+    "ProbeSHA256": "D8DF2E1F7277B47EFE9438E833CF7D14FADF0BB5AFDEDCD27E962E2EC2D8269A",
+    "Output": "ProcessBits=32\r\nNativeDeviceFamily=ABSENT\r\nReportedVersion=6.0.6002 ProductType=1\r\nSpoofedVersionCases=3\r\nOptionalOutputCombinations=8 Failures=0\r\nResult=PASS\r\n"
+  },
+  {
+    "Architecture": "x64",
+    "BinarySHA256": {
+      "KexDll": "FFCE0F6943D750005B5291C65936ED25483E8D7AAB031DACFA74544F9E550051",
+      "KxNt": "7F23703A91B5606D6692924BC15D6811F1882C9F89D9B91782D18DAC1AC0F756"
+    },
+    "ProbeSHA256": "1ED12996DED8E74338ADFA475D002FAEA91746818FE90899B54333D686737A05",
+    "Output": "ProcessBits=64\r\nNativeDeviceFamily=ABSENT\r\nReportedVersion=6.0.6002 ProductType=1\r\nSpoofedVersionCases=3\r\nOptionalOutputCombinations=8 Failures=0\r\nResult=PASS\r\n"
+  }
+]
