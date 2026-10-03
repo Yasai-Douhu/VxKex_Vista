@@ -652,3 +652,16 @@ x64のfixed contract比較は、失敗gateより後にあるためその初回ru
 証跡: docs/validation/kxnt-utf8-vista-client-resources.json（両形式10実行のraw結果、source / EXE / runner / DLL hash）。再実行: tests/build_kxnt_probes.ps1を両形式で実行し、tests/run_kxnt_utf8_resource_probe.ps1にVMX / GuestUser / GuestPassword / GuestDirectoryとArchitectureを指定する。modeごとのrawログはaudit/KxNtParityに残る。
 
 初回差分のhandle作成stack、各Eventの完全なlifecycle、計測介入がない実行との帰属、通常IFEOの統合試験は未完了。配布DLL、Installer、システムDLLは変更していない。SRWのVista成功は別の記録としてコミット済みであり、今回のUTF資源比較の失敗を覆い隠さない。
+## 2026-10-03: ConDrv限定互換の Vista クライアント検証
+
+Vista x64 VMのWOW64 / x64でtests/run_kxnt_condrv_vm.ps1を実行し、両形式でconsole and real Zig stdio試験に成功した。66f071fの限定互換をクライアントでも測定した結果であり、ConDrv全体の実装完了ではない。
+
+- コンソールハンドルの判定、無効値、File / consoleの数値alias、file / pipeのnative経路、offset / IOSB / input pointer、同期書込み、文字コード、強制部分完了など、既存probeの全gateを再実行。KexDll / KxNtの実読込みパスを専用フォルダーと照合した。
+- 識別情報とimport表を使うprofileの境界・破損入力、DisableAppSpecific、profileなしのnative対照を実行。全アプリを一律にconsole adapterへ転送したテストではない。
+- 4threadで4,000書込みをcold / warmで実行し、coldのhandle増加がnative対照と一致、warmの増加0、生きたhandle identityの前後一致を確認した。
+- 公式Zig 0.16の専用に変更したprivateコピーを使用。両形式でconsole child終了0・39 UTF-16 unitsの内容を照合。file / pipeでは終了0・40bytesの全内容を照合した。公式配布EXEやユーザーアプリのimport表を変更していない。
+- KxBaseのVT modeのロード・export・有効化・出力も成功。raster font上のUTF8表示にあるnativeの制約が解消したとは扱わない。
+
+証跡: docs/validation/kxnt-condrv-vista-client.json（native対照、VM raw結果、source / EXE / DLL hash）。再実行はtests/run_kxnt_condrv_vm.ps1にVista VMX、GuestUser、GuestPassword、専用GuestDirectoryを指定する。
+
+既存の制約は維持する。自然なOS部分完了ではなくowned KexDllのIATだけで強制したcase、曖昧aliasのNOT_SUPPORTED、event / APC等の非対応経路、cold native-control Eventの作成stack未同定、通常IFEO統合・system DLL配備未検証。配布バイナリ、システムDLL、Releasesは変更していない。
