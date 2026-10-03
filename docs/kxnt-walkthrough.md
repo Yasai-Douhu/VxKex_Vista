@@ -623,3 +623,15 @@ runnerはcommit前の再open成功・commit後の読取り失敗、commit後crea
 証跡: docs/validation/kxnt-vista-client-core/ の11 receiptとmanifest（VMX、GuestUser、GuestDirectory、client種別、EXE / DLL / runner SHA256、raw結果）。再実行: tests/run_kxnt_core_suite.ps1 -VMX <Vista VMX> -GuestUser <ユーザー> -GuestPassword <パスワード> -GuestDirectory <専用フォルダー> -RunName <新しい名前> -ExpectedProductType 1。Server用はExpectedProductType 3を指定する。
 
 この検証はscratchの明示DLL読込みであり、システムDLL配備、通常IFEO起動、native32bit OS、任意token、全競合・全不正入力の検証ではない。Vistaユーザーの名前から標準ユーザー / token elevation状態を推定していない。SRW、UTF変換、ConDrv、SilentProcessExitのVista側追加検証は継続する。既存の機能制約や未対応部分をこのPASSで解消したと扱わない。
+## 2026-10-03: SRW try取得の Vista クライアント検証
+
+Vista x64 VM（前節でnative 6.0.6002 / workstationを確認）のWOW64 / x64で、tests/run_kxnt_srw_vm.ps1のnative interoperation試験を実行し、両形式で成功した。新しい配布DLL変更ではなく、979cfa9で実装した機能のクライアント側検証である。
+
+- Native RtlTryAcquireSRWLockの不在を終了5とNATIVE_TRY_ABSENTで確認し、native acquire / releaseで作ったVistaのロック状態も検査した。
+- Nativeホストのtry取得結果と比較。保持中 / 空き / shared count、待機者のいる状態、無効・guard・read-only出力の例外、TLSとlock word不変性の固定結果が一致。ホスト上のnative委譲経路も比較した。
+- Native condition variableとexclusive / shared lockの組合せ、4workerのnativeと互換tryの混在、保護データ、終了、handle増加0のgateを通過した。
+- 実際のProviderPathとKexDllPathがVistaユーザーの専用C:\Users\Vista\KxNtParity\x86またはx64であることをrunnerが要求した。コード・DLL・EXEのSHA256、native / adapter / VM raw結果を保存した。
+
+証跡: docs/validation/kxnt-srw-vista-client.json。再実行はtests/run_kxnt_srw_vm.ps1にVista VMX、GuestUser、GuestPassword、GuestDirectoryを指定する。終了5はAPI不在の明示確認であり、try機能の試験失敗を無視するための扱いではない。
+
+通常IFEO起動、native32bit OS、任意スケジューラの全interleavingは依然として未検証。システムDLL・Installer・Releasesは変更していない。続いてUTF変換を測定したところ、x64のcold resource比較gateに差分があり停止した。これをSRWの成功やUTF変換の全面的な成功へ読み替えず、別途診断する。
