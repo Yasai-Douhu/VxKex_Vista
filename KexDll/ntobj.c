@@ -1,408 +1,252 @@
 #include "buildcfg.h"
 #include "kexdllp.h"
+#include <limits.h>
 
-//
-// Note: This function is not perfect and does not give the right answer in
-// all cases.
-//
-// If we had a kernel mode support driver, this would be trivial to implement.
-//
-// Returns STATUS_SUCCESS if the two handles refer to the same kernel object.
-// Returns STATUS_NOT_SAME_OBJECT if the handles refer to different objects.
-// Returns another NTSTATUS value on error.
-//
-KEXAPI NTSTATUS NTAPI NtCompareObjects(
-	IN	HANDLE	FirstObjectHandle,
-	IN	HANDLE	SecondObjectHandle)
+typedef struct _KEX_HANDLE_ENTRY32 {
+    ULONG Object, ProcessId, HandleValue, GrantedAccess;
+    USHORT TraceIndex, TypeIndex;
+    ULONG Attributes, Reserved;
+} KEX_HANDLE_ENTRY32;
+typedef struct _KEX_HANDLE_ENTRY64 {
+    ULONGLONG Object, ProcessId, HandleValue;
+    ULONG GrantedAccess;
+    USHORT TraceIndex, TypeIndex;
+    ULONG Attributes, Reserved;
+} KEX_HANDLE_ENTRY64;
+
+#ifdef _M_IX86
+typedef NTSTATUS (NTAPI *KEX_QUERY_PROCESS64)(HANDLE,ULONG,PVOID,ULONG,PULONG);
+typedef NTSTATUS (NTAPI *KEX_READ64)(HANDLE,ULONGLONG,PVOID,ULONGLONG,PULONGLONG);
+
+// Four-argument x64 ABI bridge for the native NtQuerySystemInformation stub.
+// Preserve x86 nonvolatile registers, align the native stack and reserve its
+// shadow space. The return far pointer occupies exactly the eight bytes of
+// the x64 call's return address; no stack DWORD is left behind.
+__declspec(naked) static NTSTATUS __cdecl KexpQueryHandles64(
+    ULONGLONG Address, ULONG Class, PVOID Buffer, ULONG Size, PULONG Returned)
 {
-	NTSTATUS Status;
-	OBJECT_BASIC_INFORMATION BasicInformation1;
-	OBJECT_BASIC_INFORMATION BasicInformation2;
-	POBJECT_TYPE_INFORMATION TypeInformation1;
-	POBJECT_TYPE_INFORMATION TypeInformation2;
-	PUNICODE_STRING NameInformation1;
-	PUNICODE_STRING NameInformation2;
-	BOOLEAN ObjectTypesAreEqual;
-	BOOLEAN ObjectNamesAreEqual;
-	ULONG RequiredSize;
-
-	UNICODE_STRING ProcessTypeString;
-	UNICODE_STRING ThreadTypeString;
-	UNICODE_STRING EventTypeString;
-
-	//
-	// Fetch and compare type information for both objects.
-	// This shouldn't fail.
-	//
-
-	Status = NtQueryObject(
-		FirstObjectHandle,
-		ObjectTypeInformation,
-		NULL,
-		0,
-		&RequiredSize);
-
-	if (Status != STATUS_INFO_LENGTH_MISMATCH) {
-		// e.g. invalid object handle
-		ASSERT (Status == STATUS_INFO_LENGTH_MISMATCH);
-		return Status;
-	}
-
-	if (FirstObjectHandle == SecondObjectHandle) {
-		//
-		// If the two handles are numerically the same, then of course they refer to the
-		// same object.
-		//
-		// Note that we do this simple check after calling NtQueryObject on one handle.
-		// The reason for this is that if the caller passes two garbage values that aren't
-		// actual handles, then NtQueryObject will catch that.
-		//
-
-		return STATUS_SUCCESS;
-	}
-
-	TypeInformation1 = (POBJECT_TYPE_INFORMATION) StackAlloc(BYTE, RequiredSize);
-
-	Status = NtQueryObject(
-		FirstObjectHandle,
-		ObjectTypeInformation,
-		TypeInformation1,
-		RequiredSize,
-		NULL);
-
-	if (!NT_SUCCESS(Status)) {
-		ASSERT (NT_SUCCESS(Status));
-		return Status;
-	}
-
-	// Get object type of 2nd handle.
-	// Re-use the same length value as for the 1st handle.
-	TypeInformation2 = (POBJECT_TYPE_INFORMATION) StackAlloc(BYTE, RequiredSize);
-
-	Status = NtQueryObject(
-		SecondObjectHandle,
-		ObjectTypeInformation,
-		TypeInformation2,
-		RequiredSize,
-		NULL);
-
-	if (Status == STATUS_INFO_LENGTH_MISMATCH) {
-		// If NtQueryObject returns STATUS_INFO_LENGTH_MISMATCH, then it means the
-		// object types are different, because the lengths are different.
-		return STATUS_NOT_SAME_OBJECT;
-	}
-
-	ASSERT (NT_SUCCESS(Status));
-
-	if (!NT_SUCCESS(Status)) {
-		return Status;
-	}
-
-	ObjectTypesAreEqual = RtlEqualUnicodeString(
-		&TypeInformation1->TypeName,
-		&TypeInformation2->TypeName,
-		FALSE);
-
-	if (!ObjectTypesAreEqual) {
-		// The two objects are of different type.
-		// We know for certain that they can't be the same.
-		return STATUS_NOT_SAME_OBJECT;
-	}
-
-	//
-	// Now, we've confirmed that the type of both objects are the same. We could
-	// check the name of the objects to find out whether they're the same object.
-	// However, this isn't enough. There are many objects which have no name.
-	//
-	// Our ability to detect differences in these cases is rather limited. For
-	// processes and threads, we can check the process ID and thread ID to obtain
-	// the answer with certainty.
-	//
-	// For events, we can check the EVENT_TYPE.
-	//
-	// For all other object types, we will use a heuristic approach which works in
-	// some cases. Unfortunately, in the cases this doesn't work, we simply have to
-	// give an answer which may be incorrect.
-	//
-
-	RtlInitConstantUnicodeString(&ProcessTypeString, L"Process");
-	RtlInitConstantUnicodeString(&ThreadTypeString, L"Thread");
-	RtlInitConstantUnicodeString(&EventTypeString, L"Event");
-
-	if (RtlEqualUnicodeString(&TypeInformation1->TypeName, &ProcessTypeString, FALSE)) {
-		PROCESS_BASIC_INFORMATION ProcessBasicInformation1;
-		PROCESS_BASIC_INFORMATION ProcessBasicInformation2;
-
-		//
-		// Both handles refer to a process.
-		//
-
-		Status = NtQueryInformationProcess(
-			FirstObjectHandle,
-			ProcessBasicInformation,
-			&ProcessBasicInformation1,
-			sizeof(ProcessBasicInformation1),
-			NULL);
-
-		if (Status == STATUS_ACCESS_DENIED) {
-			goto SkipTypeSpecificDetection;
-		} else if (!NT_SUCCESS(Status)) {
-			ASSERT (NT_SUCCESS(Status));
-			return Status;
-		}
-
-		Status = NtQueryInformationProcess(
-			SecondObjectHandle,
-			ProcessBasicInformation,
-			&ProcessBasicInformation2,
-			sizeof(ProcessBasicInformation2),
-			NULL);
-
-		if (Status == STATUS_ACCESS_DENIED) {
-			goto SkipTypeSpecificDetection;
-		} else if (!NT_SUCCESS(Status)) {
-			ASSERT (NT_SUCCESS(Status));
-			return Status;
-		}
-
-		//
-		// Ok, now check whether the process IDs are equal.
-		//
-
-		if (ProcessBasicInformation1.UniqueProcessId == ProcessBasicInformation2.UniqueProcessId) {
-			return STATUS_SUCCESS;
-		} else {
-			return STATUS_NOT_SAME_OBJECT;
-		}
-	} else if (RtlEqualUnicodeString(&TypeInformation1->TypeName, &ThreadTypeString, FALSE)) {
-		THREAD_BASIC_INFORMATION ThreadBasicInformation1;
-		THREAD_BASIC_INFORMATION ThreadBasicInformation2;
-
-		//
-		// Both handles refer to a thread.
-		//
-
-		Status = NtQueryInformationThread(
-			FirstObjectHandle,
-			ThreadBasicInformation,
-			&ThreadBasicInformation1,
-			sizeof(ThreadBasicInformation1),
-			NULL);
-
-		if (Status == STATUS_ACCESS_DENIED) {
-			goto SkipTypeSpecificDetection;
-		} else if (!NT_SUCCESS(Status)) {
-			ASSERT (NT_SUCCESS(Status));
-			return Status;
-		}
-
-		Status = NtQueryInformationThread(
-			SecondObjectHandle,
-			ThreadBasicInformation,
-			&ThreadBasicInformation2,
-			sizeof(ThreadBasicInformation2),
-			NULL);
-
-		if (Status == STATUS_ACCESS_DENIED) {
-			goto SkipTypeSpecificDetection;
-		} else if (!NT_SUCCESS(Status)) {
-			ASSERT (NT_SUCCESS(Status));
-			return Status;
-		}
-
-		//
-		// Check whether thread IDs are equal.
-		//
-
-		if (ThreadBasicInformation1.ClientId.UniqueThread == ThreadBasicInformation2.ClientId.UniqueThread) {
-			return STATUS_SUCCESS;
-		} else {
-			return STATUS_NOT_SAME_OBJECT;
-		}
-	} else if (RtlEqualUnicodeString(&TypeInformation1->TypeName, &EventTypeString, FALSE)) {
-		EVENT_BASIC_INFORMATION EventBasicInformation1;
-		EVENT_BASIC_INFORMATION EventBasicInformation2;
-
-		//
-		// Both handles refer to an event.
-		//
-
-		Status = NtQueryEvent(
-			FirstObjectHandle,
-			EventBasicInformation,
-			&EventBasicInformation1,
-			sizeof(EventBasicInformation1),
-			NULL);
-
-		if (Status == STATUS_ACCESS_DENIED) {
-			goto SkipTypeSpecificDetection;
-		} else if (!NT_SUCCESS(Status)) {
-			ASSERT (NT_SUCCESS(Status));
-			return Status;
-		}
-
-		Status = NtQueryEvent(
-			SecondObjectHandle,
-			EventBasicInformation,
-			&EventBasicInformation2,
-			sizeof(EventBasicInformation2),
-			NULL);
-
-		if (Status == STATUS_ACCESS_DENIED) {
-			goto SkipTypeSpecificDetection;
-		} else if (!NT_SUCCESS(Status)) {
-			ASSERT (NT_SUCCESS(Status));
-			return Status;
-		}
-
-		if (EventBasicInformation1.EventType != EventBasicInformation2.EventType) {
-			return STATUS_NOT_SAME_OBJECT;
-		}
-	}
-
-SkipTypeSpecificDetection:
-
-	//
-	// Heuristic approach.
-	//
-	// 1. Fetch and compare name information for both objects. If names are
-	//    different, then the objects are different. This is more reliable since
-	//    object names don't change that often.
-	//
-	// 2. Fetch and compare basic information for both objects. In the
-	//    OBJECT_BASIC_INFORMATION struct, there are a few things we can
-	//    check to immediately determine that the two objects are different.
-	//    However, this is less reliable, because the things we're checking can
-	//    be influenced by the actions of other threads.
-	//
-	// 3. In all other cases, assume the objects are the same.
-	//
-
-	//
-	// Compare names.
-	//
-
-	Status = NtQueryObject(
-		FirstObjectHandle,
-		ObjectNameInformation,
-		NULL,
-		0,
-		&RequiredSize);
-
-	if (Status != STATUS_INFO_LENGTH_MISMATCH) {
-		ASSERT (Status ==
-			STATUS_INFO_LENGTH_MISMATCH);
-		return Status;
-	}
-
-	NameInformation1 = (PUNICODE_STRING) StackAlloc(BYTE, RequiredSize);
-
-	Status = NtQueryObject(
-		FirstObjectHandle,
-		ObjectNameInformation,
-		NameInformation1,
-		RequiredSize,
-		NULL);
-
-	if (!NT_SUCCESS(Status)) {
-		ASSERT (NT_SUCCESS(Status));
-		return Status;
-	}
-
-	NameInformation2 = (PUNICODE_STRING) StackAlloc(BYTE, RequiredSize);
-
-	Status = NtQueryObject(
-		SecondObjectHandle,
-		ObjectNameInformation,
-		NameInformation2,
-		RequiredSize,
-		NULL);
-
-	if (!NT_SUCCESS(Status)) {
-		ASSERT (NT_SUCCESS(Status));
-		return Status;
-	}
-
-	ObjectNamesAreEqual = RtlEqualUnicodeString(
-		NameInformation1,
-		NameInformation2,
-		FALSE);
-
-	if (!ObjectNamesAreEqual) {
-		return STATUS_NOT_SAME_OBJECT;
-	}
-
-	//
-	// Get OBJECT_BASIC_INFORMATION structs.
-	//
-
-	Status = NtQueryObject(
-		FirstObjectHandle,
-		ObjectBasicInformation,
-		&BasicInformation1,
-		sizeof(BasicInformation1),
-		NULL);
-
-	if (!NT_SUCCESS(Status)) {
-		ASSERT (NT_SUCCESS(Status));
-		return Status;
-	}
-
-	Status = NtQueryObject(
-		SecondObjectHandle,
-		ObjectBasicInformation,
-		&BasicInformation2,
-		sizeof(BasicInformation2),
-		NULL);
-
-	if (!NT_SUCCESS(Status)) {
-		ASSERT (NT_SUCCESS(Status));
-		return Status;
-	}
-
-	//
-	// If either of the two objects has OBJ_EXCLUSIVE set in the attributes, then we
-	// know for certain that they are different objects, because only one handle with
-	// OBJ_EXCLUSIVE can be open to an object at a time.
-	//
-	// I think OBJ_EXCLUSIVE is a rare attribute to find, though. This code probably
-	// doesn't really do anything.
-	//
-
-	if (BasicInformation1.Attributes & OBJ_EXCLUSIVE) {
-		return STATUS_NOT_SAME_OBJECT;
-	}
-
-	if (BasicInformation2.Attributes & OBJ_EXCLUSIVE) {
-		return STATUS_NOT_SAME_OBJECT;
-	}
-
-	//
-	// If HandleCount or PointerCount are different between the two objects, then we
-	// can guess that they're different objects. Not 100% certain, due to race conditions.
-	//
-
-	if (BasicInformation1.HandleCount != BasicInformation2.HandleCount) {
-		return STATUS_NOT_SAME_OBJECT;
-	}
-
-	if (BasicInformation1.PointerCount != BasicInformation2.PointerCount) {
-		return STATUS_NOT_SAME_OBJECT;
-	}
-
-	//
-	// Check if the objects have differently sized security descriptors. Since security
-	// descriptors are associated with the object, rather than the handle, this can tell
-	// us if the objects are different.
-	//
-
-	if (BasicInformation1.SecurityDescriptorSize != BasicInformation2.SecurityDescriptorSize) {
-		return STATUS_NOT_SAME_OBJECT;
-	}
-
-	//
-	// Otherwise, we'll just say that the objects are the same.
-	//
-
-	return STATUS_SUCCESS;
+    __asm {
+        push ebp
+        mov ebp, esp
+        push ebx
+        push esi
+        push edi
+        mov ebx, esp
+        push 33h
+        call enter64
+    enter64:
+        add dword ptr [esp], 5
+        retf
+        // x64: clear upper halves inherited from 32bit register writes.
+        _emit 0x89
+        _emit 0xED
+        _emit 0x89
+        _emit 0xDB
+        // mov rax, [rbp+8]; mov ecx,[rbp+16]; mov edx,[rbp+20]
+        _emit 0x48
+        _emit 0x8B
+        _emit 0x45
+        _emit 0x08
+        _emit 0x8B
+        _emit 0x4D
+        _emit 0x10
+        _emit 0x8B
+        _emit 0x55
+        _emit 0x14
+        // mov r8d,[rbp+24]; mov r9d,[rbp+28]
+        _emit 0x44
+        _emit 0x8B
+        _emit 0x45
+        _emit 0x18
+        _emit 0x44
+        _emit 0x8B
+        _emit 0x4D
+        _emit 0x1C
+        // and rsp,-16; sub rsp,32; call rax; mov esp,ebx
+        _emit 0x48
+        _emit 0x83
+        _emit 0xE4
+        _emit 0xF0
+        _emit 0x48
+        _emit 0x83
+        _emit 0xEC
+        _emit 0x20
+        _emit 0xFF
+        _emit 0xD0
+        _emit 0x89
+        _emit 0xDC
+        call leave64
+    leave64:
+        _emit 0xC7
+        _emit 0x44
+        _emit 0x24
+        _emit 0x04
+        _emit 0x23
+        _emit 0x00
+        _emit 0x00
+        _emit 0x00
+        _emit 0x83
+        _emit 0x04
+        _emit 0x24
+        _emit 0x0D
+        _emit 0xCB
+        pop edi
+        pop esi
+        pop ebx
+        mov esp, ebp
+        pop ebp
+        ret
+    }
+}
+
+static ULONGLONG KexpFindNativeSystemQuery(VOID)
+{
+    HMODULE Module = GetModuleHandleW(L"ntdll.dll");
+    KEX_QUERY_PROCESS64 Query = (KEX_QUERY_PROCESS64) GetProcAddress(Module, "NtWow64QueryInformationProcess64");
+    KEX_READ64 Read = (KEX_READ64) GetProcAddress(Module, "NtWow64ReadVirtualMemory64");
+    PROCESS_BASIC_INFORMATION64 Basic;
+    ULONGLONG Ldr, Head, Entry, Base = 0;
+    BYTE Record[104];
+    WCHAR Name[32];
+    ULONG Index;
+    if (!Query || !Read || !NT_SUCCESS(Query(NtCurrentProcess(), ProcessBasicInformation, &Basic, sizeof(Basic), NULL))) return 0;
+    if (!NT_SUCCESS(Read(NtCurrentProcess(), (ULONGLONG)Basic.PebBaseAddress + 0x18, &Ldr, sizeof(Ldr), NULL))) return 0;
+    Head = Ldr + 0x10; // PEB_LDR_DATA64.InLoadOrderModuleList
+    if (!NT_SUCCESS(Read(NtCurrentProcess(), Head, &Entry, sizeof(Entry), NULL))) return 0;
+    for (Index = 0; Index < 128 && Entry != Head; ++Index) {
+        USHORT Length;
+        ULONGLONG NameAddress;
+        if (!NT_SUCCESS(Read(NtCurrentProcess(), Entry, Record, sizeof(Record), NULL))) return 0;
+        memcpy(&Length, Record + 0x58, sizeof(Length));
+        memcpy(&NameAddress, Record + 0x60, sizeof(NameAddress));
+        if (Length == 18 && NT_SUCCESS(Read(NtCurrentProcess(), NameAddress, Name, Length, NULL))) {
+            ULONG Character;
+            for (Character = 0; Character < 9; ++Character) {
+                if ((Name[Character] | 0x20) != L"ntdll.dll"[Character]) break;
+            }
+            if (Character == 9) { memcpy(&Base, Record + 0x30, sizeof(Base)); break; }
+        }
+        memcpy(&Entry, Record, sizeof(Entry));
+    }
+    // NT 6.0 maps native ntdll below 4GB. Check this before using x86 pointers
+    // to parse its PE64 export directory; never silently truncate an address.
+    if (!Base || Base > ULONG_MAX) return 0;
+    __try {
+        PBYTE Image = (PBYTE)(ULONG_PTR)Base;
+        IMAGE_DOS_HEADER *Dos = (IMAGE_DOS_HEADER*)Image;
+        IMAGE_NT_HEADERS64 *Nt;
+        IMAGE_EXPORT_DIRECTORY *Exports;
+        ULONG *Names, *Functions;
+        USHORT *Ordinals;
+        if (Dos->e_magic != IMAGE_DOS_SIGNATURE || Dos->e_lfanew <= 0) return 0;
+        Nt = (IMAGE_NT_HEADERS64*)(Image + Dos->e_lfanew);
+        if (Nt->Signature != IMAGE_NT_SIGNATURE || Nt->OptionalHeader.Magic != IMAGE_NT_OPTIONAL_HDR64_MAGIC ||
+            Base + Nt->OptionalHeader.SizeOfImage > ULONG_MAX) return 0;
+        Exports = (IMAGE_EXPORT_DIRECTORY*)(Image + Nt->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_EXPORT].VirtualAddress);
+        Names = (ULONG*)(Image + Exports->AddressOfNames);
+        Functions = (ULONG*)(Image + Exports->AddressOfFunctions);
+        Ordinals = (USHORT*)(Image + Exports->AddressOfNameOrdinals);
+        for (Index = 0; Index < Exports->NumberOfNames; ++Index) {
+            if (!strcmp((PCHAR)(Image + Names[Index]),"NtQuerySystemInformation")) {
+                ULONG Rva;
+                if (Ordinals[Index] >= Exports->NumberOfFunctions) return 0;
+                Rva = Functions[Ordinals[Index]];
+                if (!Rva || Rva >= Nt->OptionalHeader.SizeOfImage) return 0;
+                return Base + Rva;
+            }
+        }
+    } __except(EXCEPTION_EXECUTE_HANDLER) { return 0; }
+    return 0;
+}
+
+static NTSTATUS KexpQueryNativeHandles(PVOID Buffer, ULONG Size, PULONG Returned)
+{
+    __declspec(align(8)) static LONGLONG Address;
+    ULONGLONG Query = (ULONGLONG)InterlockedCompareExchange64(&Address, 0, 0);
+    if (!Query) {
+        Query = KexpFindNativeSystemQuery();
+        if (!Query) return STATUS_NOT_SUPPORTED;
+        InterlockedCompareExchange64(&Address, (LONGLONG)Query, 0);
+    }
+    return KexpQueryHandles64(Query, SystemExtendedHandleInformation, Buffer, Size, Returned);
+}
+#endif
+
+static NTSTATUS KexpComparePinnedObjects(HANDLE First, HANDLE Second)
+{
+    HANDLE PinnedFirst = NULL, PinnedSecond = NULL;
+    PVOID Buffer = NULL;
+    BOOLEAN Native64;
+    ULONG Size = 65536, Returned = 0, Attempt;
+    ULONGLONG Count, Index, Object1 = 0, Object2 = 0;
+    ULONG_PTR ProcessId = (ULONG_PTR)NtCurrentTeb()->ClientId.UniqueProcess;
+    ULONG HeaderSize, EntrySize;
+    NTSTATUS Status;
+    Native64 = KexRtlOperatingSystemBitness() == 64;
+    Status = NtDuplicateObject(NtCurrentProcess(), First, NtCurrentProcess(), &PinnedFirst, 0, 0, DUPLICATE_SAME_ACCESS);
+    if (!NT_SUCCESS(Status)) return Status;
+    if (First == Second) { NtClose(PinnedFirst); return STATUS_SUCCESS; }
+    Status = NtDuplicateObject(NtCurrentProcess(), Second, NtCurrentProcess(), &PinnedSecond, 0, 0, DUPLICATE_SAME_ACCESS);
+    if (!NT_SUCCESS(Status)) { NtClose(PinnedFirst); return Status; }
+    HeaderSize = Native64 ? 16 : 8;
+    EntrySize = Native64 ? sizeof(KEX_HANDLE_ENTRY64) : sizeof(KEX_HANDLE_ENTRY32);
+    for (Attempt = 0; Attempt < 10; ++Attempt) {
+        Buffer = RtlAllocateHeap(NtCurrentPeb()->ProcessHeap, 0, Size);
+        if (!Buffer) { Status = STATUS_NO_MEMORY; break; }
+#ifdef _M_IX86
+        if (Native64) Status = KexpQueryNativeHandles(Buffer, Size, &Returned);
+        else
+#endif
+        Status = NtQuerySystemInformation(SystemExtendedHandleInformation, Buffer, Size, &Returned);
+        if (Status != STATUS_INFO_LENGTH_MISMATCH && Status != STATUS_BUFFER_TOO_SMALL) break;
+        RtlFreeHeap(NtCurrentPeb()->ProcessHeap, 0, Buffer); Buffer = NULL;
+        if (Size >= 64 * 1024 * 1024 || Returned > 64 * 1024 * 1024) break;
+        Size = max(Size * 2, Returned);
+    }
+    if (NT_SUCCESS(Status)) {
+        Count = Native64 ? *(ULONGLONG*)Buffer : *(ULONG*)Buffer;
+        if (Returned < HeaderSize || Returned > Size || Count > (Returned - HeaderSize) / EntrySize) {
+            Status = STATUS_INFO_LENGTH_MISMATCH;
+        } else {
+            for (Index = 0; Index < Count; ++Index) {
+                ULONGLONG Object, Pid, Handle;
+                if (Native64) {
+                    KEX_HANDLE_ENTRY64 *Entry = (KEX_HANDLE_ENTRY64*)((PBYTE)Buffer + HeaderSize) + (SIZE_T)Index;
+                    Object = Entry->Object; Pid = Entry->ProcessId; Handle = Entry->HandleValue;
+                } else {
+                    KEX_HANDLE_ENTRY32 *Entry = (KEX_HANDLE_ENTRY32*)((PBYTE)Buffer + HeaderSize) + (SIZE_T)Index;
+                    Object = Entry->Object; Pid = Entry->ProcessId; Handle = Entry->HandleValue;
+                }
+                if (Pid != ProcessId) continue;
+                if (Handle == (ULONG_PTR)PinnedFirst) Object1 = Object;
+                if (Handle == (ULONG_PTR)PinnedSecond) Object2 = Object;
+                if (Object1 && Object2) break;
+            }
+            // Missing or suppressed identifiers cannot prove either identity or
+            // inequality. Do not fall back to matching names or reference counts.
+            Status = !Object1 || !Object2 ? STATUS_NOT_SUPPORTED :
+                Object1 == Object2 ? STATUS_SUCCESS : STATUS_NOT_SAME_OBJECT;
+        }
+    }
+    if (Buffer) RtlFreeHeap(NtCurrentPeb()->ProcessHeap, 0, Buffer);
+    NtClose(PinnedSecond); NtClose(PinnedFirst);
+    return Status;
+}
+
+KEXAPI NTSTATUS NTAPI NtCompareObjects(HANDLE FirstObjectHandle, HANDLE SecondObjectHandle)
+{
+    typedef NTSTATUS (NTAPI *NATIVE_COMPARE)(HANDLE,HANDLE);
+    static PVOID NativeCache;
+    ULONG Error = GetLastError();
+    NATIVE_COMPARE Native = (NATIVE_COMPARE)InterlockedCompareExchangePointer(&NativeCache, NULL, NULL);
+    NTSTATUS Status;
+    if (!Native) {
+        Native = (NATIVE_COMPARE)GetProcAddress(GetModuleHandleW(L"ntdll.dll"),"NtCompareObjects");
+        if (!Native || Native == NtCompareObjects) Native = (NATIVE_COMPARE)1;
+        InterlockedCompareExchangePointer(&NativeCache, (PVOID)Native, NULL);
+    }
+    Status = (ULONG_PTR)Native > 1 ? Native(FirstObjectHandle,SecondObjectHandle) :
+        KexpComparePinnedObjects(FirstObjectHandle,SecondObjectHandle);
+    SetLastError(Error);
+    return Status;
 }

@@ -1,0 +1,22 @@
+[
+  {
+    "Architecture": "x86",
+    "SourceCommit": "e992afd",
+    "BinarySHA256": {
+      "KxNt": "2A28C0AF81FD088ABABC49539E4B08B07CF33AF01501B7A40D41E1F4610B97E6",
+      "KexDll": "AB8953D3AAE16BD11BD485F60A5E99D854E2A866329F5E309083075B387FD5E8"
+    },
+    "GuestExitCode": 1,
+    "Output": "ProcessBits=32\r\nCase=same-handle Status=00000000 AliasStatus=00000000 LastError=12345678\r\nCase=duplicate Status=00000000 AliasStatus=00000000 LastError=12345678\r\nCase=distinct-unnamed-events Status=00000000 AliasStatus=00000000 LastError=12345678\r\nCase=different-types Status=c00001ac AliasStatus=c00001ac LastError=12345678\r\nCase=named-reopened Status=c00001ac AliasStatus=c00001ac LastError=12345678\r\nCase=zero-access-duplicate Status=00000000 AliasStatus=00000000 LastError=12345678\r\nCase=zero-access-distinct Status=00000000 AliasStatus=00000000 LastError=12345678\r\nCase=pseudo-process Status=c00001ac AliasStatus=c00001ac LastError=12345678\r\nCase=pseudo-thread Status=c00001ac AliasStatus=c00001ac LastError=12345678\r\nCase=file-duplicate Status=00000000 AliasStatus=00000000 LastError=12345678\r\nCase=same-file-separate-opens Status=c00001ac AliasStatus=c00001ac LastError=12345678\r\nCase=null-first Status=c0000008 AliasStatus=c0000008 LastError=12345678\r\nCase=null-second Status=c0000005 AliasStatus=c0000005 LastError=12345678\r\nCase=null-both Status=c0000008 AliasStatus=c0000008 LastError=12345678\r\nCase=invalid-same Status=c0000008 AliasStatus=c0000008 LastError=12345678\r\nCase=closed-handle Status=c0000008 AliasStatus=c0000008 LastError=12345678\r\nDiagnostic TableStatus=00000000 EntryBytes=28\r\nDiagnostic Object=08A0F610 Type=9\r\nCompareCases=16 Failures=6\r\nResult=FAIL\r\n"
+  },
+  {
+    "Architecture": "x64",
+    "SourceCommit": "e992afd",
+    "BinarySHA256": {
+      "KxNt": "24F3F067B4F6CF8AA9D0D610EA9F503F5B73C952BAE5B15BA87124B58989CACF",
+      "KexDll": "71BA9A88B05109C941C2EB3C58D20FB7DBBE6796C5B2482381ED9DDC8DF1A98E"
+    },
+    "GuestExitCode": 1,
+    "Output": "ProcessBits=64\r\nCase=same-handle Status=00000000 AliasStatus=00000000 LastError=12345678\r\nCase=duplicate Status=00000000 AliasStatus=00000000 LastError=12345678\r\nCase=distinct-unnamed-events Status=00000000 AliasStatus=00000000 LastError=12345678\r\nCase=different-types Status=c00001ac AliasStatus=c00001ac LastError=12345678\r\nCase=named-reopened Status=c00001ac AliasStatus=c00001ac LastError=12345678\r\nCase=zero-access-duplicate Status=00000000 AliasStatus=00000000 LastError=12345678\r\nCase=zero-access-distinct Status=00000000 AliasStatus=00000000 LastError=12345678\r\nCase=pseudo-process Status=c00001ac AliasStatus=c00001ac LastError=12345678\r\nCase=pseudo-thread Status=c00001ac AliasStatus=c00001ac LastError=12345678\r\nCase=file-duplicate Status=00000000 AliasStatus=00000000 LastError=12345678\r\nCase=same-file-separate-opens Status=c00001ac AliasStatus=c00001ac LastError=12345678\r\nCase=null-first Status=c0000008 AliasStatus=c0000008 LastError=12345678\r\nCase=null-second Status=c0000008 AliasStatus=c0000008 LastError=12345678\r\nCase=null-both Status=c0000008 AliasStatus=c0000008 LastError=12345678\r\nCase=invalid-same Status=c0000008 AliasStatus=c0000008 LastError=12345678\r\nCase=closed-handle Status=c0000008 AliasStatus=c0000008 LastError=12345678\r\nDiagnostic TableStatus=00000000 EntryBytes=40\r\nDiagnostic Object=FFFFFA8009C90FE0 Type=9\r\nCompareCases=16 Failures=5\r\nResult=FAIL\r\n"
+  }
+]

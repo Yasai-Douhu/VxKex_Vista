@@ -12,7 +12,8 @@
         "RtlGetPersistedStateLocation": 2203,
         "RtlIsCapabilitySid": 2205,
         "RtlIsPackageSid": 2204,
-        "RtlIsProcessorFeaturePresent": 2201
+        "RtlIsProcessorFeaturePresent": 2201,
+        "ZwCompareObjects": 2207
       }
     },
     {
@@ -26,7 +27,8 @@
         "RtlGetPersistedStateLocation": 2203,
         "RtlIsCapabilitySid": 2205,
         "RtlIsPackageSid": 2204,
-        "RtlIsProcessorFeaturePresent": 2201
+        "RtlIsProcessorFeaturePresent": 2201,
+        "ZwCompareObjects": 2207
       }
     },
     {

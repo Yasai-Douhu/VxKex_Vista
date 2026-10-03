@@ -1,5 +1,6 @@
 LIBRARY KxNt
 EXPORTS
+	ZwCompareObjects = KexDll.NtCompareObjects @2207
 	RtlCheckTokenMembershipEx = KexDll.KexRtlCheckTokenMembershipEx @2206
 	RtlIsPackageSid = KexDll.KexRtlIsPackageSid @2204
 	RtlIsCapabilitySid = KexDll.KexRtlIsCapabilitySid @2205

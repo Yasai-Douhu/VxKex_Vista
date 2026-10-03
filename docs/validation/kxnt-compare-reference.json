@@ -1,0 +1,26 @@
+{
+  "ReferenceExport": "ntdll!NtCompareObjects / ZwCompareObjects",
+  "OSVersion": "Microsoft Windows NT 10.0.26300.0",
+  "NtdllVersion": "10.0.26100.9549 (WinBuild.160101.0800)",
+  "Output": [
+    "ConcurrentCalls=800 HandleDelta=0",
+    "Case=same-handle Status=00000000 AliasStatus=00000000 LastError=12345678",
+    "Case=duplicate Status=00000000 AliasStatus=00000000 LastError=12345678",
+    "Case=distinct-unnamed-events Status=c00001ac AliasStatus=c00001ac LastError=12345678",
+    "Case=different-types Status=c00001ac AliasStatus=c00001ac LastError=12345678",
+    "Case=named-reopened Status=00000000 AliasStatus=00000000 LastError=12345678",
+    "Case=zero-access-duplicate Status=00000000 AliasStatus=00000000 LastError=12345678",
+    "Case=zero-access-distinct Status=c00001ac AliasStatus=c00001ac LastError=12345678",
+    "Case=pseudo-process Status=00000000 AliasStatus=00000000 LastError=12345678",
+    "Case=pseudo-thread Status=00000000 AliasStatus=00000000 LastError=12345678",
+    "Case=file-duplicate Status=00000000 AliasStatus=00000000 LastError=12345678",
+    "Case=same-file-separate-opens Status=c00001ac AliasStatus=c00001ac LastError=12345678",
+    "Case=null-first Status=c0000008 AliasStatus=c0000008 LastError=12345678",
+    "Case=null-second Status=c0000008 AliasStatus=c0000008 LastError=12345678",
+    "Case=null-both Status=c0000008 AliasStatus=c0000008 LastError=12345678",
+    "Case=invalid-same Status=c0000008 AliasStatus=c0000008 LastError=12345678",
+    "Case=closed-handle Status=c0000008 AliasStatus=c0000008 LastError=12345678",
+    "CompareCases=16 Failures=0",
+    "Result=PASS"
+  ]
+}

@@ -28,3 +28,5 @@ if ($LASTEXITCODE) { throw "Persisted state probe build failed ($Architecture)" 
 if ($LASTEXITCODE) { throw "SID classification probe build failed ($Architecture)" }
 & cl.exe /nologo /MT /O1 /W4 "/Fo$out\membership.obj" "/Fe$out\membership.exe" "$PSScriptRoot\kxnt_membership_probe.c" /link /SUBSYSTEM:CONSOLE,6.0 advapi32.lib
 if ($LASTEXITCODE) { throw "Token membership probe build failed ($Architecture)" }
+& cl.exe /nologo /MT /O1 /W4 "/Fo$out\compare.obj" "/Fe$out\compare.exe" "$PSScriptRoot\kxnt_compare_probe.c" /link /SUBSYSTEM:CONSOLE,6.0
+if ($LASTEXITCODE) { throw "Object comparison probe build failed ($Architecture)" }
