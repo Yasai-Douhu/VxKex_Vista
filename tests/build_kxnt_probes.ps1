@@ -60,3 +60,5 @@ if ($LASTEXITCODE) { throw "Registry open reference probe build failed ($Archite
 if ($LASTEXITCODE) { throw "Registry transaction probe build failed ($Architecture)" }
 & cl.exe /nologo /MT /O1 /W4 "/Fo$out\utf8-resource.obj" "/Fe$out\utf8-resource.exe" "$PSScriptRoot\kxnt_utf8_resource_probe.c" /link /SUBSYSTEM:CONSOLE,6.0
 if ($LASTEXITCODE) { throw "UTF resource probe build failed ($Architecture)" }
+& cl.exe /nologo /MT /O1 /W4 "/Fo$out\utf8-resource-windowless.obj" "/Fe$out\utf8-resource-windowless.exe" "$PSScriptRoot\kxnt_utf8_resource_probe.c" /link /SUBSYSTEM:WINDOWS,6.0 /ENTRY:mainCRTStartup
+if ($LASTEXITCODE) { throw "Windowless UTF resource probe build failed ($Architecture)" }

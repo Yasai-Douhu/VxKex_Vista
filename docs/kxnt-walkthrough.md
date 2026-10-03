@@ -717,3 +717,24 @@ native-launchのtimeout採取でinteger registerとRdx先頭32bytesを追加し�
 証跡: docs/validation/kxnt-launch-wait-registers.json（raw context、module hash、export RVAとdisassembly抜粋）。VCのx64 dumpbinはmsdis170.dllをロードできずdisassemblyを生成しなかったため、その出力を証拠にせず、同梱32bit dumpbinでx64 imageを逆アセンブルした。関数名を推定で補わず、確認できたexportとoffsetのみを記録した。
 
 配布DLL、Installer、system DLL、Releasesは変更していない。UTFの資源gate、待機objectの帰属、通常IFEO統合、監査に残る未実装項目は引き続き未完了。
+
+## 2026-10-04: Windowless資源identityとnative loader-lock Eventの作成を観測
+
+tests/build_kxnt_probes.ps1に同じ資源診断ソースのWindows subsystem版を追加し、tests/run_kxnt_utf8_resource_probe.ps1にWindowless / RunNameを追加した。各VM / architectureでempty、native lookup、変換、KexDllなしempty、KexDllなしnative lookupの5mode、計20実行を完了した。全5phaseのhandle表、型・名前・identityを採取。Windowlessではflags0のowned launcherで自然終了0、PE subsystem=2、実DLLパス、no-KexDll対照の実不在を要求し、Measuredと漏れゼロの判定を区別した。DLLは当該Releaseから専用scratchへコピーし、そのhashを記録した。既存console modeの起動条件は保持した。
+
+- tests/analyze_kxnt_handle_snapshots.pyを追加。各phaseの列挙数と解析できたidentity数を照合し、handle番号とkernel objectの組を使ってbeforeから追加・削除された資源を抽出した。名前だけの比較や番号だけの再利用判定ではない。
+- 全20条件でafter100msの追加資源は0〜2個の名前なしEventであり、今回のwindowless実行でProcess / Thread / conimeの追加は観測されなかった。互換DLLを読み込まないmode4でも両VM・両形式でEventが増えた。warmの増加やidentity差は全phaseの証跡を保存し、数だけから漏れ・所有者・作成元を断定しない。
+- これは別プロセスでの診断で、前回の全UTF試験で失敗した個々のcold Eventを追跡したものではない。元のcold数一致gateやそのFailed記録を維持する。
+
+証跡: docs/validation/kxnt-utf8-windowless-resources.json（4receipt、20raw）、kxnt-utf8-windowless-identities.json（全phaseの追加・削除と元receipt hash）。再実行はbuild後にresource runnerへWindowless、未使用RunName、VMX / user / password / scratch / architectureを渡す。異なるRunNameで過去の結果を残す。
+
+### Server x64のnative-only mode4で一つのEventをloader lockへ帰属
+
+CDBでNtCreateEventのentry stackを採取した。最初はCDBが終了時breakpointで止まり、owned launcherが10秒でdebuggerを終了したため、debuggerの自然終了とは扱わなかった。[MicrosoftのCDB仕様](https://learn.microsoft.com/en-us/windows-hardware/drivers/debugger/cdb-command-line-options)で終了時breakpointを無視する-Gを確認し、別logへ再実行。probeのMEASURED終了とdebuggerの自然終了0を確認した。
+
+- NtCreateEventのstackにLdrInitializeThunkがあり、native ntdll内部からの作成を観測した。export-onlyのvsnwprintf等の近傍名を内部関数の正確な名前として採用しない。sourceを省略した最適化EXEであり、debuggerの介入はworker間競合を変える。
+- 取得済みServer ntdllのhashとdisassemblyに対し、return RVA39b76でSTATUS_SUCCESS、RVA39b8bでcritical sectionのLockSemaphore（+18h）を観測した。critical sectionはnative ntdll+1122e0、格納済みhandleは0x30。公開LdrLockLoaderLock（RVA4b3d0）が同じcritical sectionをRtlEnterCriticalSectionへ渡す命令も照合し、loader lockであることを裏付けた。
+- 同じデバッグ実行のbeforeにはそのEventがなく、after100msではhandle0x30が名前なしEventとして存在し、warm100msにも同じkernel objectが残った。native loader lockの同期資源を変換関数の漏れと混同しない。全Eventの作成・閉鎖、他VM / architecture、前回失敗時の同一processへの帰属は未証明。
+- 内部RVAは当該Server ntdllだけの診断用。互換DLLに固定アドレスやアプリ名の分岐を追加していない。再現用の正確なCDB commandsとmodule / probe hashを証跡内に保存した。別imageへこれらのRVAを無検証で適用しない。
+
+証跡: docs/validation/kxnt-native-loader-event-trace.json（成功traceと同じprocessのsnapshot、初回debugger timeoutの区別、commands / hashes / disassembly）。通常consoleの全cold差分、残るEventの帰属・lifecycle、通常IFEO統合は未完了。配布DLL、Installer、system DLL、Releasesは変更していない。

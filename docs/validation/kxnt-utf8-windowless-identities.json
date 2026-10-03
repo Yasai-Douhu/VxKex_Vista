@@ -1,0 +1,1396 @@
+{
+  "Sources": {
+    "audit\\KxNtParity\\resource-server-20261004-first-x86\\receipt.json": "0F44E580201748378CB6EA24C93F4B2A05C4DD879D9A73468AAC56904A80A512",
+    "audit\\KxNtParity\\resource-server-20261004-first-x64\\receipt.json": "A676DD4201DBCEFD47D9CB01DD69D5D887117372EFD4E8E0228D039D95BB15EC",
+    "audit\\KxNtParity\\resource-vista-20261004-first-x86\\receipt.json": "425C6449AB1315F4F4B0BA6DDD2A383E62896DF8C512E912A95F803937C55E9B",
+    "audit\\KxNtParity\\resource-vista-20261004-first-x64\\receipt.json": "C157D05F68D1882070759134557FBA16BE0233FBA0070EC01160FB0E2E1C2E0D"
+  },
+  "AnalyzerSHA256": "F2CFEE14F9B88DEA2C3D23692A1221C61971870C11E080BCDCF2923FEE120BA2",
+  "Results": [
+    {
+      "Architecture": "x86",
+      "Mode": 0,
+      "VMX": "C:\\Users\\YamaR\\Documents\\Virtual Machines\\W2k8\\Windows Server 2008.vmx",
+      "Windowless": true,
+      "Counts": {
+        "before": {
+          "Entries": 51,
+          "HandleCount": 51
+        },
+        "immediate": {
+          "Entries": 52,
+          "HandleCount": 52
+        },
+        "after100ms": {
+          "Entries": 52,
+          "HandleCount": 52
+        },
+        "after1000ms": {
+          "Entries": 52,
+          "HandleCount": 52
+        },
+        "warm100ms": {
+          "Entries": 52,
+          "HandleCount": 52
+        }
+      },
+      "Changes": {
+        "after1000ms": {
+          "Added": [
+            {
+              "Handle": "d8",
+              "Object": "09D4D040",
+              "Access": "00100003",
+              "TypeStatus": "00000000",
+              "Type": "Event",
+              "Name": ""
+            }
+          ],
+          "Removed": []
+        },
+        "after100ms": {
+          "Added": [
+            {
+              "Handle": "d8",
+              "Object": "09D4D040",
+              "Access": "00100003",
+              "TypeStatus": "00000000",
+              "Type": "Event",
+              "Name": ""
+            }
+          ],
+          "Removed": []
+        },
+        "immediate": {
+          "Added": [
+            {
+              "Handle": "d8",
+              "Object": "09D4D040",
+              "Access": "00100003",
+              "TypeStatus": "00000000",
+              "Type": "Event",
+              "Name": ""
+            }
+          ],
+          "Removed": []
+        },
+        "warm100ms": {
+          "Added": [
+            {
+              "Handle": "d8",
+              "Object": "09D4D040",
+              "Access": "00100003",
+              "TypeStatus": "00000000",
+              "Type": "Event",
+              "Name": ""
+            }
+          ],
+          "Removed": []
+        }
+      }
+    },
+    {
+      "Architecture": "x86",
+      "Mode": 1,
+      "VMX": "C:\\Users\\YamaR\\Documents\\Virtual Machines\\W2k8\\Windows Server 2008.vmx",
+      "Windowless": true,
+      "Counts": {
+        "before": {
+          "Entries": 51,
+          "HandleCount": 51
+        },
+        "immediate": {
+          "Entries": 52,
+          "HandleCount": 52
+        },
+        "after100ms": {
+          "Entries": 52,
+          "HandleCount": 52
+        },
+        "after1000ms": {
+          "Entries": 52,
+          "HandleCount": 52
+        },
+        "warm100ms": {
+          "Entries": 52,
+          "HandleCount": 52
+        }
+      },
+      "Changes": {
+        "after1000ms": {
+          "Added": [
+            {
+              "Handle": "d8",
+              "Object": "098AB1F0",
+              "Access": "00100003",
+              "TypeStatus": "00000000",
+              "Type": "Event",
+              "Name": ""
+            }
+          ],
+          "Removed": []
+        },
+        "after100ms": {
+          "Added": [
+            {
+              "Handle": "d8",
+              "Object": "098AB1F0",
+              "Access": "00100003",
+              "TypeStatus": "00000000",
+              "Type": "Event",
+              "Name": ""
+            }
+          ],
+          "Removed": []
+        },
+        "immediate": {
+          "Added": [
+            {
+              "Handle": "d8",
+              "Object": "098AB1F0",
+              "Access": "00100003",
+              "TypeStatus": "00000000",
+              "Type": "Event",
+              "Name": ""
+            }
+          ],
+          "Removed": []
+        },
+        "warm100ms": {
+          "Added": [
+            {
+              "Handle": "d8",
+              "Object": "098AB1F0",
+              "Access": "00100003",
+              "TypeStatus": "00000000",
+              "Type": "Event",
+              "Name": ""
+            }
+          ],
+          "Removed": []
+        }
+      }
+    },
+    {
+      "Architecture": "x86",
+      "Mode": 2,
+      "VMX": "C:\\Users\\YamaR\\Documents\\Virtual Machines\\W2k8\\Windows Server 2008.vmx",
+      "Windowless": true,
+      "Counts": {
+        "before": {
+          "Entries": 51,
+          "HandleCount": 51
+        },
+        "immediate": {
+          "Entries": 52,
+          "HandleCount": 52
+        },
+        "after100ms": {
+          "Entries": 52,
+          "HandleCount": 52
+        },
+        "after1000ms": {
+          "Entries": 52,
+          "HandleCount": 52
+        },
+        "warm100ms": {
+          "Entries": 52,
+          "HandleCount": 52
+        }
+      },
+      "Changes": {
+        "after1000ms": {
+          "Added": [
+            {
+              "Handle": "e0",
+              "Object": "0901EED0",
+              "Access": "00100003",
+              "TypeStatus": "00000000",
+              "Type": "Event",
+              "Name": ""
+            }
+          ],
+          "Removed": []
+        },
+        "after100ms": {
+          "Added": [
+            {
+              "Handle": "e0",
+              "Object": "0901EED0",
+              "Access": "00100003",
+              "TypeStatus": "00000000",
+              "Type": "Event",
+              "Name": ""
+            }
+          ],
+          "Removed": []
+        },
+        "immediate": {
+          "Added": [
+            {
+              "Handle": "e0",
+              "Object": "0901EED0",
+              "Access": "00100003",
+              "TypeStatus": "00000000",
+              "Type": "Event",
+              "Name": ""
+            }
+          ],
+          "Removed": []
+        },
+        "warm100ms": {
+          "Added": [
+            {
+              "Handle": "e0",
+              "Object": "0901EED0",
+              "Access": "00100003",
+              "TypeStatus": "00000000",
+              "Type": "Event",
+              "Name": ""
+            }
+          ],
+          "Removed": []
+        }
+      }
+    },
+    {
+      "Architecture": "x86",
+      "Mode": 3,
+      "VMX": "C:\\Users\\YamaR\\Documents\\Virtual Machines\\W2k8\\Windows Server 2008.vmx",
+      "Windowless": true,
+      "Counts": {
+        "before": {
+          "Entries": 51,
+          "HandleCount": 51
+        },
+        "immediate": {
+          "Entries": 51,
+          "HandleCount": 51
+        },
+        "after100ms": {
+          "Entries": 51,
+          "HandleCount": 51
+        },
+        "after1000ms": {
+          "Entries": 51,
+          "HandleCount": 51
+        },
+        "warm100ms": {
+          "Entries": 51,
+          "HandleCount": 51
+        }
+      },
+      "Changes": {
+        "after1000ms": {
+          "Added": [],
+          "Removed": []
+        },
+        "after100ms": {
+          "Added": [],
+          "Removed": []
+        },
+        "immediate": {
+          "Added": [],
+          "Removed": []
+        },
+        "warm100ms": {
+          "Added": [],
+          "Removed": []
+        }
+      }
+    },
+    {
+      "Architecture": "x86",
+      "Mode": 4,
+      "VMX": "C:\\Users\\YamaR\\Documents\\Virtual Machines\\W2k8\\Windows Server 2008.vmx",
+      "Windowless": true,
+      "Counts": {
+        "before": {
+          "Entries": 51,
+          "HandleCount": 51
+        },
+        "immediate": {
+          "Entries": 52,
+          "HandleCount": 52
+        },
+        "after100ms": {
+          "Entries": 52,
+          "HandleCount": 52
+        },
+        "after1000ms": {
+          "Entries": 52,
+          "HandleCount": 52
+        },
+        "warm100ms": {
+          "Entries": 52,
+          "HandleCount": 52
+        }
+      },
+      "Changes": {
+        "after1000ms": {
+          "Added": [
+            {
+              "Handle": "d8",
+              "Object": "09981EF0",
+              "Access": "00100003",
+              "TypeStatus": "00000000",
+              "Type": "Event",
+              "Name": ""
+            }
+          ],
+          "Removed": []
+        },
+        "after100ms": {
+          "Added": [
+            {
+              "Handle": "d8",
+              "Object": "09981EF0",
+              "Access": "00100003",
+              "TypeStatus": "00000000",
+              "Type": "Event",
+              "Name": ""
+            }
+          ],
+          "Removed": []
+        },
+        "immediate": {
+          "Added": [
+            {
+              "Handle": "d8",
+              "Object": "09981EF0",
+              "Access": "00100003",
+              "TypeStatus": "00000000",
+              "Type": "Event",
+              "Name": ""
+            }
+          ],
+          "Removed": []
+        },
+        "warm100ms": {
+          "Added": [
+            {
+              "Handle": "d8",
+              "Object": "09981EF0",
+              "Access": "00100003",
+              "TypeStatus": "00000000",
+              "Type": "Event",
+              "Name": ""
+            }
+          ],
+          "Removed": []
+        }
+      }
+    },
+    {
+      "Architecture": "x64",
+      "Mode": 0,
+      "VMX": "C:\\Users\\YamaR\\Documents\\Virtual Machines\\W2k8\\Windows Server 2008.vmx",
+      "Windowless": true,
+      "Counts": {
+        "before": {
+          "Entries": 6,
+          "HandleCount": 6
+        },
+        "immediate": {
+          "Entries": 6,
+          "HandleCount": 6
+        },
+        "after100ms": {
+          "Entries": 6,
+          "HandleCount": 6
+        },
+        "after1000ms": {
+          "Entries": 6,
+          "HandleCount": 6
+        },
+        "warm100ms": {
+          "Entries": 6,
+          "HandleCount": 6
+        }
+      },
+      "Changes": {
+        "after1000ms": {
+          "Added": [],
+          "Removed": []
+        },
+        "after100ms": {
+          "Added": [],
+          "Removed": []
+        },
+        "immediate": {
+          "Added": [],
+          "Removed": []
+        },
+        "warm100ms": {
+          "Added": [],
+          "Removed": []
+        }
+      }
+    },
+    {
+      "Architecture": "x64",
+      "Mode": 1,
+      "VMX": "C:\\Users\\YamaR\\Documents\\Virtual Machines\\W2k8\\Windows Server 2008.vmx",
+      "Windowless": true,
+      "Counts": {
+        "before": {
+          "Entries": 6,
+          "HandleCount": 6
+        },
+        "immediate": {
+          "Entries": 7,
+          "HandleCount": 7
+        },
+        "after100ms": {
+          "Entries": 7,
+          "HandleCount": 7
+        },
+        "after1000ms": {
+          "Entries": 7,
+          "HandleCount": 7
+        },
+        "warm100ms": {
+          "Entries": 7,
+          "HandleCount": 7
+        }
+      },
+      "Changes": {
+        "after1000ms": {
+          "Added": [
+            {
+              "Handle": "24",
+              "Object": "FFFFFA8008AE45B0",
+              "Access": "00100003",
+              "TypeStatus": "00000000",
+              "Type": "Event",
+              "Name": ""
+            }
+          ],
+          "Removed": []
+        },
+        "after100ms": {
+          "Added": [
+            {
+              "Handle": "24",
+              "Object": "FFFFFA8008AE45B0",
+              "Access": "00100003",
+              "TypeStatus": "00000000",
+              "Type": "Event",
+              "Name": ""
+            }
+          ],
+          "Removed": []
+        },
+        "immediate": {
+          "Added": [
+            {
+              "Handle": "24",
+              "Object": "FFFFFA8008AE45B0",
+              "Access": "00100003",
+              "TypeStatus": "00000000",
+              "Type": "Event",
+              "Name": ""
+            }
+          ],
+          "Removed": []
+        },
+        "warm100ms": {
+          "Added": [
+            {
+              "Handle": "24",
+              "Object": "FFFFFA8008AE45B0",
+              "Access": "00100003",
+              "TypeStatus": "00000000",
+              "Type": "Event",
+              "Name": ""
+            }
+          ],
+          "Removed": []
+        }
+      }
+    },
+    {
+      "Architecture": "x64",
+      "Mode": 2,
+      "VMX": "C:\\Users\\YamaR\\Documents\\Virtual Machines\\W2k8\\Windows Server 2008.vmx",
+      "Windowless": true,
+      "Counts": {
+        "before": {
+          "Entries": 6,
+          "HandleCount": 6
+        },
+        "immediate": {
+          "Entries": 6,
+          "HandleCount": 6
+        },
+        "after100ms": {
+          "Entries": 6,
+          "HandleCount": 6
+        },
+        "after1000ms": {
+          "Entries": 6,
+          "HandleCount": 6
+        },
+        "warm100ms": {
+          "Entries": 6,
+          "HandleCount": 6
+        }
+      },
+      "Changes": {
+        "after1000ms": {
+          "Added": [],
+          "Removed": []
+        },
+        "after100ms": {
+          "Added": [],
+          "Removed": []
+        },
+        "immediate": {
+          "Added": [],
+          "Removed": []
+        },
+        "warm100ms": {
+          "Added": [],
+          "Removed": []
+        }
+      }
+    },
+    {
+      "Architecture": "x64",
+      "Mode": 3,
+      "VMX": "C:\\Users\\YamaR\\Documents\\Virtual Machines\\W2k8\\Windows Server 2008.vmx",
+      "Windowless": true,
+      "Counts": {
+        "before": {
+          "Entries": 6,
+          "HandleCount": 6
+        },
+        "immediate": {
+          "Entries": 6,
+          "HandleCount": 6
+        },
+        "after100ms": {
+          "Entries": 6,
+          "HandleCount": 6
+        },
+        "after1000ms": {
+          "Entries": 6,
+          "HandleCount": 6
+        },
+        "warm100ms": {
+          "Entries": 6,
+          "HandleCount": 6
+        }
+      },
+      "Changes": {
+        "after1000ms": {
+          "Added": [],
+          "Removed": []
+        },
+        "after100ms": {
+          "Added": [],
+          "Removed": []
+        },
+        "immediate": {
+          "Added": [],
+          "Removed": []
+        },
+        "warm100ms": {
+          "Added": [],
+          "Removed": []
+        }
+      }
+    },
+    {
+      "Architecture": "x64",
+      "Mode": 4,
+      "VMX": "C:\\Users\\YamaR\\Documents\\Virtual Machines\\W2k8\\Windows Server 2008.vmx",
+      "Windowless": true,
+      "Counts": {
+        "before": {
+          "Entries": 6,
+          "HandleCount": 6
+        },
+        "immediate": {
+          "Entries": 8,
+          "HandleCount": 8
+        },
+        "after100ms": {
+          "Entries": 8,
+          "HandleCount": 8
+        },
+        "after1000ms": {
+          "Entries": 8,
+          "HandleCount": 8
+        },
+        "warm100ms": {
+          "Entries": 8,
+          "HandleCount": 8
+        }
+      },
+      "Changes": {
+        "after1000ms": {
+          "Added": [
+            {
+              "Handle": "28",
+              "Object": "FFFFFA8008405360",
+              "Access": "00100003",
+              "TypeStatus": "00000000",
+              "Type": "Event",
+              "Name": ""
+            },
+            {
+              "Handle": "2c",
+              "Object": "FFFFFA8009BB1650",
+              "Access": "00100003",
+              "TypeStatus": "00000000",
+              "Type": "Event",
+              "Name": ""
+            }
+          ],
+          "Removed": []
+        },
+        "after100ms": {
+          "Added": [
+            {
+              "Handle": "28",
+              "Object": "FFFFFA8008405360",
+              "Access": "00100003",
+              "TypeStatus": "00000000",
+              "Type": "Event",
+              "Name": ""
+            },
+            {
+              "Handle": "2c",
+              "Object": "FFFFFA8009BB1650",
+              "Access": "00100003",
+              "TypeStatus": "00000000",
+              "Type": "Event",
+              "Name": ""
+            }
+          ],
+          "Removed": []
+        },
+        "immediate": {
+          "Added": [
+            {
+              "Handle": "28",
+              "Object": "FFFFFA8008405360",
+              "Access": "00100003",
+              "TypeStatus": "00000000",
+              "Type": "Event",
+              "Name": ""
+            },
+            {
+              "Handle": "2c",
+              "Object": "FFFFFA8009BB1650",
+              "Access": "00100003",
+              "TypeStatus": "00000000",
+              "Type": "Event",
+              "Name": ""
+            }
+          ],
+          "Removed": []
+        },
+        "warm100ms": {
+          "Added": [
+            {
+              "Handle": "28",
+              "Object": "FFFFFA8008405360",
+              "Access": "00100003",
+              "TypeStatus": "00000000",
+              "Type": "Event",
+              "Name": ""
+            },
+            {
+              "Handle": "2c",
+              "Object": "FFFFFA8009BB1650",
+              "Access": "00100003",
+              "TypeStatus": "00000000",
+              "Type": "Event",
+              "Name": ""
+            }
+          ],
+          "Removed": []
+        }
+      }
+    },
+    {
+      "Architecture": "x86",
+      "Mode": 0,
+      "VMX": "C:\\Users\\YamaR\\Documents\\Virtual Machines\\Vista\\Windows Vista x64 Edition.vmx",
+      "Windowless": true,
+      "Counts": {
+        "before": {
+          "Entries": 45,
+          "HandleCount": 45
+        },
+        "immediate": {
+          "Entries": 45,
+          "HandleCount": 45
+        },
+        "after100ms": {
+          "Entries": 45,
+          "HandleCount": 45
+        },
+        "after1000ms": {
+          "Entries": 45,
+          "HandleCount": 45
+        },
+        "warm100ms": {
+          "Entries": 45,
+          "HandleCount": 45
+        }
+      },
+      "Changes": {
+        "after1000ms": {
+          "Added": [],
+          "Removed": []
+        },
+        "after100ms": {
+          "Added": [],
+          "Removed": []
+        },
+        "immediate": {
+          "Added": [],
+          "Removed": []
+        },
+        "warm100ms": {
+          "Added": [],
+          "Removed": []
+        }
+      }
+    },
+    {
+      "Architecture": "x86",
+      "Mode": 1,
+      "VMX": "C:\\Users\\YamaR\\Documents\\Virtual Machines\\Vista\\Windows Vista x64 Edition.vmx",
+      "Windowless": true,
+      "Counts": {
+        "before": {
+          "Entries": 45,
+          "HandleCount": 45
+        },
+        "immediate": {
+          "Entries": 46,
+          "HandleCount": 46
+        },
+        "after100ms": {
+          "Entries": 46,
+          "HandleCount": 46
+        },
+        "after1000ms": {
+          "Entries": 46,
+          "HandleCount": 46
+        },
+        "warm100ms": {
+          "Entries": 46,
+          "HandleCount": 46
+        }
+      },
+      "Changes": {
+        "after1000ms": {
+          "Added": [
+            {
+              "Handle": "c0",
+              "Object": "07798A60",
+              "Access": "00100003",
+              "TypeStatus": "00000000",
+              "Type": "Event",
+              "Name": ""
+            }
+          ],
+          "Removed": []
+        },
+        "after100ms": {
+          "Added": [
+            {
+              "Handle": "c0",
+              "Object": "07798A60",
+              "Access": "00100003",
+              "TypeStatus": "00000000",
+              "Type": "Event",
+              "Name": ""
+            }
+          ],
+          "Removed": []
+        },
+        "immediate": {
+          "Added": [
+            {
+              "Handle": "c0",
+              "Object": "07798A60",
+              "Access": "00100003",
+              "TypeStatus": "00000000",
+              "Type": "Event",
+              "Name": ""
+            }
+          ],
+          "Removed": []
+        },
+        "warm100ms": {
+          "Added": [
+            {
+              "Handle": "c0",
+              "Object": "07798A60",
+              "Access": "00100003",
+              "TypeStatus": "00000000",
+              "Type": "Event",
+              "Name": ""
+            }
+          ],
+          "Removed": []
+        }
+      }
+    },
+    {
+      "Architecture": "x86",
+      "Mode": 2,
+      "VMX": "C:\\Users\\YamaR\\Documents\\Virtual Machines\\Vista\\Windows Vista x64 Edition.vmx",
+      "Windowless": true,
+      "Counts": {
+        "before": {
+          "Entries": 45,
+          "HandleCount": 45
+        },
+        "immediate": {
+          "Entries": 46,
+          "HandleCount": 46
+        },
+        "after100ms": {
+          "Entries": 46,
+          "HandleCount": 46
+        },
+        "after1000ms": {
+          "Entries": 46,
+          "HandleCount": 46
+        },
+        "warm100ms": {
+          "Entries": 46,
+          "HandleCount": 46
+        }
+      },
+      "Changes": {
+        "after1000ms": {
+          "Added": [
+            {
+              "Handle": "c8",
+              "Object": "077B7E70",
+              "Access": "00100003",
+              "TypeStatus": "00000000",
+              "Type": "Event",
+              "Name": ""
+            }
+          ],
+          "Removed": []
+        },
+        "after100ms": {
+          "Added": [
+            {
+              "Handle": "c8",
+              "Object": "077B7E70",
+              "Access": "00100003",
+              "TypeStatus": "00000000",
+              "Type": "Event",
+              "Name": ""
+            }
+          ],
+          "Removed": []
+        },
+        "immediate": {
+          "Added": [
+            {
+              "Handle": "c8",
+              "Object": "077B7E70",
+              "Access": "00100003",
+              "TypeStatus": "00000000",
+              "Type": "Event",
+              "Name": ""
+            }
+          ],
+          "Removed": []
+        },
+        "warm100ms": {
+          "Added": [
+            {
+              "Handle": "c8",
+              "Object": "077B7E70",
+              "Access": "00100003",
+              "TypeStatus": "00000000",
+              "Type": "Event",
+              "Name": ""
+            }
+          ],
+          "Removed": []
+        }
+      }
+    },
+    {
+      "Architecture": "x86",
+      "Mode": 3,
+      "VMX": "C:\\Users\\YamaR\\Documents\\Virtual Machines\\Vista\\Windows Vista x64 Edition.vmx",
+      "Windowless": true,
+      "Counts": {
+        "before": {
+          "Entries": 45,
+          "HandleCount": 45
+        },
+        "immediate": {
+          "Entries": 45,
+          "HandleCount": 45
+        },
+        "after100ms": {
+          "Entries": 45,
+          "HandleCount": 45
+        },
+        "after1000ms": {
+          "Entries": 45,
+          "HandleCount": 45
+        },
+        "warm100ms": {
+          "Entries": 45,
+          "HandleCount": 45
+        }
+      },
+      "Changes": {
+        "after1000ms": {
+          "Added": [],
+          "Removed": []
+        },
+        "after100ms": {
+          "Added": [],
+          "Removed": []
+        },
+        "immediate": {
+          "Added": [],
+          "Removed": []
+        },
+        "warm100ms": {
+          "Added": [],
+          "Removed": []
+        }
+      }
+    },
+    {
+      "Architecture": "x86",
+      "Mode": 4,
+      "VMX": "C:\\Users\\YamaR\\Documents\\Virtual Machines\\Vista\\Windows Vista x64 Edition.vmx",
+      "Windowless": true,
+      "Counts": {
+        "before": {
+          "Entries": 45,
+          "HandleCount": 45
+        },
+        "immediate": {
+          "Entries": 46,
+          "HandleCount": 46
+        },
+        "after100ms": {
+          "Entries": 46,
+          "HandleCount": 46
+        },
+        "after1000ms": {
+          "Entries": 46,
+          "HandleCount": 46
+        },
+        "warm100ms": {
+          "Entries": 46,
+          "HandleCount": 46
+        }
+      },
+      "Changes": {
+        "after1000ms": {
+          "Added": [
+            {
+              "Handle": "c0",
+              "Object": "09359430",
+              "Access": "00100003",
+              "TypeStatus": "00000000",
+              "Type": "Event",
+              "Name": ""
+            }
+          ],
+          "Removed": []
+        },
+        "after100ms": {
+          "Added": [
+            {
+              "Handle": "c0",
+              "Object": "09359430",
+              "Access": "00100003",
+              "TypeStatus": "00000000",
+              "Type": "Event",
+              "Name": ""
+            }
+          ],
+          "Removed": []
+        },
+        "immediate": {
+          "Added": [
+            {
+              "Handle": "c0",
+              "Object": "09359430",
+              "Access": "00100003",
+              "TypeStatus": "00000000",
+              "Type": "Event",
+              "Name": ""
+            }
+          ],
+          "Removed": []
+        },
+        "warm100ms": {
+          "Added": [
+            {
+              "Handle": "c0",
+              "Object": "09359430",
+              "Access": "00100003",
+              "TypeStatus": "00000000",
+              "Type": "Event",
+              "Name": ""
+            }
+          ],
+          "Removed": []
+        }
+      }
+    },
+    {
+      "Architecture": "x64",
+      "Mode": 0,
+      "VMX": "C:\\Users\\YamaR\\Documents\\Virtual Machines\\Vista\\Windows Vista x64 Edition.vmx",
+      "Windowless": true,
+      "Counts": {
+        "before": {
+          "Entries": 6,
+          "HandleCount": 6
+        },
+        "immediate": {
+          "Entries": 6,
+          "HandleCount": 6
+        },
+        "after100ms": {
+          "Entries": 6,
+          "HandleCount": 6
+        },
+        "after1000ms": {
+          "Entries": 6,
+          "HandleCount": 6
+        },
+        "warm100ms": {
+          "Entries": 6,
+          "HandleCount": 6
+        }
+      },
+      "Changes": {
+        "after1000ms": {
+          "Added": [],
+          "Removed": []
+        },
+        "after100ms": {
+          "Added": [],
+          "Removed": []
+        },
+        "immediate": {
+          "Added": [],
+          "Removed": []
+        },
+        "warm100ms": {
+          "Added": [],
+          "Removed": []
+        }
+      }
+    },
+    {
+      "Architecture": "x64",
+      "Mode": 1,
+      "VMX": "C:\\Users\\YamaR\\Documents\\Virtual Machines\\Vista\\Windows Vista x64 Edition.vmx",
+      "Windowless": true,
+      "Counts": {
+        "before": {
+          "Entries": 6,
+          "HandleCount": 6
+        },
+        "immediate": {
+          "Entries": 7,
+          "HandleCount": 7
+        },
+        "after100ms": {
+          "Entries": 7,
+          "HandleCount": 7
+        },
+        "after1000ms": {
+          "Entries": 7,
+          "HandleCount": 7
+        },
+        "warm100ms": {
+          "Entries": 7,
+          "HandleCount": 7
+        }
+      },
+      "Changes": {
+        "after1000ms": {
+          "Added": [
+            {
+              "Handle": "24",
+              "Object": "FFFFFA800ACDF910",
+              "Access": "00100003",
+              "TypeStatus": "00000000",
+              "Type": "Event",
+              "Name": ""
+            }
+          ],
+          "Removed": []
+        },
+        "after100ms": {
+          "Added": [
+            {
+              "Handle": "24",
+              "Object": "FFFFFA800ACDF910",
+              "Access": "00100003",
+              "TypeStatus": "00000000",
+              "Type": "Event",
+              "Name": ""
+            }
+          ],
+          "Removed": []
+        },
+        "immediate": {
+          "Added": [
+            {
+              "Handle": "24",
+              "Object": "FFFFFA800ACDF910",
+              "Access": "00100003",
+              "TypeStatus": "00000000",
+              "Type": "Event",
+              "Name": ""
+            }
+          ],
+          "Removed": []
+        },
+        "warm100ms": {
+          "Added": [
+            {
+              "Handle": "24",
+              "Object": "FFFFFA800ACDF910",
+              "Access": "00100003",
+              "TypeStatus": "00000000",
+              "Type": "Event",
+              "Name": ""
+            }
+          ],
+          "Removed": []
+        }
+      }
+    },
+    {
+      "Architecture": "x64",
+      "Mode": 2,
+      "VMX": "C:\\Users\\YamaR\\Documents\\Virtual Machines\\Vista\\Windows Vista x64 Edition.vmx",
+      "Windowless": true,
+      "Counts": {
+        "before": {
+          "Entries": 6,
+          "HandleCount": 6
+        },
+        "immediate": {
+          "Entries": 7,
+          "HandleCount": 7
+        },
+        "after100ms": {
+          "Entries": 7,
+          "HandleCount": 7
+        },
+        "after1000ms": {
+          "Entries": 7,
+          "HandleCount": 7
+        },
+        "warm100ms": {
+          "Entries": 7,
+          "HandleCount": 7
+        }
+      },
+      "Changes": {
+        "after1000ms": {
+          "Added": [
+            {
+              "Handle": "24",
+              "Object": "FFFFFA8008BB4110",
+              "Access": "00100003",
+              "TypeStatus": "00000000",
+              "Type": "Event",
+              "Name": ""
+            }
+          ],
+          "Removed": []
+        },
+        "after100ms": {
+          "Added": [
+            {
+              "Handle": "24",
+              "Object": "FFFFFA8008BB4110",
+              "Access": "00100003",
+              "TypeStatus": "00000000",
+              "Type": "Event",
+              "Name": ""
+            }
+          ],
+          "Removed": []
+        },
+        "immediate": {
+          "Added": [
+            {
+              "Handle": "24",
+              "Object": "FFFFFA8008BB4110",
+              "Access": "00100003",
+              "TypeStatus": "00000000",
+              "Type": "Event",
+              "Name": ""
+            }
+          ],
+          "Removed": []
+        },
+        "warm100ms": {
+          "Added": [
+            {
+              "Handle": "24",
+              "Object": "FFFFFA8008BB4110",
+              "Access": "00100003",
+              "TypeStatus": "00000000",
+              "Type": "Event",
+              "Name": ""
+            }
+          ],
+          "Removed": []
+        }
+      }
+    },
+    {
+      "Architecture": "x64",
+      "Mode": 3,
+      "VMX": "C:\\Users\\YamaR\\Documents\\Virtual Machines\\Vista\\Windows Vista x64 Edition.vmx",
+      "Windowless": true,
+      "Counts": {
+        "before": {
+          "Entries": 6,
+          "HandleCount": 6
+        },
+        "immediate": {
+          "Entries": 6,
+          "HandleCount": 6
+        },
+        "after100ms": {
+          "Entries": 6,
+          "HandleCount": 6
+        },
+        "after1000ms": {
+          "Entries": 6,
+          "HandleCount": 6
+        },
+        "warm100ms": {
+          "Entries": 6,
+          "HandleCount": 6
+        }
+      },
+      "Changes": {
+        "after1000ms": {
+          "Added": [],
+          "Removed": []
+        },
+        "after100ms": {
+          "Added": [],
+          "Removed": []
+        },
+        "immediate": {
+          "Added": [],
+          "Removed": []
+        },
+        "warm100ms": {
+          "Added": [],
+          "Removed": []
+        }
+      }
+    },
+    {
+      "Architecture": "x64",
+      "Mode": 4,
+      "VMX": "C:\\Users\\YamaR\\Documents\\Virtual Machines\\Vista\\Windows Vista x64 Edition.vmx",
+      "Windowless": true,
+      "Counts": {
+        "before": {
+          "Entries": 6,
+          "HandleCount": 6
+        },
+        "immediate": {
+          "Entries": 7,
+          "HandleCount": 7
+        },
+        "after100ms": {
+          "Entries": 7,
+          "HandleCount": 7
+        },
+        "after1000ms": {
+          "Entries": 7,
+          "HandleCount": 7
+        },
+        "warm100ms": {
+          "Entries": 7,
+          "HandleCount": 7
+        }
+      },
+      "Changes": {
+        "after1000ms": {
+          "Added": [
+            {
+              "Handle": "28",
+              "Object": "FFFFFA8008C9CD10",
+              "Access": "00100003",
+              "TypeStatus": "00000000",
+              "Type": "Event",
+              "Name": ""
+            }
+          ],
+          "Removed": []
+        },
+        "after100ms": {
+          "Added": [
+            {
+              "Handle": "28",
+              "Object": "FFFFFA8008C9CD10",
+              "Access": "00100003",
+              "TypeStatus": "00000000",
+              "Type": "Event",
+              "Name": ""
+            }
+          ],
+          "Removed": []
+        },
+        "immediate": {
+          "Added": [
+            {
+              "Handle": "28",
+              "Object": "FFFFFA8008C9CD10",
+              "Access": "00100003",
+              "TypeStatus": "00000000",
+              "Type": "Event",
+              "Name": ""
+            }
+          ],
+          "Removed": []
+        },
+        "warm100ms": {
+          "Added": [
+            {
+              "Handle": "28",
+              "Object": "FFFFFA8008C9CD10",
+              "Access": "00100003",
+              "TypeStatus": "00000000",
+              "Type": "Event",
+              "Name": ""
+            }
+          ],
+          "Removed": []
+        }
+      }
+    }
+  ],
+  "Scope": "Observed identity differences from each process baseline; no creation stack, lifecycle or leak attribution"
+}

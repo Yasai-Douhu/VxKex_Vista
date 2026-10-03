@@ -1,0 +1,3 @@
+.echo KXNT_EVENT_TRACE_BEGIN
+bp ntdll!NtCreateEvent ".echo KXNT_EVENT_CREATE; r rcx; k 16; g"
+g
