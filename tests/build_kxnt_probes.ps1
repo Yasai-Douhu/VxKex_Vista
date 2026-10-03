@@ -34,3 +34,7 @@ if ($LASTEXITCODE) { throw "Object comparison probe build failed ($Architecture)
 if ($LASTEXITCODE) { throw "File information probe build failed ($Architecture)" }
 & cl.exe /nologo /MT /O1 /W4 "/Fo$out\alert.obj" "/Fe$out\alert.exe" "$PSScriptRoot\kxnt_alert_probe.c" /link /SUBSYSTEM:CONSOLE,6.0
 if ($LASTEXITCODE) { throw "Thread alert probe build failed ($Architecture)" }
+& cl.exe /nologo /MT /O1 /W4 "/Fo$out\console-classification.obj" "/Fe$out\console-classification.exe" "$PSScriptRoot\kxnt_console_classification_probe.c" /link /SUBSYSTEM:CONSOLE,6.0
+if ($LASTEXITCODE) { throw "Console classification probe build failed ($Architecture)" }
+& cl.exe /nologo /MT /O1 /W4 "/Fo$out\native-launch.obj" "/Fe$out\native-launch.exe" "$PSScriptRoot\kxnt_native_launch_probe.c" /link /SUBSYSTEM:CONSOLE,6.0
+if ($LASTEXITCODE) { throw "Native launch probe build failed ($Architecture)" }

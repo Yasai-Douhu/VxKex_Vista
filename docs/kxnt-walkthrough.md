@@ -17,7 +17,7 @@
 | ZwCompareObjects / NtCompareObjects 精度改善 | 実装済み | Server 2008 x86 / x64 native 比較・並列検証成功。DLL 未読込みの対照でもコンソール初期化資源の増加を確認 |
 | 拡張 rename / delete | 実装済み（通常操作。追加フラグは拒否） | Server 2008 x86 / x64、Nt / Zw 双方96ケース・各1,000回反復成功 |
 | スレッド通知・待機 / Zw 別名 | 実装済み（プロセス内の状態管理） | Server 2008 x86 / x64、Nt / Zw の native 比較・4,096スレッド反復・実 ID 再利用・終了後回収成功 |
-| ConDrv 向け NtWriteFile | 未着手 | 未実施 |
+| ConDrv 向け NtWriteFile | 実装前調査 | Server 2008 x86 / x64 でハンドルの数値衝突・判定方法の制約を実測。実アプリの呼出し経路を調査中 |
 | WNF / ZwQueryWnfStateData | 調査段階 | 本家にも未実装があるため実機能の対応を判断する必要あり |
 | 既存の未解決 native 転送 | 調査段階 | 呼び出すアプリと API ごとに検証予定 |
 
@@ -316,3 +316,35 @@ WOW64 の検証親から子を作る試験では、公開名不足の終了6と�
 未登録の対象には THREAD_QUERY_LIMITED_INFORMATION | SYNCHRONIZE での open が必要。特殊な制限 DACL、標準ユーザー / 制限トークン、Vista クライアント、native 32bit OS、実アプリ、任意位置の強制終了・他モジュールが DLL を使用中の unload は未検証。終了状態は次の API 呼び出し時に回収するため、呼び出しが止まった時点で直ちにすべての状態を解放する設計ではない。
 
 VM ログ・DLL / プローブ SHA256・直接起動した終了試験のログ: `docs/validation/kxnt-alert.json`。ホスト参照と VM native の不在確認: `docs/validation/kxnt-alert-reference.json`。再実行: `tests/build_kxnt_parity.ps1` → `tests/run_kxnt_alert_reference.ps1` → 参照 JSON を更新 → `tests/run_kxnt_processor_feature_vm.ps1 -Probe alert`。runner は基本試験を CoreOnly モードで実行し、終了試験を別プロセスで実行して双方をゲートにする。単体診断の `--provider` / `--termination` モードも用意した。
+
+## 2026-10-03: ConDrv の実装前検証
+
+本家の `ntcondrv.c` / `dllmain.c` を確認した。`.buildid` セクションで Zig を判定し、アプリ専用フラグを有効にした場合だけ、型名 Console のハンドルへ同期 NtWriteFile を WriteConsoleA に変換する。イベント / APC / Key が指定された経路は native のまま。現行 Vista 版にはこのフラグ・検出・置換経路がない。`docs/inno-content-profile.md` の Qt / Godot / Zig の記述は本家の説明であり、Vista 版に実装済みという意味ではない。
+
+`tests/kxnt_console_classification_probe.c` と VM runner を追加した。Server 2008 x86 WOW64 / x64 の native ntdll と kernel32 のみを使い、KexDllLoaded=0 を確認。診断 EXE の直接実行は再起動後も成功するため、cmd.exe の終了1はこの検証を妨げない。ファイル転送とプロセス取得も成功した。一方 MCP guest_run / guest_ls は vmcli のファイル・引数エラーになるので、VMTools の vmrun 経路を使用した。REST API をタスクスケジューラへ移したことを原因とは断定しない。
+
+### 実測した制約
+
+- Vista の stdout は Win32 コンソールとして有効でも、NtQueryObject は Key と報告した。作成した screen buffer も Directory / File、入力は Directory / File だった。Console 型名を検査する本家の方法では識別できない。
+- 書込み専用 screen buffer は GetFileType=CHAR / VerifyConsoleIoHandle=TRUE / WriteConsoleA 成功だが、GetConsoleMode は ERROR_INVALID_HANDLE。GetConsoleMode のみの判定では正常な出力を落とす。NULL に VerifyConsoleIoHandle が TRUE を返すことも観測したため、この非公開関数の結果だけでも不足する。
+- 所有する使い捨てファイルハンドルに下位タグ3を付けても、native NtWriteFile はそのファイルへ成功した。これは不正ハンドルとして扱えない。
+- さらに screen buffer を追加作成し、タグ付きファイルと同じ数値の有効なコンソールを得た。NtQueryObject は File、GetConsoleMode 成功、GetFileType=CHAR、VerifyConsoleIoHandle=TRUE。同じ値への NtWriteFile は使い捨てファイルへ N を追記し、WriteConsoleA はコンソールへ C を出力した。ファイルは NN の2バイトとなった。この数値衝突を両アーキテクチャで runner の必須観測として検査した。
+- 数値タグ・Win32 console の判定だけで NtWriteFile を全アプリに変換すると、本来のタグ付きファイルの書込み先を変更する。native 書込みを先に試してから fallback する方法も、別ファイルへの書込みを成功させてしまう。実アプリの呼出し経路と明示的な適用条件を確認してから実装する。
+
+NT コンソールとカーネルの名前空間を区別し、意図が曖昧な呼出しの方針を決める必要がある。今回、所有確認できない native オブジェクトと数値が衝突する console への NtWriteFile はプローブで実行しない。実行した衝突書込みはすべてプローブ所有の使い捨てファイルに限定した。通常ファイル、パイプ、不正ハンドル、NULL、stdout / stdin、読み書き用 / 書込み専用 screen buffer を観測した。
+
+証跡: `docs/validation/kxnt-console-classification.json`（生ログ、プローブ SHA256、VMX）。再実行: `tests/build_kxnt_probes.ps1 -Architecture x86` / `x64` → `tests/run_kxnt_console_classification_vm.ps1 -VMX <VMX> -GuestPassword <パスワード>`。Result=MEASURED は制約の測定であり、ConDrv 互換実装の成功を意味しない。DLL / Installer / システム配備は変更していない。
+
+公開仕様: [Microsoft Console Handles](https://learn.microsoft.com/en-us/windows/console/console-handles)、[GetConsoleMode の必要権限](https://learn.microsoft.com/en-us/windows/console/getconsolemode)。非公開 VerifyConsoleIoHandle の観測を公式な将来保証とは扱わない。
+
+### Zig の対象選択
+
+公式 Zig 0.15.2 の Windows 配布を取得し、公式 download/index.json の SHA256 と一致することを確認した。配布内 std/os/windows.zig の WriteFile は kernel32.WriteFile を呼び、通常の console 出力に直接 NtWriteFile を使う根拠にはならない。NEXT が対象とする、より新しい NT I/O 経路を調べている。ダウンロード・静的調査だけを実アプリの VM 実行成功とは扱わない。部分書込み・コードページ・非同期・不正バッファ・実アプリはまだ未検証。
+
+公式 Zig 0.16.0 を追加取得し、公式 archive SHA256 `68659eb5f1e4eb1437a722f1dd889c5a322c9954607f5edcf337bc3684a75a7e` と一致を確認。配布内 `lib/std/Io/Threaded.zig` の `fileWriteStreamingWindows` は同期 console 出力で NtWriteFile を呼ぶ。`tests/kxnt_zig_console_smoke.zig` はこの標準 I/O を使い、手書きの syscall 再現ではない。x86-windows.vista / x86_64-windows.vista、ReleaseSafe でビルドした（PE の OS / subsystem version 6.00 も確認）。`.buildid` と NtWriteFile のインポートを確認した。
+
+`tests/kxnt_native_launch_probe.c` から VM 内で実際にこのプログラムを起動した。両アーキテクチャとも CreateProcess 成功、子の終了 `c0000139` (ENTRYPOINT_NOT_FOUND)。native ntdll の NtAlertThreadByThreadId / NtWaitForAlertByThreadId、RtlQueryPerformanceCounter / Frequency、RtlGetSystemTimePrecise、RtlReportSilentProcessExit は公開されていない。スレッド API と SystemTimePrecise は作業ブランチの KxNt で提供済みだが、PerformanceCounter / Frequency と ReportSilentProcessExit の現行転送は native を参照している。この既存未解決転送を先に評価してから、標準 I/O の実行トレースへ進む。今回の欠落一覧は依存関係検査であり、どのエントリが loader の最初の失敗になったかを dump で確定したものではない。
+
+結果・EXE / ソース / コンパイラ SHA256: `docs/validation/kxnt-zig-native-reference.json`。再実行: 両アーキテクチャのプローブをビルド → `tests/run_kxnt_zig_native_reference.ps1 -ZigExecutable <公式0.16.0のzig.exe> -VMX <VMX> -GuestPassword <パスワード>`。テストのコンパイラ版は再現のため固定し、製品へのファイル名・版の固定選択は実装していない。
+
+また同じ native launch probe から `cmd.exe /d /c exit 0` を CreateProcess の明示的な command line で起動すると終了0になった。vmrun の直接起動では終了1だったため、cmd.exe 自体が動作しないとは結論しない。引数伝達・起動経路の差を含めた詳細原因は未確定。必要なゲストコマンドはこのネイティブ起動プローブを使って実行可能になった。証跡: `docs/validation/kxnt-cmd-native-launch.json`。

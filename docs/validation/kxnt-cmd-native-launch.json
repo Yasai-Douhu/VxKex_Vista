@@ -1,0 +1,7 @@
+{
+  "VMX": "C:\\Users\\YamaR\\Documents\\Virtual Machines\\W2k8\\Windows Server 2008.vmx",
+  "Program": "C:\\Windows\\System32\\cmd.exe",
+  "Arguments": "/d /c exit 0",
+  "LaunchProbeSHA256": "5CB617AC95F606F63759B3834BE59FC6D54F0068FEE3CCCEF374A2C13463084A",
+  "Output": "ProcessBits=64 KexDllLoaded=0\r\nNativeExport=NtAlertThreadByThreadId Present=0\r\nNativeExport=NtWaitForAlertByThreadId Present=0\r\nNativeExport=RtlQueryPerformanceCounter Present=0\r\nNativeExport=RtlQueryPerformanceFrequency Present=0\r\nNativeExport=RtlGetSystemTimePrecise Present=0\r\nNativeExport=RtlReportSilentProcessExit Present=0\r\nNativeExport=NtWriteFile Present=1\r\nCreateProcess=1 Error=0\r\nChildWait=00000000 ChildExitCode=00000000\r\nResult=MEASURED\r\n"
+}

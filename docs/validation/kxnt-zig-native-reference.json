@@ -1,0 +1,26 @@
+[
+  {
+    "Architecture": "x86",
+    "Target": "x86-windows.vista",
+    "VMX": "C:\\Users\\YamaR\\Documents\\Virtual Machines\\W2k8\\Windows Server 2008.vmx",
+    "CompilerVersion": "0.16.0",
+    "CompilerSHA256": "086CE9D47BA42F33A514E1A6E04EB1D4A8FA1D75E0868E0213CAAD447C91E864",
+    "SourceSHA256": "3621FEE8278633B599FE9AA2D5D8412605D803F0E79BB184E5738C399FCCD05D",
+    "ProgramSHA256": "9681E69406F0EA83EB49E5320314449958BCAFD05EEAA38CA02706B2FCD15898",
+    "LaunchProbeSHA256": "2293E5D9E81B0F1B7672628AED7A04AD0FFC1BD36EC069F71EF3F1442CEC67AB",
+    "Output": "ProcessBits=32 KexDllLoaded=0\r\nNativeExport=NtAlertThreadByThreadId Present=0\r\nNativeExport=NtWaitForAlertByThreadId Present=0\r\nNativeExport=RtlQueryPerformanceCounter Present=0\r\nNativeExport=RtlQueryPerformanceFrequency Present=0\r\nNativeExport=RtlGetSystemTimePrecise Present=0\r\nNativeExport=RtlReportSilentProcessExit Present=0\r\nNativeExport=NtWriteFile Present=1\r\nCreateProcess=1 Error=0\r\nChildWait=00000000 ChildExitCode=c0000139\r\nResult=MEASURED\r\n",
+    "Interpretation": "Native process fails at load with missing entries; console write not reached."
+  },
+  {
+    "Architecture": "x64",
+    "Target": "x86_64-windows.vista",
+    "VMX": "C:\\Users\\YamaR\\Documents\\Virtual Machines\\W2k8\\Windows Server 2008.vmx",
+    "CompilerVersion": "0.16.0",
+    "CompilerSHA256": "086CE9D47BA42F33A514E1A6E04EB1D4A8FA1D75E0868E0213CAAD447C91E864",
+    "SourceSHA256": "3621FEE8278633B599FE9AA2D5D8412605D803F0E79BB184E5738C399FCCD05D",
+    "ProgramSHA256": "181C5758F3EBA83F5F54E9BA3C50A2E39EB8B190829A02D25B028F0AF1A1E20D",
+    "LaunchProbeSHA256": "5CB617AC95F606F63759B3834BE59FC6D54F0068FEE3CCCEF374A2C13463084A",
+    "Output": "ProcessBits=64 KexDllLoaded=0\r\nNativeExport=NtAlertThreadByThreadId Present=0\r\nNativeExport=NtWaitForAlertByThreadId Present=0\r\nNativeExport=RtlQueryPerformanceCounter Present=0\r\nNativeExport=RtlQueryPerformanceFrequency Present=0\r\nNativeExport=RtlGetSystemTimePrecise Present=0\r\nNativeExport=RtlReportSilentProcessExit Present=0\r\nNativeExport=NtWriteFile Present=1\r\nCreateProcess=1 Error=0\r\nChildWait=00000000 ChildExitCode=c0000139\r\nResult=MEASURED\r\n",
+    "Interpretation": "Native process fails at load with missing entries; console write not reached."
+  }
+]
