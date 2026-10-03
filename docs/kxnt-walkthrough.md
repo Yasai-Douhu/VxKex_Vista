@@ -665,3 +665,13 @@ Vista x64 VMのWOW64 / x64でtests/run_kxnt_condrv_vm.ps1を実行し、両形�
 証跡: docs/validation/kxnt-condrv-vista-client.json（native対照、VM raw結果、source / EXE / DLL hash）。再実行はtests/run_kxnt_condrv_vm.ps1にVista VMX、GuestUser、GuestPassword、専用GuestDirectoryを指定する。
 
 既存の制約は維持する。自然なOS部分完了ではなくowned KexDllのIATだけで強制したcase、曖昧aliasのNOT_SUPPORTED、event / APC等の非対応経路、cold native-control Eventの作成stack未同定、通常IFEO統合・system DLL配備未検証。配布バイナリ、システムDLL、Releasesは変更していない。
+## 2026-10-03: SilentProcessExitの明示的未対応とimport解決を Vistaで確認
+
+Vista VMのWOW64 / x64でtests/run_kxnt_silent_exit_vm.ps1を実行し、既存の明示的rejectionとimport bindabilityの試験に成功した。**WER終了監視・報告機能は未実装のまま。** 014c609の機能制約をクライアントで確認した結果である。
+
+- 各形式9handle validation caseをホストnativeと比較し、有効なprocessではSTATUS_NOT_SUPPORTEDを期待値として明示した。無効、閉じたhandle、別object、zero / limited access等の結果も比較し、LastErrorを確認した。
+- 各形式1,000回の呼出しでhandle増加0。ReportingSupported=0、Result=PASSを確認した。PASSは報告処理の実施を意味しない。
+- 専用Zig smoke EXEのimport resolutionを全件確認し、RtlReportSilentProcessExitもResolved=1、Missing=0。ここでは実際のWERイベントやreport作成の観測は行っていない。
+- DLL / EXE hash、native / VM raw結果を保存。runnerはKxNtを専用絶対パスで渡すが、forward先KexDllの実module pathをログ・gateにしていないため、その限定も証跡に明示した。
+
+証跡: docs/validation/kxnt-silent-exit-vista-client.json。再実行はtests/run_kxnt_silent_exit_vm.ps1にVista VMX / GuestUser / GuestPassword / GuestDirectoryを指定。配布DLL、システムDLL、Releasesは変更していない。実際のWER、通常IFEO、任意process tokenの全面検証へ成功範囲を拡張しない。
