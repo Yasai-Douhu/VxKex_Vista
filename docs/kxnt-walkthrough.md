@@ -16,7 +16,7 @@
 | RtlCheckTokenMembershipEx | 完了（NT 6.0 の通常トークン） | Server 2008 x86 / x64、native 比較と反復検証成功 |
 | ZwCompareObjects / NtCompareObjects 精度改善 | 実装済み | Server 2008 x86 / x64 native 比較・並列検証成功。DLL 未読込みの対照でもコンソール初期化資源の増加を確認 |
 | 拡張 rename / delete | 実装済み（通常操作。追加フラグは拒否） | Server 2008 x86 / x64、Nt / Zw 双方96ケース・各1,000回反復成功 |
-| スレッド通知・待機 / Zw 別名 | 未着手 | 未実施 |
+| スレッド通知・待機 / Zw 別名 | 実装済み（プロセス内の状態管理） | Server 2008 x86 / x64、Nt / Zw の native 比較・4,096スレッド反復・実 ID 再利用・終了後回収成功 |
 | ConDrv 向け NtWriteFile | 未着手 | 未実施 |
 | WNF / ZwQueryWnfStateData | 調査段階 | 本家にも未実装があるため実機能の対応を判断する必要あり |
 | 既存の未解決 native 転送 | 調査段階 | 呼び出すアプリと API ごとに検証予定 |
@@ -273,3 +273,46 @@ Vista クライアント、native 32bit OS、標準ユーザー / 制限トー�
 VM 出力と DLL / プローブ SHA256: `docs/validation/kxnt-file-information.json`。ホスト native 出力: `docs/validation/kxnt-file-information-reference.json`。再実行は `tests/build_kxnt_parity.ps1` → `tests/run_kxnt_processor_feature_vm.ps1 -Probe file-information`。ホストの通常操作参照は `file-information.exe ntdll.dll <出力ファイル> Native`。
 
 残る範囲: Vista クライアント、native 32bit OS、標準ユーザー、実アプリ、ネットワーク・他ファイルシステム、実際に pending となる I/O、同時 rename / delete 競合、追加フラグの意味の実装。新 DLL は作業ブランチの Installer と VM の専用検証フォルダーへ配置し、システム配備や Releases 公開は行っていない。
+
+## 2026-10-03: スレッド通知・待機の実装前検証
+
+NEXT の ntalrtid.c と現行の ntthread.c / dllmain.c を確認した。現行の両関数は STATUS_NOT_IMPLEMENTED の本体で、KxNt の公開経路にもない。NEXT が使う TEB 末尾の状態領域と共有 keyed event は現行 Vista 版にない。また現行 DllMain は通常ロード時にスレッド通知を無効にするため、NEXT の thread attach 初期化だけをコピーしても成立しない。
+
+`tests/kxnt_alert_probe.c` と `tests/run_kxnt_alert_reference.ps1` を追加し、実装の基準になる native の挙動を測定した。ホスト x86 / x64 は Failures=0。Server 2008 の system ntdll を直接ロードしたプローブは、両アーキテクチャとも Alert=0 / Wait=0（公開名なし）、予定した診断終了コード6。これは互換実装の成功ではなく、移植が必要なことの確認。
+
+- 自スレッドおよびまだ待機していない worker への通知が、次の待機を STATUS_ALERTED にする。15回の重複通知は1回分にまとまり、次のゼロ待機は STATUS_TIMEOUT。
+- Timeout=0、短い相対時間、過去の絶対時刻は通知がなければ TIMEOUT。無効な timeout ポインターは ACCESS_VIOLATION。通知済みでも先に timeout の読取り失敗を返し、その後の正常な待機では通知が維持される。
+- unreadable な Hint 値を渡しても、この試験の待機は成立した。User APC をキューに入れてもこの待機は APC を実行せず、明示的な SleepEx(TRUE) で初めて実行された。
+- 自スレッド ID の下位2ビットを付けた値でも通知が成功した。NULL、存在しない ID、-1、プロセス ID は INVALID_CID。別プロセスの suspended thread は ACCESS_DENIED。
+- 終了した worker のハンドルを保持している時点では通知が SUCCESS、閉じた直後の観測では INVALID_CID。ID の寿命に影響するため、互換実装が自身で持つスレッドハンドルを無期限に残さない設計が必要。この単発観測だけで終了後の全タイミングを固定しない。
+- 1,000回の短い待機と1,500回の通知を競合させ、ALERTED / TIMEOUT 以外の返却がなく、両結果を実際に観測した。初回ログの x86 は632 / 368、x64 は647 / 353。件数はスケジューリング依存の診断値であり、固定参照値にはしない。
+
+結果とプローブ SHA256: `docs/validation/kxnt-alert-reference.json`。再実行: `tests/build_kxnt_probes.ps1 -Architecture x86` / `x64` → `tests/run_kxnt_alert_reference.ps1 -VMX <VMX> -GuestPassword <パスワード>`。宣言・導入時期: [phnt](https://github.com/winsiderss/phnt/blob/master/ntpsapi.h)、開発者による挙動記述: [wait](https://github.com/m417z/ntdoc/blob/main/descriptions/ntwaitforalertbythreadid.md) / [alert](https://github.com/m417z/ntdoc/blob/main/descriptions/ntalertthreadbythreadid.md)。Windows 8 以降の API である。
+
+この調査を基に、以下のプロセス内状態管理を実装した。
+
+### 実装と VM 検証
+
+- KexDll に NtAlertThreadByThreadId / NtWaitForAlertByThreadId を追加し、既存の未実装本体を削除した。KexDll ordinal 308 / 309、KxNt の Nt / Zw 4名は2208～2211。全4配布 DLL の既存 ordinal は変更0件。
+- 各利用スレッドに auto-reset event と実スレッドのハンドルを保持する。1件の保留通知、重複通知の合流、timeout と通知の競合を NT 6.0 のイベント待機に委譲する。待機は non-alertable、SUCCESS を STATUS_ALERTED へ変換する。Hint を逆参照せず、timeout は保留通知の消費前に取り込む。
+- TEB 末尾を拡張せず、DLL の thread attach 通知も前提にしない。SRW lock は状態表の操作に使い、無期限待機中は保持しない。既に確認した生存スレッドは保持した実体を利用し、繰り返しの open を避ける。
+- 未登録の対象を NtOpenThread / NtQueryInformationThread で確認し、別プロセスは ACCESS_DENIED、不正 ID は INVALID_CID。低位2ビットのタグを除いて扱う。終了したスレッドは次の API 呼び出しで状態・イベント・保持ハンドルを回収してから ID を再照会し、保持ハンドルによって死んだ ID を残し続けない。
+- 外部のハンドルによって終了スレッドの ID が残る場合は native 同様 SUCCESS とし、新しい状態を保持しない。明示的 DLL unload では状態を閉じ、プロセス終了時には kernel の回収に任せる。native API が存在する OS では native へ委譲する。LastError を保存する。
+
+イベントの根拠: [Microsoft Event Objects](https://learn.microsoft.com/en-us/windows/win32/sync/event-objects)。本家の keyed event / TEB 状態機械のコピーではなく、Vista の既存の同期機能を使う実装である。
+
+Server 2008 x86 WOW64 / x64 の KxNt → KexDll を Nt / Zw 双方で実行し、ホスト native と固定結果が一致した。参照選択の PowerShell 5.1 の配列処理を修正し、アーキテクチャごとに参照1件であることも検査する。
+
+- 待機前の通知、15回の重複、自スレッド・他スレッド、無期限待機、0 / 相対 / 過去の絶対 timeout、不正 timeout と保留通知維持、APC 非実行、ID タグ、不正 ID、別プロセス。
+- Nt / Zw それぞれ、1,000待機と1,500通知の競合。ALERTED と TIMEOUT の両方を観測し、その他の返却0件。
+- Nt / Zw それぞれ4,096スレッドを生成・終了。新しいスレッドが古い通知を受け取らず、自分への通知を受け取ることを確認。初期256回では再利用が観測できなかったため4,096回へ拡大し、実際の ID 再利用を両アーキテクチャで多数観測した。再利用件数はログの診断値に保存し、固定件数との比較はしない。計測ハンドル増加0。
+- 通知を消費せず終了したスレッドも、次の API 呼び出しで回収され、計測ハンドル増加0。
+- 別の検証プロセス内で worker を無期限待機へ進ませ、100ms後に強制終了。残るスレッドの API が TIMEOUT を返し、回収後のハンドル増加0。親の10秒 watchdog を用意した。これは任意の命令位置での強制終了を安全にしたという意味ではなく、メモリ確保・状態表のロック保持中の強制終了は検証していない。[Microsoft の TerminateThread の制約](https://learn.microsoft.com/windows/win32/api/processthreadsapi/nf-processthreadsapi-terminatethread)。
+
+### 配備差と残る範囲
+
+WOW64 の検証親から子を作る試験では、公開名不足の終了6と検証 DLL の LoadLibrary エラー127を観測した。親の DLL 読込みで有効になる伝播と、旧 system DLL の混在を切り分けるため、終了試験のプロセスを VMware Tools から直接起動するようにした。強制終了試験を省略したものではなく、Nt / Zw 双方の結果を別ログで必須確認する。既存 system 配備は更新していない。新 DLL を system 配備した親子起動全体の回帰と、この混在エラーの詳細解析は未完了。
+
+未登録の対象には THREAD_QUERY_LIMITED_INFORMATION | SYNCHRONIZE での open が必要。特殊な制限 DACL、標準ユーザー / 制限トークン、Vista クライアント、native 32bit OS、実アプリ、任意位置の強制終了・他モジュールが DLL を使用中の unload は未検証。終了状態は次の API 呼び出し時に回収するため、呼び出しが止まった時点で直ちにすべての状態を解放する設計ではない。
+
+VM ログ・DLL / プローブ SHA256・直接起動した終了試験のログ: `docs/validation/kxnt-alert.json`。ホスト参照と VM native の不在確認: `docs/validation/kxnt-alert-reference.json`。再実行: `tests/build_kxnt_parity.ps1` → `tests/run_kxnt_alert_reference.ps1` → 参照 JSON を更新 → `tests/run_kxnt_processor_feature_vm.ps1 -Probe alert`。runner は基本試験を CoreOnly モードで実行し、終了試験を別プロセスで実行して双方をゲートにする。単体診断の `--provider` / `--termination` モードも用意した。

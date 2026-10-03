@@ -78,7 +78,6 @@ NTSTATUS NTAPI Ext_NtQueryInformationThread(
 		ThreadInformationLength,
 		ReturnLength);
 } PROTECTED_FUNCTION_END
-
 NTSTATUS NTAPI Ext_NtSetInformationThread(
 	IN	HANDLE				ThreadHandle,
 	IN	THREADINFOCLASS		ThreadInformationClass,
@@ -94,19 +93,4 @@ NTSTATUS NTAPI Ext_NtSetInformationThread(
 		ThreadInformationClass,
 		ThreadInformation,
 		ThreadInformationLength);
-} PROTECTED_FUNCTION_END
-
-NTSTATUS NTAPI NtAlertThreadByThreadId(
-	IN	HANDLE	UniqueThread) PROTECTED_FUNCTION
-{
-	// TODO
-	return STATUS_NOT_IMPLEMENTED;
-} PROTECTED_FUNCTION_END
-
-NTSTATUS NTAPI NtWaitForAlertByThreadId(
-	IN	PVOID		Hint,
-	IN	PLONGLONG	Timeout) PROTECTED_FUNCTION
-{
-	// TODO
-	return STATUS_NOT_IMPLEMENTED;
 } PROTECTED_FUNCTION_END

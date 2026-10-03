@@ -1,5 +1,9 @@
 LIBRARY KxNt
 EXPORTS
+	NtAlertThreadByThreadId = KexDll.NtAlertThreadByThreadId @2208
+	NtWaitForAlertByThreadId = KexDll.NtWaitForAlertByThreadId @2209
+	ZwAlertThreadByThreadId = KexDll.NtAlertThreadByThreadId @2210
+	ZwWaitForAlertByThreadId = KexDll.NtWaitForAlertByThreadId @2211
 	ZwCompareObjects = KexDll.NtCompareObjects @2207
 	RtlCheckTokenMembershipEx = KexDll.KexRtlCheckTokenMembershipEx @2206
 	RtlIsPackageSid = KexDll.KexRtlIsPackageSid @2204

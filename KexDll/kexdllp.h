@@ -235,3 +235,5 @@ NTSTATUS VxlpFindOrCreateSourceFunctionIndex(
 NTSTATUS VxlpBuildIndex(
 	IN	VXLHANDLE			LogHandle);
 
+VOID KexCleanupAlertByThreadId(VOID);
+

@@ -1,5 +1,7 @@
 LIBRARY "KexDll.dll"
 EXPORTS
+	NtAlertThreadByThreadId @308
+	NtWaitForAlertByThreadId @309
 	Ext_NtSetInformationFile @307
 	KexRtlCheckTokenMembershipEx @306
 	KexRtlIsPackageSid @304

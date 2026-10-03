@@ -293,6 +293,9 @@ KEXAPI NTSTATUS NTAPI Ext_NtSetInformationFile(
 	IN ULONG FileInformationLength,
 	IN FILE_INFORMATION_CLASS FileInformationClass);
 
+KEXAPI NTSTATUS NTAPI NtAlertThreadByThreadId(IN HANDLE UniqueThread);
+KEXAPI NTSTATUS NTAPI NtWaitForAlertByThreadId(IN PVOID Hint OPTIONAL, IN PLARGE_INTEGER Timeout OPTIONAL);
+
 KEXAPI NTSTATUS NTAPI NtCompareObjects(
 	IN	HANDLE	FirstObjectHandle,
 	IN	HANDLE	SecondObjectHandle);

@@ -111,6 +111,10 @@ BOOL WINAPI DllMain(
 	NTSTATUS Status;
 	PVOID DllNotificationCookie;
 
+	if (Reason == DLL_PROCESS_DETACH && Descriptor == NULL) {
+		KexCleanupAlertByThreadId();
+	}
+
 	if (Reason == DLL_PROCESS_VERIFIER) {
 		//
 		// Register a useless descriptor with app verifier system.

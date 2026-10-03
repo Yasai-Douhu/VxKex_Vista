@@ -32,3 +32,5 @@ if ($LASTEXITCODE) { throw "Token membership probe build failed ($Architecture)"
 if ($LASTEXITCODE) { throw "Object comparison probe build failed ($Architecture)" }
 & cl.exe /nologo /MT /O1 /W4 "/Fo$out\file-information.obj" "/Fe$out\file-information.exe" "$PSScriptRoot\kxnt_file_information_probe.c" /link /SUBSYSTEM:CONSOLE,6.0
 if ($LASTEXITCODE) { throw "File information probe build failed ($Architecture)" }
+& cl.exe /nologo /MT /O1 /W4 "/Fo$out\alert.obj" "/Fe$out\alert.exe" "$PSScriptRoot\kxnt_alert_probe.c" /link /SUBSYSTEM:CONSOLE,6.0
+if ($LASTEXITCODE) { throw "Thread alert probe build failed ($Architecture)" }

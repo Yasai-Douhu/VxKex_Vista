@@ -6,6 +6,8 @@
       "BaselineNames": 2015,
       "OrdinalChanges": {},
       "NewExports": {
+        "NtAlertThreadByThreadId": 2208,
+        "NtWaitForAlertByThreadId": 2209,
         "RtlCanonicalizeDomainName": 2200,
         "RtlCheckTokenMembershipEx": 2206,
         "RtlGetDeviceFamilyInfoEnum": 2202,
@@ -13,7 +15,9 @@
         "RtlIsCapabilitySid": 2205,
         "RtlIsPackageSid": 2204,
         "RtlIsProcessorFeaturePresent": 2201,
-        "ZwCompareObjects": 2207
+        "ZwAlertThreadByThreadId": 2210,
+        "ZwCompareObjects": 2207,
+        "ZwWaitForAlertByThreadId": 2211
       }
     },
     {
@@ -21,6 +25,8 @@
       "BaselineNames": 2055,
       "OrdinalChanges": {},
       "NewExports": {
+        "NtAlertThreadByThreadId": 2208,
+        "NtWaitForAlertByThreadId": 2209,
         "RtlCanonicalizeDomainName": 2200,
         "RtlCheckTokenMembershipEx": 2206,
         "RtlGetDeviceFamilyInfoEnum": 2202,
@@ -28,7 +34,9 @@
         "RtlIsCapabilitySid": 2205,
         "RtlIsPackageSid": 2204,
         "RtlIsProcessorFeaturePresent": 2201,
-        "ZwCompareObjects": 2207
+        "ZwAlertThreadByThreadId": 2210,
+        "ZwCompareObjects": 2207,
+        "ZwWaitForAlertByThreadId": 2211
       }
     },
     {
@@ -43,7 +51,9 @@
         "KexRtlGetPersistedStateLocation": 303,
         "KexRtlIsCapabilitySid": 305,
         "KexRtlIsPackageSid": 304,
-        "KexRtlIsProcessorFeaturePresent": 301
+        "KexRtlIsProcessorFeaturePresent": 301,
+        "NtAlertThreadByThreadId": 308,
+        "NtWaitForAlertByThreadId": 309
       }
     },
     {
@@ -58,7 +68,9 @@
         "KexRtlGetPersistedStateLocation": 303,
         "KexRtlIsCapabilitySid": 305,
         "KexRtlIsPackageSid": 304,
-        "KexRtlIsProcessorFeaturePresent": 301
+        "KexRtlIsProcessorFeaturePresent": 301,
+        "NtAlertThreadByThreadId": 308,
+        "NtWaitForAlertByThreadId": 309
       }
     }
   ]
