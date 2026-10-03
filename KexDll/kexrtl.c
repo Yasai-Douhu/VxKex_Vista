@@ -23,6 +23,44 @@
 #include "kexdllp.h"
 #include <limits.h>
 
+// NT 6.0 has the underlying clocks, but not these RTL exports. Query into a
+// local aligned value: the old Win32 wrappers reject unaligned user pointers
+// and translate kernel probing failures to LastError. Modern RTL instead
+// stores to the caller directly (raising on an inaccessible output pointer).
+KEXAPI ULONG NTAPI KexRtlQueryPerformanceCounter(OUT PLARGE_INTEGER Counter)
+{
+	PTEB Teb = NtCurrentTeb();
+	ULONG OldError = Teb->LastErrorValue;
+	NTSTATUS OldStatus = Teb->LastStatusValue;
+	LARGE_INTEGER Value;
+	BOOL Success;
+	try {
+		Success = QueryPerformanceCounter(&Value);
+		if (Success) *Counter = Value;
+		return Success ? 1UL : 0UL; // LOGICAL is 32 bits, not BOOLEAN.
+	} finally {
+		Teb->LastErrorValue = OldError;
+		Teb->LastStatusValue = OldStatus;
+	}
+}
+
+KEXAPI ULONG NTAPI KexRtlQueryPerformanceFrequency(OUT PLARGE_INTEGER Frequency)
+{
+	PTEB Teb = NtCurrentTeb();
+	ULONG OldError = Teb->LastErrorValue;
+	NTSTATUS OldStatus = Teb->LastStatusValue;
+	LARGE_INTEGER Value;
+	BOOL Success;
+	try {
+		Success = QueryPerformanceFrequency(&Value);
+		if (Success) *Frequency = Value;
+		return Success ? 1UL : 0UL;
+	} finally {
+		Teb->LastErrorValue = OldError;
+		Teb->LastStatusValue = OldStatus;
+	}
+}
+
 // Use the OS feature policy, not just CPUID or the raw shared-data bitmap.
 // For example, x64 Windows masks the legacy MMX feature in this API even when
 // ProcessorFeatures[PF_MMX_INSTRUCTIONS_AVAILABLE] is set. Never advertise

@@ -52,6 +52,8 @@
         "KexRtlIsCapabilitySid": 305,
         "KexRtlIsPackageSid": 304,
         "KexRtlIsProcessorFeaturePresent": 301,
+        "KexRtlQueryPerformanceCounter": 310,
+        "KexRtlQueryPerformanceFrequency": 311,
         "NtAlertThreadByThreadId": 308,
         "NtWaitForAlertByThreadId": 309
       }
@@ -69,6 +71,8 @@
         "KexRtlIsCapabilitySid": 305,
         "KexRtlIsPackageSid": 304,
         "KexRtlIsProcessorFeaturePresent": 301,
+        "KexRtlQueryPerformanceCounter": 310,
+        "KexRtlQueryPerformanceFrequency": 311,
         "NtAlertThreadByThreadId": 308,
         "NtWaitForAlertByThreadId": 309
       }

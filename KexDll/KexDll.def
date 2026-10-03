@@ -1,5 +1,7 @@
 LIBRARY "KexDll.dll"
 EXPORTS
+	KexRtlQueryPerformanceCounter @310
+	KexRtlQueryPerformanceFrequency @311
 	NtAlertThreadByThreadId @308
 	NtWaitForAlertByThreadId @309
 	Ext_NtSetInformationFile @307

@@ -38,3 +38,5 @@ if ($LASTEXITCODE) { throw "Thread alert probe build failed ($Architecture)" }
 if ($LASTEXITCODE) { throw "Console classification probe build failed ($Architecture)" }
 & cl.exe /nologo /MT /O1 /W4 "/Fo$out\native-launch.obj" "/Fe$out\native-launch.exe" "$PSScriptRoot\kxnt_native_launch_probe.c" /link /SUBSYSTEM:CONSOLE,6.0
 if ($LASTEXITCODE) { throw "Native launch probe build failed ($Architecture)" }
+& cl.exe /nologo /MT /O1 /W4 "/Fo$out\performance.obj" "/Fe$out\performance.exe" "$PSScriptRoot\kxnt_performance_probe.c" /link /SUBSYSTEM:CONSOLE,6.0
+if ($LASTEXITCODE) { throw "Performance counter probe build failed ($Architecture)" }

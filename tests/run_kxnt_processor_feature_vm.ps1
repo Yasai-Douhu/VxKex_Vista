@@ -3,7 +3,7 @@ param(
     [Parameter(Mandatory=$true)][string]$GuestPassword,
     [string]$GuestUser = 'Administrator',
     [string]$GuestDirectory = 'C:\KxNtParity',
-    [ValidateSet('processor-feature','domain','device-family','persisted-state','sid-package','sid-capability','membership','compare','file-information','alert')][string]$Probe = 'processor-feature',
+    [ValidateSet('processor-feature','domain','device-family','persisted-state','sid-package','sid-capability','membership','compare','file-information','alert','performance')][string]$Probe = 'processor-feature',
     [string]$VMRun = 'C:\Program Files\VMware\VMware Workstation\vmrun.exe'
 )
 $ErrorActionPreference = 'Stop'
@@ -53,6 +53,17 @@ foreach ($arch in @('x86','x64')) {
     }
     if ($Probe -eq 'device-family' -and ($text -notmatch 'OptionalOutputCombinations=8 Failures=0' -or $text -notmatch 'SpoofedVersionCases=3')) {
         throw "Device family checks missing ($arch)"
+    }
+    if ($Probe -eq 'performance') {
+        if ($text -notmatch 'UnalignedOutputCases=16 Failures=0' -or $text -notmatch 'Threads=4 CounterCalls=4000 FrequencyCalls=4000 InvalidOutputCases=10 Failures=0') {
+            throw "Performance counter checks missing ($arch)"
+        }
+        $references=Get-Content -Raw "$root\docs\validation\kxnt-performance-reference.json" | ConvertFrom-Json
+        $reference=@($references | Where-Object {$_.Architecture -eq $arch})
+        if($reference.Count -ne 1){throw "Expected one performance reference ($arch)"}
+        $actual=@($text -split '\r?\n' | Where-Object {$_ -and $_ -notmatch '^ProcessBits=|^Diagnostic '})
+        $expected=@($reference[0].HostOutput -split '\r?\n' | Where-Object {$_ -and $_ -notmatch '^ProcessBits=|^Diagnostic '})
+        if(Compare-Object $expected $actual){throw "Performance output differs from native RTL ($arch)"}
     }
     if ($Probe -eq 'compare') {
         $before = @($text -split '\r?\n' | Where-Object { $_ -match '^Diagnostic before ' } | ForEach-Object { $_ -replace '^Diagnostic before ','' })

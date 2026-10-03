@@ -17,6 +17,7 @@
 | ZwCompareObjects / NtCompareObjects 精度改善 | 実装済み | Server 2008 x86 / x64 native 比較・並列検証成功。DLL 未読込みの対照でもコンソール初期化資源の増加を確認 |
 | 拡張 rename / delete | 実装済み（通常操作。追加フラグは拒否） | Server 2008 x86 / x64、Nt / Zw 双方96ケース・各1,000回反復成功 |
 | スレッド通知・待機 / Zw 別名 | 実装済み（プロセス内の状態管理） | Server 2008 x86 / x64、Nt / Zw の native 比較・4,096スレッド反復・実 ID 再利用・終了後回収成功 |
+| RtlQueryPerformanceCounter / Frequency（既存の未解決転送） | 実装済み | Server 2008 x86 / x64、native 参照・未整列出力・例外・並列照会成功 |
 | ConDrv 向け NtWriteFile | 実装前調査 | Server 2008 x86 / x64 でハンドルの数値衝突・判定方法の制約を実測。実アプリの呼出し経路を調査中 |
 | WNF / ZwQueryWnfStateData | 調査段階 | 本家にも未実装があるため実機能の対応を判断する必要あり |
 | 既存の未解決 native 転送 | 調査段階 | 呼び出すアプリと API ごとに検証予定 |
@@ -348,3 +349,31 @@ NT コンソールとカーネルの名前空間を区別し、意図が曖昧�
 結果・EXE / ソース / コンパイラ SHA256: `docs/validation/kxnt-zig-native-reference.json`。再実行: 両アーキテクチャのプローブをビルド → `tests/run_kxnt_zig_native_reference.ps1 -ZigExecutable <公式0.16.0のzig.exe> -VMX <VMX> -GuestPassword <パスワード>`。テストのコンパイラ版は再現のため固定し、製品へのファイル名・版の固定選択は実装していない。
 
 また同じ native launch probe から `cmd.exe /d /c exit 0` を CreateProcess の明示的な command line で起動すると終了0になった。vmrun の直接起動では終了1だったため、cmd.exe 自体が動作しないとは結論しない。引数伝達・起動経路の差を含めた詳細原因は未確定。必要なゲストコマンドはこのネイティブ起動プローブを使って実行可能になった。証跡: `docs/validation/kxnt-cmd-native-launch.json`。
+
+## 2026-10-03: RtlQueryPerformanceCounter / RtlQueryPerformanceFrequency
+
+ConDrv の実アプリ検証用にビルドした Zig 0.16.0 標準 I/O プログラムが、両関数を直接インポートすることを確認した。現行 KxNt のエクスポートは存在するが転送先の native ntdll は Server 2008 の両アーキテクチャで非公開だったため、既存未解決転送の実装を先行した。
+
+### 実装
+
+- `KexDll/kexrtl.c` に両関数を追加。Vista にある QueryPerformanceCounter / Frequency で値を取得する。実際の OS のカウンタ・周波数を使い、壁時計や固定値で代用しない。VM は14,318,180Hz、ホストは10,000,000Hzで、別々の OS の値を混ぜない。
+- 整列したローカル LARGE_INTEGER へ照会してから8バイトの出力を書き込む。Vista の Win32 API に呼出し元ポインターを直接渡すと、未整列ポインターを STATUS_DATATYPE_MISALIGNMENT として拒否する。一方ホスト native RTL は未整列出力を扱い、不正出力先にはアクセス違反を起こす。この差を事前測定し、単純な Win32 転送を避けた。
+- 返却は32bitの LOGICAL。正常時1、元の照会が失敗した場合0。BOOLEAN の1バイト返却と混同しない。LastError と LastStatus は正常時・出力コピーでの例外時とも finally で維持する。不正出力の例外を FALSE に変換して隠さない。
+- KexDll ordinal 310 / 311 で公開。KxNt の既存 RtlQueryPerformanceCounter / Frequency 転送だけを変更し、既存 ordinal 1094 / 1095、1114 / 1115 を保持。共通宣言を追加。新しいプロジェクトファイルや DLL 書換えルールは不要。
+
+存在・意味の根拠: [phnt の LOGICAL 宣言](https://github.com/winsiderss/phnt/blob/master/ntrtl.h)、[Microsoft QueryPerformanceCounter](https://learn.microsoft.com/en-us/windows/win32/api/profileapi/nf-profileapi-queryperformancecounter)、[QueryPerformanceFrequency](https://learn.microsoft.com/en-us/windows/win32/api/profileapi/nf-profileapi-queryperformancefrequency)。Win32 の両 API 自体は Windows 2000 以降に存在する。RTL の両エクスポートは VM で存在しないことを別途測定した。
+
+### 検証
+
+VS2010 / SDK 7.1 の x86 / x64 ビルド成功。`tests/kxnt_performance_probe.c` をホスト native ntdll と VM の実際の KxNt → KexDll 経路で実行し、両アーキテクチャとも失敗0。計測値・経過時間などの環境依存行を除き、VM runner がアーキテクチャごとの native 出力と固定行を照合する。
+
+- 各関数の出力先を0～7バイトずらした計16ケース。返却値は32bitの1、8バイト以外の前後のガード値は不変。周波数は同じ OS の QueryPerformanceFrequency と完全一致。カウンタは同じ OS の前後の QueryPerformanceCounter の間に入る。
+- 各関数で NULL、アドレス1、PAGE_NOACCESS、4バイトでガードページに跨がる出力、readonly 出力の計10ケース。native 同様 ACCESS_VIOLATION、LastError と LastStatus が維持される。例外直前の部分書込みバイトの順序までは照合していない。
+- 4スレッド各1,000反復。カウンタ計4,000回、周波数計4,000回。各回で値の照合・返却値・LastError・LastStatus を確認。タイムアウトせず、worker 終了0。ハンドルリークの専用計測はこのプローブでは実施していない。
+- 30ms の Sleep 前後でカウンタが進み、周波数で換算した経過が10ms以上。各環境の実測値を診断行に記録し、特定の経過値との完全一致は要求しない。
+- Server 2008 の native RTL は未公開（診断終了5）、Win32 への単純転送は上記の pointer / error 契約に一致しない（予定した比較失敗・終了1）。これらは互換実装の失敗とは別の対照結果。Win32 の不正 counter 出力は例外ではなく LastError 998 となる。
+- 全4配布 DLL の既存 ordinal 変更0。Installer の各 DLL の SHA256 が VM で検証したビルドの値と一致することを確認した。
+
+証跡: `docs/validation/kxnt-performance.json`（VMログ、DLL / プローブ SHA256）、`docs/validation/kxnt-performance-reference.json`（host native、VM の native 不在と Win32 の差）、`docs/validation/kxnt-export-ordinals.json`。再実行: `tests/build_kxnt_parity.ps1` → `tests/run_kxnt_performance_reference.ps1 -VMX <VMX> -GuestPassword <パスワード>` → 参照 receipt を docs/validation に保存 → `tests/run_kxnt_processor_feature_vm.ps1 -Probe performance -VMX <VMX> -GuestPassword <パスワード>`。診断終了コードを無視せず、参照 runner 内で予定した5 / 1を明示的に照合する。
+
+Vista クライアント、native 32bit OS、標準ユーザー、実アプリ全体の回帰、OS の時計照会自体が失敗する状況は未検証。システム DLL の配備と Releases 公開は行わず、作業ブランチの Installer と専用 VM フォルダーに配置した。Zig 標準 I/O プログラムには RtlReportSilentProcessExit 等の依存が残るため、今回の API 単体成功を Zig や ConDrv 全体の起動成功とは扱わない。
