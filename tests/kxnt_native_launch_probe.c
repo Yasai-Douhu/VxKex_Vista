@@ -19,7 +19,7 @@ static void timeoutEvidence(FILE *out,PROCESS_INFORMATION *process)
     } else fprintf(out,"ChildModuleSnapshotError=%lu\n",GetLastError());
     suspended=SuspendThread(process->hThread);
     if(suspended!=(DWORD)-1){
-        ZeroMemory(&context,sizeof(context));context.ContextFlags=CONTEXT_CONTROL;
+        ZeroMemory(&context,sizeof(context));context.ContextFlags=CONTEXT_CONTROL|CONTEXT_INTEGER;
         if(GetThreadContext(process->hThread,&context)){
 #ifdef _WIN64
             ULONG_PTR pc=(ULONG_PTR)context.Rip,sp=(ULONG_PTR)context.Rsp;
@@ -27,6 +27,15 @@ static void timeoutEvidence(FILE *out,PROCESS_INFORMATION *process)
             ULONG_PTR pc=(ULONG_PTR)context.Eip,sp=(ULONG_PTR)context.Esp;
 #endif
             fprintf(out,"ChildContext PC=%p SP=%p\n",(PVOID)pc,(PVOID)sp);
+#ifdef _WIN64
+            fprintf(out,"ChildRegisters Rcx=%p Rdx=%p R8=%p R9=%p R10=%p Rsi=%p\n",
+                (PVOID)context.Rcx,(PVOID)context.Rdx,(PVOID)context.R8,(PVOID)context.R9,(PVOID)context.R10,(PVOID)context.Rsi);
+            if(ReadProcessMemory(process->hProcess,(PVOID)context.Rdx,stack,4*sizeof(stack[0]),&read)){
+                fprintf(out,"ChildRdxMemoryBytes=%Iu",read);
+                for(i=0;i<read/sizeof(stack[0]);++i)fprintf(out," %p",(PVOID)stack[i]);
+                fputc('\n',out);
+            } else fprintf(out,"ChildRdxReadError=%lu\n",GetLastError());
+#endif
             if(ReadProcessMemory(process->hProcess,(PVOID)sp,stack,sizeof(stack),&read)){
                 fprintf(out,"ChildStackBytes=%Iu",read);
                 for(i=0;i<read/sizeof(stack[0]);++i)fprintf(out," %p",(PVOID)stack[i]);

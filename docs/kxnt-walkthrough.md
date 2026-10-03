@@ -698,3 +698,22 @@ UTF cold資源測定のconime影響を切り離すため、[Microsoftのprocess 
 - x64では明示的な標準入出力だけでは解消しない。CREATE_NO_WINDOWが利用不能という一般論、OS / VMware / VxKexの原因特定、UTFのcold資源gate合格へは拡張しない。MEASUREDは観測完了であり機能成功ではない。
 
 証跡: docs/validation/kxnt-launch-stdio.json。以前の8実行の証跡は別ファイルに保持した。この12実行は実行セッションの終了コード0と全ログ取得を確認済みであり、後続のVM再起動の測定とは混在させていない。再実行は tests/run_kxnt_launch_creation_flags.ps1（3modeに拡張）を使用する。UTFの通常console cold差分、作成stackとlifecycle、通常IFEO統合は引き続き未解決。Installer / system DLL / Releasesは変更していない。
+
+## 2026-10-04: WindowsサブシステムでUTF全caseを比較、cold資源gateは未解決
+
+コンソールなしフラグでの起動停止を避ける追加条件として、tests/build_kxnt_probes.ps1にutf8-windowless.exeを追加した。同一のkxnt_utf8_probe.cをWindows subsystem 6.0 / mainCRTStartupでビルドし、case数・worker・100ms測定・guard・TLS・内容比較を省略していない。画面を作るコードはなく、CREATE_NO_WINDOWは使わずflags0で所有するlauncherから起動した。これは別起動条件の診断であり、元のconsole resource gateを置き換えない。
+
+- Server 2008 / Vista、WOW64 / x64の4組でlookup対照と変換試験が自然終了0。Windows subsystem=2のPE header、実runtime provider / implementationパス、launcherのflags0・自然終了0をrunnerで要求した。
+- 全4組でホストnativeの同じソースによる固定行と完全一致。4,850変換 / size-query、24pointer、全1,112,064 scalarの全内容と往復、18overlap、4worker ×16,000変換のcold / warm各phaseを維持した。資源countは別gateで評価し、固定行のcold数だけを環境値として分離した。
+- cold変換 / lookupの100ms後deltaはServer WOW64=1 / 1、Server x64=0 / 2、Vista WOW64=0 / 1、Vista x64=0 / 1。warmはすべて0。Server WOW64だけ資源gateも通過し、残る3組は失敗。全体receiptは両VMともFailed。native semanticsの一致を資源問題の解決と扱わない。
+- tests/run_kxnt_utf8_windowless_vm.ps1を追加。RunNameごとの新規専用archiveに全raw logとreceiptを保存し、過去の結果を上書きしない。途中例外でもIncomplete状態を残し、gate失敗をthrowする。DLL / EXE / source / runner hash、VMX / user、範囲を記録した。通常IFEO統合やsystem DLL配備は証明しない。
+
+証跡: docs/validation/kxnt-utf8-windowless-server.json / kxnt-utf8-windowless-vista.json。元のconsole初回失敗の記録は保持した。再実行は両形式をbuild後、runnerにVMX / GuestUser / GuestPassword / GuestDirectory（この診断では空白のないscratch） / 未使用RunNameを指定する。追加起動条件でもcold対照数に差が残るため、コンソールIMEだけを原因と断定できない。次は残るhandleの型・identity・作成元を調べる。
+
+### コンソールなし起動の停止位置
+
+native-launchのtimeout採取でinteger registerとRdx先頭32bytesを追加し、Server x64のno-console-nulを実測した。所有する子は10秒以内に終了せず、module一覧とcontext取得後に終了した。現VMからntdll / kernel32を取得し、PCのRVA45b4aはNtWaitForMultipleObjects export45b40の内部であることを照合した。kernel32のreturn RVA22cdeの直前はwait呼出し、count=2を設定し、handles配列をrsi+28hから渡す命令列だった。実contextのRcx=2、Rdx=Rsi+28h、配列の先頭二値は0x10 / 0x18。これらのobject type / name、signalしない理由、CSR messageの意味は未特定。
+
+証跡: docs/validation/kxnt-launch-wait-registers.json（raw context、module hash、export RVAとdisassembly抜粋）。VCのx64 dumpbinはmsdis170.dllをロードできずdisassemblyを生成しなかったため、その出力を証拠にせず、同梱32bit dumpbinでx64 imageを逆アセンブルした。関数名を推定で補わず、確認できたexportとoffsetのみを記録した。
+
+配布DLL、Installer、system DLL、Releasesは変更していない。UTFの資源gate、待機objectの帰属、通常IFEO統合、監査に残る未実装項目は引き続き未完了。
