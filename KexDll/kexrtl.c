@@ -53,6 +53,11 @@ KEXAPI BOOLEAN NTAPI KexRtlIsPackageSid(IN PSID Sid)
 	return KexRtlpIsApplicationSid(Sid, 2);
 }
 
+KEXAPI BOOLEAN NTAPI KexRtlIsCapabilitySid(IN PSID Sid)
+{
+	return KexRtlpIsApplicationSid(Sid, 3);
+}
+
 KEXAPI VOID NTAPI KexRtlGetDeviceFamilyInfoEnum(
 	OUT PULONGLONG UAPInfo OPTIONAL,
 	OUT PULONG DeviceFamily OPTIONAL,

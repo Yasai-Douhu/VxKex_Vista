@@ -58,7 +58,8 @@ int main(int argc, char **argv)
             VirtualFree(pages,0,MEM_RELEASE); fclose(out); return 7;
         }
         ZeroMemory(&sid,sizeof(sid));
-        sid.revision = 1; sid.count = 2; sid.authority[5] = 15; sid.rid[0] = 2;
+        sid.revision = 1; sid.count = 2; sid.authority[5] = 15;
+        sid.rid[0] = strcmp(argv[3], "RtlIsCapabilitySid") == 0 ? 3 : 2;
         for (bytes = 0; bytes <= 16; ++bytes) {
             BYTE *input = pages + system.dwPageSize - bytes;
             DWORD exception = 0;

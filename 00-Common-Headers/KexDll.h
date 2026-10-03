@@ -422,6 +422,7 @@ KEXAPI BOOLEAN NTAPI KexRtlIsProcessorFeaturePresent(
 	IN ULONG ProcessorFeature);
 
 KEXAPI BOOLEAN NTAPI KexRtlIsPackageSid(IN PSID Sid);
+KEXAPI BOOLEAN NTAPI KexRtlIsCapabilitySid(IN PSID Sid);
 
 KEXAPI VOID NTAPI KexRtlGetDeviceFamilyInfoEnum(
 	OUT PULONGLONG UAPInfo OPTIONAL,

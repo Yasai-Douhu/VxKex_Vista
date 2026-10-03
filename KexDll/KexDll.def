@@ -1,6 +1,7 @@
 LIBRARY "KexDll.dll"
 EXPORTS
 	KexRtlIsPackageSid @304
+	KexRtlIsCapabilitySid @305
 	KexRtlGetPersistedStateLocation @303
 	KexRtlGetDeviceFamilyInfoEnum @302
 	KexRtlCanonicalizeDomainName @300

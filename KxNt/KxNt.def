@@ -1,6 +1,7 @@
 LIBRARY KxNt
 EXPORTS
 	RtlIsPackageSid = KexDll.KexRtlIsPackageSid @2204
+	RtlIsCapabilitySid = KexDll.KexRtlIsCapabilitySid @2205
 	RtlGetPersistedStateLocation = KexDll.KexRtlGetPersistedStateLocation @2203
 	RtlGetDeviceFamilyInfoEnum = KexDll.KexRtlGetDeviceFamilyInfoEnum @2202
 	RtlCanonicalizeDomainName = KexDll.KexRtlCanonicalizeDomainName @2200

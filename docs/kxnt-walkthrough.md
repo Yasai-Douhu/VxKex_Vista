@@ -12,7 +12,7 @@
 | RtlGetDeviceFamilyInfoEnum | 完了 | Server 2008 x86 / x64 成功 |
 | RtlGetPersistedStateLocation | 完了（既定パスへのフォールバック） | Server 2008 x86 / x64 成功 |
 | RtlIsPackageSid | 完了 | Server 2008 x86 / x64、native 参照との比較成功 |
-| RtlIsCapabilitySid | 未着手 | 未実施 |
+| RtlIsCapabilitySid | 完了 | Server 2008 x86 / x64、native 参照との比較成功 |
 | RtlCheckTokenMembershipEx | 未着手 | 未実施 |
 | ZwCompareObjects | 未着手 | 未実施 |
 | 拡張 rename / delete | 未着手 | 未実施 |
@@ -156,3 +156,14 @@ Server 2008 x86 / x64 と native Windows の参照結果で、16 ケースの NT
 ホスト native ntdll の x86 / x64 と Server 2008 の KxNt → KexDll を比較。revision、count、authority、RID を組み合わせた 660 ケース、NULL、読み取り可能長 0～16 バイトのガードページ 17 ケースで返却値・例外結果が一致した。NULL や不足した入力は、native と同じアクセス違反をプローブ内の SEH で捕捉した。
 
 参照結果: `docs/validation/kxnt-sid-package-reference.json`。VM ログ・DLL とプローブの SHA256: `docs/validation/kxnt-sid-package.json`。再実行: `tests/run_kxnt_processor_feature_vm.ps1 -Probe sid-package`。SID 分類に AppContainer の作成・隔離機能は含まれない。Vista クライアントと実アプリでの回帰は未実施。
+## 2026-10-03: RtlIsCapabilitySid
+
+- Package SID と共通の分類処理を利用し、S-1-15-3-… を識別する関数を追加。SID revision、authority、count の条件は native に合わせた。
+- KexDll 305、KxNt 2205 の固定 ordinal で公開。全4 DLL の既存公開番号に変更がないことを確認。
+- [phnt の宣言](https://github.com/winsiderss/phnt/blob/master/ntrtl.h)を確認。NEXT の Windows 8 以降の native 転送を Vista 上の独立実装に置き換えた。
+
+### 検証範囲
+
+Server 2008 x86 / x64 で 660 組み合わせ、NULL、17 ガードページ境界ケースの返却値・例外を native Windows と比較し、一致した。ガードページは Capability SID 自体を入力する。Package SID の全ケースも最新 DLL で再実行し成功。
+
+参照結果: `docs/validation/kxnt-sid-capability-reference.json`。VM ログ・SHA256: `docs/validation/kxnt-sid-capability.json`。再実行: `tests/run_kxnt_processor_feature_vm.ps1 -Probe sid-capability`。分類処理は AppContainer の作成・権限付与・隔離機能ではない。Vista クライアントと実アプリでの回帰は未実施。
