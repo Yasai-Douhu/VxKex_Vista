@@ -688,3 +688,13 @@ UTF cold資源測定のconime影響を切り離すため、[Microsoftのprocess 
 証跡: docs/validation/kxnt-launch-creation-flags.json（最新8 raw結果、VMX / user、source / EXE / runner hash、自然終了とtimeoutの区別）。再実行はtests/build_kxnt_probes.ps1を両形式で実行し、tests/run_kxnt_launch_creation_flags.ps1に各VMX / GuestUser / GuestPassword / 専用GuestDirectoryを指定する。10秒は診断上限であり、永続ハングの証明ではない。MEASUREDとtimeoutを動作成功としない。正常終了したno-console例もエラーに置換しない。
 
 次の解析ではPC / return addressのsymbol・module offset、子の初期化と標準handle条件を調べる。conime由来と推測した全handleの作成stack・lifecycle、計測介入の影響、通常console条件のUTF cold差分、通常IFEO統合は未解決。配布DLL、システムDLL、Installerは変更していない。
+## 2026-10-04: CREATE_NO_WINDOW の標準入出力条件を切り分け
+
+前回のコンソールなし起動停止について、tests/kxnt_native_launch_probe.c に no-console-nul を追加した。実際の継承可能な NUL read / write handle を作り、STARTF_USESTDHANDLES と bInheritHandles=TRUE で子に渡す。親は CreateProcess 後に自分の handle を閉じる。通常起動と従来の no-console 条件は保持した。配布互換 DLL の変更ではなく、UTF 資源診断を進めるための起動対照である。
+
+- VS2010 / SDK7.1で x86 / x64 probe をビルドし、Vista / Server 2008 の各形式で normal / no-console / no-console-nul、計12実行を完了した。
+- 通常起動4実行と WOW64 のコンソールなし4実行は自然終了0。x64の no-console / no-console-nul は両VMで10秒の診断上限に達した。所有する子の module / PC / SP / stack を採取し、当該子だけを終了した。前回はServer WOW64にも時間切れがあり、今回の自然終了は停止が恒常的とは限らないことを裏付ける。
+- raw logの ExplicitNulStdio / StartupFlags でNUL指定の実行を確認した。source / runner hash と当時のEXE hash、VMX / user、raw logを保存した。runnerはcreation flagsと親KexDll不在をgateにしているが、NUL指定行の照合はこの証跡整理時に追加で実施した。
+- x64では明示的な標準入出力だけでは解消しない。CREATE_NO_WINDOWが利用不能という一般論、OS / VMware / VxKexの原因特定、UTFのcold資源gate合格へは拡張しない。MEASUREDは観測完了であり機能成功ではない。
+
+証跡: docs/validation/kxnt-launch-stdio.json。以前の8実行の証跡は別ファイルに保持した。この12実行は実行セッションの終了コード0と全ログ取得を確認済みであり、後続のVM再起動の測定とは混在させていない。再実行は tests/run_kxnt_launch_creation_flags.ps1（3modeに拡張）を使用する。UTFの通常console cold差分、作成stackとlifecycle、通常IFEO統合は引き続き未解決。Installer / system DLL / Releasesは変更していない。

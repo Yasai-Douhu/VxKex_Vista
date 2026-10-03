@@ -47,9 +47,9 @@ int main(int argc,char **argv)
     const char *names[]={"NtAlertThreadByThreadId","NtWaitForAlertByThreadId",
         "RtlQueryPerformanceCounter","RtlQueryPerformanceFrequency",
         "RtlGetSystemTimePrecise","RtlReportSilentProcessExit","NtWriteFile"};
-    unsigned i;DWORD creationFlags=0;
+    unsigned i;DWORD creationFlags=0;BOOL redirected=FALSE;HANDLE nullInput=INVALID_HANDLE_VALUE,nullOutput=INVALID_HANDLE_VALUE;SECURITY_ATTRIBUTES inherit;
     if(argc<3 || argc>5)return 2;
-    if(argc==5){if(strcmp(argv[4],"no-console"))return 2;creationFlags=CREATE_NO_WINDOW;}
+    if(argc==5){if(strcmp(argv[4],"no-console") && strcmp(argv[4],"no-console-nul"))return 2;creationFlags=CREATE_NO_WINDOW;redirected=!strcmp(argv[4],"no-console-nul");}
     out=fopen(argv[2],"w");if(!out)return 3;
     fprintf(out,"ProcessBits=%u KexDllLoaded=%d\n",(unsigned)(sizeof(void*)*8),GetModuleHandleW(L"KexDll.dll")!=NULL);
     for(i=0;i<sizeof(names)/sizeof(names[0]);i++)
@@ -57,12 +57,21 @@ int main(int argc,char **argv)
     if(strlen(argv[1])+(argc>=4?strlen(argv[3]):0)+4>=sizeof(command))return 4;
     sprintf(command,"\"%s\" %s",argv[1],argc>=4?argv[3]:"");
     ZeroMemory(&startup,sizeof(startup));startup.cb=sizeof(startup);
+    if(redirected){
+        ZeroMemory(&inherit,sizeof(inherit));inherit.nLength=sizeof(inherit);inherit.bInheritHandle=TRUE;
+        nullInput=CreateFileA("NUL",GENERIC_READ,FILE_SHARE_READ|FILE_SHARE_WRITE,&inherit,OPEN_EXISTING,0,NULL);
+        nullOutput=CreateFileA("NUL",GENERIC_WRITE,FILE_SHARE_READ|FILE_SHARE_WRITE,&inherit,OPEN_EXISTING,0,NULL);
+        if(nullInput==INVALID_HANDLE_VALUE || nullOutput==INVALID_HANDLE_VALUE){if(nullInput!=INVALID_HANDLE_VALUE)CloseHandle(nullInput);if(nullOutput!=INVALID_HANDLE_VALUE)CloseHandle(nullOutput);fclose(out);return 6;}
+        startup.dwFlags=STARTF_USESTDHANDLES;startup.hStdInput=nullInput;startup.hStdOutput=startup.hStdError=nullOutput;
+    }
     ZeroMemory(&process,sizeof(process));
     SetErrorMode(SEM_FAILCRITICALERRORS|SEM_NOGPFAULTERRORBOX|SEM_NOOPENFILEERRORBOX);
     fprintf(out,"CreationFlags=%08lx\n",creationFlags);
     fprintf(out,"CommandLine=%s\n",command);
-    ok=CreateProcessA(argv[1],command,NULL,NULL,FALSE,creationFlags,NULL,NULL,&startup,&process);
+    fprintf(out,"ExplicitNulStdio=%d StartupFlags=%08lx\n",redirected,startup.dwFlags);
+    ok=CreateProcessA(argv[1],command,NULL,NULL,redirected,creationFlags,NULL,NULL,&startup,&process);
     error=ok?0:GetLastError();
+    if(nullInput!=INVALID_HANDLE_VALUE)CloseHandle(nullInput);if(nullOutput!=INVALID_HANDLE_VALUE)CloseHandle(nullOutput);
     fprintf(out,"CreateProcess=%d Error=%lu\n",ok,error);fflush(out);
     if(ok) {
         wait=WaitForSingleObject(process.hProcess,10000);

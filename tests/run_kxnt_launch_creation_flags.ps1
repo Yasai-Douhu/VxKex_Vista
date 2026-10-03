@@ -11,9 +11,9 @@ function Guest([string[]]$Arguments){& $VMRun -T ws -gu $GuestUser -gp $GuestPas
 foreach($arch in @('x86','x64')){
     $results="$root\audit\KxNtParity\$arch";$guest="$GuestDirectory\$arch";$probe="$results\native-launch.exe"
     Guest @('copyFileFromHostToGuest',$VMX,$probe,"$guest\native-launch.exe")
-    foreach($mode in @('normal','no-console')){
+    foreach($mode in @('normal','no-console','no-console-nul')){
         $operation=@('runProgramInGuest',$VMX,"$guest\native-launch.exe",'C:\Windows\System32\cmd.exe',"$guest\native-cmd-$mode.txt",'/d /c exit 0')
-        if($mode -eq 'no-console'){$operation+='no-console'}
+        if($mode -ne 'normal'){$operation+=$mode}
         Guest $operation
         Guest @('copyFileFromGuestToHost',$VMX,"$guest\native-cmd-$mode.txt","$results\native-cmd-$mode.txt")
         $output=[IO.File]::ReadAllText("$results\native-cmd-$mode.txt")
