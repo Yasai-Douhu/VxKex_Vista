@@ -1,0 +1,95 @@
+{
+  "BaseCommit": "24a03ae",
+  "Results": [
+    {
+      "Path": "Installer/KxNt.dll",
+      "BaselineNames": 2015,
+      "OrdinalChanges": {},
+      "NewExports": {
+        "NtAlertThreadByThreadId": 2208,
+        "NtWaitForAlertByThreadId": 2209,
+        "RtlCanonicalizeDomainName": 2200,
+        "RtlCheckTokenMembershipEx": 2206,
+        "RtlGetDeviceFamilyInfoEnum": 2202,
+        "RtlGetPersistedStateLocation": 2203,
+        "RtlIsCapabilitySid": 2205,
+        "RtlIsPackageSid": 2204,
+        "RtlIsProcessorFeaturePresent": 2201,
+        "ZwAlertThreadByThreadId": 2210,
+        "ZwCompareObjects": 2207,
+        "ZwWaitForAlertByThreadId": 2211
+      }
+    },
+    {
+      "Path": "Installer/Kex32/KxNt.dll",
+      "BaselineNames": 2055,
+      "OrdinalChanges": {},
+      "NewExports": {
+        "NtAlertThreadByThreadId": 2208,
+        "NtWaitForAlertByThreadId": 2209,
+        "RtlCanonicalizeDomainName": 2200,
+        "RtlCheckTokenMembershipEx": 2206,
+        "RtlGetDeviceFamilyInfoEnum": 2202,
+        "RtlGetPersistedStateLocation": 2203,
+        "RtlIsCapabilitySid": 2205,
+        "RtlIsPackageSid": 2204,
+        "RtlIsProcessorFeaturePresent": 2201,
+        "ZwAlertThreadByThreadId": 2210,
+        "ZwCompareObjects": 2207,
+        "ZwWaitForAlertByThreadId": 2211
+      }
+    },
+    {
+      "Path": "Installer/KexDll.dll",
+      "BaselineNames": 103,
+      "OrdinalChanges": {},
+      "NewExports": {
+        "Ext_NtSetInformationFile": 307,
+        "Ext_NtWriteFile": 313,
+        "KexNtOpenKeyEx": 318,
+        "KexRtlCanonicalizeDomainName": 300,
+        "KexRtlCheckTokenMembershipEx": 306,
+        "KexRtlGetDeviceFamilyInfoEnum": 302,
+        "KexRtlGetPersistedStateLocation": 303,
+        "KexRtlIsCapabilitySid": 305,
+        "KexRtlIsPackageSid": 304,
+        "KexRtlIsProcessorFeaturePresent": 301,
+        "KexRtlQueryPerformanceCounter": 310,
+        "KexRtlQueryPerformanceFrequency": 311,
+        "KexRtlReportSilentProcessExit": 312,
+        "KexRtlTryAcquireSRWLockExclusive": 314,
+        "KexRtlTryAcquireSRWLockShared": 315,
+        "KexRtlUTF8ToUnicodeN": 316,
+        "KexRtlUnicodeToUTF8N": 317,
+        "NtAlertThreadByThreadId": 308,
+        "NtWaitForAlertByThreadId": 309
+      }
+    },
+    {
+      "Path": "Installer/Kex32/KexDll.dll",
+      "BaselineNames": 103,
+      "OrdinalChanges": {},
+      "NewExports": {
+        "Ext_NtSetInformationFile": 307,
+        "Ext_NtWriteFile": 313,
+        "KexNtOpenKeyEx": 318,
+        "KexRtlCanonicalizeDomainName": 300,
+        "KexRtlCheckTokenMembershipEx": 306,
+        "KexRtlGetDeviceFamilyInfoEnum": 302,
+        "KexRtlGetPersistedStateLocation": 303,
+        "KexRtlIsCapabilitySid": 305,
+        "KexRtlIsPackageSid": 304,
+        "KexRtlIsProcessorFeaturePresent": 301,
+        "KexRtlQueryPerformanceCounter": 310,
+        "KexRtlQueryPerformanceFrequency": 311,
+        "KexRtlReportSilentProcessExit": 312,
+        "KexRtlTryAcquireSRWLockExclusive": 314,
+        "KexRtlTryAcquireSRWLockShared": 315,
+        "KexRtlUTF8ToUnicodeN": 316,
+        "KexRtlUnicodeToUTF8N": 317,
+        "NtAlertThreadByThreadId": 308,
+        "NtWaitForAlertByThreadId": 309
+      }
+    }
+  ]
+}

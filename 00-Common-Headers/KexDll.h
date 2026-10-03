@@ -318,6 +318,8 @@ KEXAPI NTSTATUS NTAPI KexDataInitialize(
 
 #pragma region KexRtl* functions
 
+KEXAPI NTSTATUS NTAPI KexNtOpenKeyEx(PHANDLE KeyHandle,ACCESS_MASK DesiredAccess,POBJECT_ATTRIBUTES ObjectAttributes,ULONG OpenOptions);
+
 KEXAPI NTSTATUS NTAPI KexRtlUTF8ToUnicodeN(PWSTR Destination,ULONG Capacity,PULONG Actual,PCCH Source,ULONG Bytes);
 KEXAPI NTSTATUS NTAPI KexRtlUnicodeToUTF8N(PCHAR Destination,ULONG Capacity,PULONG Actual,PCWSTR Source,ULONG Bytes);
 

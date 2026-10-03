@@ -766,3 +766,18 @@ kxnt_utf8_probe.cにKXNT_UTF8_RESOURCE_TRACEでのみ有効なsnapshotを加え�
 証跡: docs/validation/kxnt-open-key-options-server.json / kxnt-open-key-options-vista.json（それぞれ両形式、native / legacy raw、source / EXE / runner hash、VMX / user）。RunNameごとに別archiveへ保存し、途中例外はIncompleteを残す。キー作成・ACL変更・特権有効化・配布API変更は行っていない。
 
 次工程は、仕様とnativeで保証される通常openの移植を進めつつ、flags4 / 8 / 0x10、保護キー、相対root / view、削除競合、引数検証順序を別途解決する。通常openだけでNtOpenKeyEx全体が完成したとは扱わない。WNFは元監査の実利用確認・設計条件を維持する。UTF資源の残る帰属と通常IFEO統合検証も未完了のまま。Installer / system DLL / Releasesは変更していない。
+
+## 2026-10-04: NtOpenKeyEx の通常openを実装・両VMで検証
+
+未解決native転送の通常openをKexDll/openkeyex.cへ実装し、KxNtのNtOpenKeyEx / ZwOpenKeyExをKexNtOpenKeyExへ転送した。KexDllにordinal318を追加し、宣言とプロジェクト / filtersを追加した。Native NtOpenKeyExが存在するOSでは全引数をそのまま委譲し、NT6.0の非存在時はOpenOptions=0だけをNtOpenKeyへ渡す。これは通常openの移植であり、NtOpenKeyEx全体の完成ではない。
+
+- GetProcAddressのキャッシュ初期化時にLastError / LastStatusを保存・復元。ObjectAttributes、Name、RootDirectory、出力pointerをローカルcopyしたり書き換えたりしない。native probing、alignment、ACL、view指定、output handleの失敗時動作を旧APIに任せる。
+- NT6.0の非ゼロoptionsはSTATUS_NOT_SUPPORTEDとし、出力を変更しない。invalid flagsのnative statusを完全再現したとは主張しない。backup / restore、OpenOptionsのlink指定、virtualization等は未対応のまま。保護キーを作成する代替や、flag8をOBJ_OPENLINKへ変換する処理は追加していない。ObjectAttributesに明示されたOBJ_OPENLINKは通常openでそのままnativeへ渡る。
+- VS2010でKexDll / KxNt / probeを両形式build。Server 2008 / VistaのWOW64 / x64、計4組で通常openの140case / 組をnative NtOpenKeyと同じプロセスで比較して全件一致。absolute通常 / link / missing、relative root / empty name、NULL / bad length / missing Name / inaccessible Name / inaccessible attributes / unaligned attributes / NULL output / readonly output / invalid root、2attributes ×5access maskを対象にした。状態、output変更の有無、LastError / LastStatus、実キー名、GrantedAccessを比較した。
+- 各組1,000回の取得・closeでhandle delta0。未対応options8種類のNOT_SUPPORTED・output未変更を確認した。Nt / Zwが同じ実装addressを解決することと、provider / implementationが専用scratchの実DLLであることをrunnerで要求した。
+- ホストの両形式でも140caseをnative旧APIと比較し、native NtOpenKeyExへの委譲を確認。さらに非ゼロoptions8種類をnative NtOpenKeyExと直接比較して一致した。NT6.0の非ゼロ対応が完成したこととは区別した。
+- build後に作業ブランチのInstaller4DLLを更新し、Release / Installerのhash一致を確認。24a03ae時点の既存export ordinal変更は4DLLすべて0。新APIの追加が既存ordinalを変えていない。追加probeにはWindowsのfunction addressをGetModuleHandleExのFROM_ADDRESSへ渡すcastに対するVS2010 C4054警告があり、build failureではない。production新ファイルのcompiler errorはない。
+
+証跡: docs/validation/kxnt-open-key-adapter-server.json / kxnt-open-key-adapter-vista.json、kxnt-open-key-export-ordinals.json。再実行はbuild_kxnt_parity.ps1の後にtests/run_kxnt_open_key_adapter.ps1へVMX / user / password / scratch / 未使用RunNameを指定する。receiptがPassedでもscopeは通常openとホストnative委譲に限定する。
+
+今回のVM配備は専用scratchだけで、system DLL / 原作業ツリーのInstaller / Releasesは変更していない。native32bit OS、任意のsecurity descriptor / QOS、registry virtualization、transaction root、削除競合、通常IFEOの統合は未検証。GuestUserは記録したがtokenの標準 / 昇格状態を別測定していない。拡張flags、とくに保護ACLを迂回すべきbackup / restoreの実装・検証は継続する。UTFの資源gateと監査の残りも未完了。

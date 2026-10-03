@@ -307,6 +307,7 @@
     <ClCompile Include="rtlwoa.c" />
     <ClCompile Include="rtlwow64.c" />
     <ClCompile Include="status.c" />
+    <ClCompile Include="openkeyex.c" />
     <ClCompile Include="syscal.c" />
     <ClCompile Include="verspoof.c" />
     <ClCompile Include="vxlopcl.c" />
