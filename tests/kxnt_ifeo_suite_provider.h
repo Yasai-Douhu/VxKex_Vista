@@ -3,6 +3,10 @@
 #include <windows.h>
 #include <stdio.h>
 #include <string.h>
+#ifdef KXNT_IFEO_RESOURCE_PHASES
+/* Export is solely a symbolic debugger rendezvous in owned test images. */
+__declspec(dllexport) __declspec(noinline) void __cdecl KxNtIfeoResourcePhase(unsigned phase){static volatile unsigned observed;observed=phase;}
+#endif
 /* Read import slots without inventing calling conventions for unrelated APIs.
    Existing probes retain their typed call signatures. No API is called here. */
 #ifdef _WIN64

@@ -151,6 +151,9 @@ int main(int argc,char **argv)
             if(!workers[threadIndex])return 11;
         }
         if(!SetEvent(gate) || WaitForMultipleObjects(4,done,TRUE,60000)!=WAIT_OBJECT_0)return 12;
+#ifdef KXNT_IFEO_RESOURCE_PHASES
+        KxNtIfeoResourcePhase(0);
+#endif
         if(!GetProcessHandleCount(GetCurrentProcess(),&before))return 13;
         diagnosticHandles("before");
         fprintf(out,"Diagnostic ColdInitializationHandleDelta=%ld\n",(LONG)(before-initial-8));
@@ -158,6 +161,9 @@ int main(int argc,char **argv)
         if(!SetEvent(run) || WaitForMultipleObjects(4,done,TRUE,60000)!=WAIT_OBJECT_0)return 12;
         if(!GetProcessHandleCount(GetCurrentProcess(),&after))return 13;
         diagnosticHandles("after");
+#ifdef KXNT_IFEO_RESOURCE_PHASES
+        KxNtIfeoResourcePhase(1);
+#endif
         if(before!=after)++failures;
         fprintf(out,"ConcurrentCalls=%u HandleDelta=%ld\n",contexts[0].mode?0:800,(LONG)(after-before));
         if(!SetEvent(exit) || WaitForMultipleObjects(4,workers,TRUE,60000)!=WAIT_OBJECT_0)return 12;

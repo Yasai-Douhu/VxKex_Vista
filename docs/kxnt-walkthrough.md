@@ -815,3 +815,15 @@ tests/kxnt_open_key_adapter_probe.c に KXNT_IFEO_IMPORT 時だけ有効な静�
 証跡: docs/validation/kxnt-ifeo-core-suite-server.json（InitialFailed / TracedPassed / Analysis）。再実行は build_kxnt_ifeo_probe.ps1 -Architecture x86 -Suite と x64 -Suite の後、run_kxnt_ifeo_vm.ps1 -Suiteへ使い捨てclone VMX / credentials / 新規RunNameを指定する。既存guest fixtureはteardown成功を確認して別の専用archiveへ保存する。解析はanalyze_kxnt_ifeo_suite.ps1へInitialReceipt / TracedReceipt / 未使用Outputを渡す。意味・競合試験と単なるbinding検査を区別する。
 
 今回のbinding表にはUTF、NtWriteFile、SilentExitも含むが、その動作をsuiteで実行したとの証拠にはしない。これらの通常起動での詳細検証、Vista clientのIFEO、native32bit OS、初回資源増加とUTFの残る資源gate、拡張registry options、WNFの実利用・設計は未完了。production DLL / Installer / Releasesはこの工程では変更していない。
+
+## 2026-10-04: WOW64 IFEO の資源差分を native loader lock の Event 格納まで追跡
+
+通常IFEOで見つかった比較 / SRWのハンドル増加を調査した。productionコードを変更せず、専用buildのexport rendezvousで同一processの測定前後を停止し、既存CDB6.12とwow64extsでNtCreateEvent、native critical-sectionの作成結果とCAS格納を採取した。診断用のprivate RVAはnative x86 ntdll SHA256 A3D767B53F36E97DFEFCAD305AE050C98D5282D0107B7D51A36825C25F544506と一致する場合だけ使用する。製品への固定address追加ではない。
+
+- 初回 / 二回目はWOW64初期停止、および旧CDBのeffmachコマンド解析エラーにより専用60秒watchdogへ到達した。Incomplete receiptを保存し、teardown成功を確認した。観測待ちをアプリ成功として扱わない。
+- 三回目は両probeが自然終了したが、診断PID parserがログのコマンド文字列をPID行と誤認し、さらにSRWのexit1をdebugger自体の失敗としたためreceiptはIncomplete。rawを別途回収して保存し、過去の状態は変更しない。SRWは4000操作 / 2000書込の値検証に成功、handle delta1でFailures=1。phase0のnative loader lock LockSemaphoreは0、測定中にEvent作成status0、CASのprevious値0でhandle80がslot77750070へ格納され、phase1まで残った。
+- native imageの公開LdrLockLoaderLockの逆アセンブルはCS image+e0060をRtlEnterCriticalSectionへ渡している。CS+10のslot、NtCreateEvent後のreturn、CAS後のeax / ecx / edx / slotを照合したため、このSRW processの増加にはnative loader lock Eventのlazy作成という具体的な説明がある。nearest exportのstack名だけをprivate関数名として断定していない。
+- PIDを行頭markerに限定し、Wait=OBJECT0の自然終了code0 / 1とprobe自身の合否を別保存して四回目を実行。driver / install / uninstall / owned IFEO cleanupは成功し、receiptはMeasured。比較とSRWはPASS。このSRWでは同じloader lock Event handle70がphase0以前に格納されており、両phaseのslotは70、mixed delta0だった。同じ診断fixtureでも生成時期が違い、初回の資源失敗が修正されたことは証明しない。
+- tests/analyze_kxnt_ifeo_event.ps1は保存receipt / log / probe / native imageをhash記録し、phase順序、CS+10、CAS previous0、実handle格納、測定区間との位置関係、delta1 / 0を検査する。tests/kxnt_ifeo_event_trace.cdbとbuild / runnerオプションで採取を再現できる。UninstrumentedSrwはsnapshot列挙を追加せず、EventPhaseTraceは診断exportだけを加える。既存handle delta0のgateは維持した。
+
+証跡: docs/validation/kxnt-ifeo-event-server.json。四回目のreceiptとraw、三回目のIncomplete receipt / raw SRW / binding / trace、二つの初期Incomplete receipt hash、native disassemblyと解析結果を保存。解析はtests/analyze_kxnt_ifeo_event.ps1へInitialArchive（三回目） / MeasuredArchive（四回目） / 未使用Outputを指定する。観測対象はServer 2008使い捨てcloneのWOW64二processで、debuggerは実行時期を変える。歴史的な比較Event、全UTF Event、初回SRWの未採取identityを全面帰属させない。資源gateの全面解決、Vista IFEO、UTF / NtWriteFile / SilentExitの通常起動での詳細動作、拡張registry flags、WNFなど元監査の残りは未完了。配布DLL / Installer / Releasesはこの工程で変更していない。

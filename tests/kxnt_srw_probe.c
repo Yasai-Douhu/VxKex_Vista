@@ -89,12 +89,18 @@ static void mixed(void) {
 #ifdef KXNT_IFEO_SRW_RESOURCE_TRACE
     utf8_snapshot("srw-before");
 #endif
+#ifdef KXNT_IFEO_RESOURCE_PHASES
+    KxNtIfeoResourcePhase(0);
+#endif
     GetProcessHandleCount(GetCurrentProcess(),&before);
     for(i=0;i<4;++i)threads[i]=CreateThread(NULL,0,mixedWorker,(PVOID)(ULONG_PTR)i,0,NULL);
     wait=WaitForMultipleObjects(4,threads,TRUE,10000);check("mixed-workers-finish",wait==WAIT_OBJECT_0);
     if(wait!=WAIT_OBJECT_0){fflush(out);TerminateProcess(GetCurrentProcess(),9);}
     for(i=0;i<4;++i){GetExitCodeThread(threads[i],&errors);check("mixed-worker-errors",errors==0);CloseHandle(threads[i]);}
     GetProcessHandleCount(GetCurrentProcess(),&after);
+#ifdef KXNT_IFEO_RESOURCE_PHASES
+    KxNtIfeoResourcePhase(1);
+#endif
     check("mixed-protected-data",sequence==2000 && complement==~sequence && readers==0 && writers==0 && mixedLock.Ptr==NULL);
     check("mixed-handle-delta",after==before);
     fprintf(out,"MixedOperations=4000 Threads=4 Writes=%lu HandleDelta=%ld\n",sequence,(LONG)after-(LONG)before);

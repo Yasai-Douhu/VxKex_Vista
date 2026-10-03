@@ -1,4 +1,4 @@
-param([ValidateSet('x86','x64')][string]$Architecture='x64',[switch]$Suite)
+param([ValidateSet('x86','x64')][string]$Architecture='x64',[switch]$Suite,[switch]$UninstrumentedSrw,[switch]$EventPhaseTrace)
 $ErrorActionPreference='Stop'
 $root=Split-Path $PSScriptRoot
 $vc='C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC'
@@ -24,7 +24,8 @@ if($Suite){
  foreach($kind in @('processor-feature','domain','device-family','persisted-state','sid-package','sid-capability','membership','compare','file-information','alert','performance','srw')){
   $source=if($kind -like 'sid-*'){'sid_class'}else{$kind.Replace('-','_')}
   [string[]]$libs=@(if($kind -eq 'membership'){'advapi32.lib'})
-  [string[]]$trace=@(if($kind -eq 'srw'){'/DKXNT_IFEO_SRW_RESOURCE_TRACE'})
+  [string[]]$trace=@(if($kind -eq 'srw' -and !$UninstrumentedSrw){'/DKXNT_IFEO_SRW_RESOURCE_TRACE'})
+  if($EventPhaseTrace -and $kind -in @('compare','srw')){$trace+='/DKXNT_IFEO_RESOURCE_PHASES'}
   $image="$suiteOut\KxNtIfeo-$kind-$Architecture.exe"
   & cl.exe /nologo /MT /O1 /W4 /D_WIN32_WINNT=0x0600 /D_CRT_SECURE_NO_WARNINGS @trace "/FI$PSScriptRoot\kxnt_ifeo_suite_provider.h" "/Fo$suiteOut\$kind.obj" "/Fe$image" "$PSScriptRoot\kxnt_${source}_probe.c" /link /SUBSYSTEM:CONSOLE,6.0 "$suiteOut\suite-imports.lib" @libs
   if($LASTEXITCODE){throw "Detailed IFEO suite build failed: $kind"}

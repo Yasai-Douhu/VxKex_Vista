@@ -1,0 +1,12 @@
+.echo KXNT_IFEO_EVENT_TRACE_BEGIN
+.printf "KXNT_TARGET_PID=%x\n", @$tpid
+.load C:\VxKexProbe\KxNtIfeo\wow64exts.dll
+lm m ntdll*
+sxd av
+sxe -c "g" 0x4000001f
+bu ntdll32!NtCreateEvent ".echo KXNT_EVENT_CREATE32; .effmach x86 ; dd @esp L7; k 16; g"
+bu ntdll!NtCreateEvent ".echo KXNT_EVENT_CREATE_NATIVE; .effmach amd64 ; r rcx; k 16; g"
+bp ntdll32+0x397d8 ".effmach x86 ; .echo KXNT_CS_EVENT_RETURN; r eax; dd @ebp-4 L1; dd @ebp+8 L1; g"
+bp ntdll32+0x397eb ".effmach x86 ; .echo KXNT_CS_EVENT_STORE; r eax; r ecx; r edx; dd @edx L1; dd ntdll32+0xe0060 L6; g"
+bm *!KxNtIfeoResourcePhase ".effmach x86 ; .echo KXNT_RESOURCE_PHASE; dd @esp+4 L1; dd ntdll32+0xe0060 L6; g"
+g
