@@ -19,7 +19,7 @@
 | スレッド通知・待機 / Zw 別名 | 実装済み（プロセス内の状態管理） | Server 2008 x86 / x64、Nt / Zw の native 比較・4,096スレッド反復・実 ID 再利用・終了後回収成功 |
 | RtlQueryPerformanceCounter / Frequency（既存の未解決転送） | 実装済み | Server 2008 x86 / x64、native 参照・未整列出力・例外・並列照会成功 |
 | RtlReportSilentProcessExit（起動時のリンク依存） | 入口のみ追加。NT 6.0 の終了監視は未対応 | 不正ハンドル9ケース比較・未対応エラー・反復・Zig インポート解決を検証。WER の報告成功とは扱わない |
-| ConDrv 向け NtWriteFile | 実装前調査 | Server 2008 x86 / x64 でハンドルの数値衝突・判定方法の制約を実測。実アプリの呼出し経路を調査中 |
+| ConDrv 向け NtWriteFile / ZwWriteFile | NT-I/O 内容プロファイルに限定した同期書込みを実装 | Server 2008 x86 / x64、実 Zig 標準出力・ファイル・パイプ、境界・衝突・並行・VT 成功。native の UTF-8 描画制限、通常 IFEO 起動の統合検証は残る |
 | WNF / ZwQueryWnfStateData | 調査段階 | 本家にも未実装があるため実機能の対応を判断する必要あり |
 | 既存の未解決 native 転送 | 調査段階 | 呼び出すアプリと API ごとに検証予定 |
 
@@ -418,3 +418,41 @@ VM の native launch probe から x86 / x64 のコピーを実際に起動する
 - RtlReportSilentProcessExit にも breakpoint を設定し、最初に止まったのは NtWriteFile。戻り値取得後は全 breakpoint を解除して終了させたので、終了後まで report 関数が一切呼ばれないことをこのログだけで主張しない。
 
 証跡: `docs/validation/kxnt-zig-console-trace.json`（元と私設 EXE のハッシュ、CDB コマンド、CP932で読んだ生ログ、debugger 終了ログ）。拡張 DLL と PDB が不足する警告はあるが、native export の breakpoint・レジスタ・戻り値の取得は成功した。コンソール表示や文字符号の成功はまだ確認していない。次はこの実際の呼出しに対し、適用プロファイルとコンソール判定を実装する。
+
+## 2026-10-03: NT 6.0 の同期コンソール書込み
+
+先の実 Zig 標準 I/O の NtWriteFile → OBJECT_TYPE_MISMATCH を解消した。NtWriteFile 自体がないのではなく、NT 6.0 の独立した console handle を NT の File として扱えない問題への適応である。ConDrv ドライバー全体、非同期 console I/O、NtClose の置換は実装していない。
+
+### 実装・適用条件
+
+- `00-Common-Headers/ZigNtIoProfile.h` で mapped PE の内容を判定する。読み取り可能な `.buildid` と、NTDLL / 書換え後の KxNt の NtWriteFile・NtWaitForAlertByThreadId・RtlReportSilentProcessExit の import signature を要求する。製品名、版、固定 RVA を使わない。これは Zig 系の NT-I/O 経路の保守的なプロファイルであり、コンパイラの真正性の証明ではない。他の compiler が同じ内容を持てば対象となる。
+- DOS / NT / optional / section / import headers、各 RVA・長さ・終端を減算による範囲検査で扱い、PE32 / PE32+ 双方に対応。Main EXE の判定結果を atomic に cache する。NT 6.0 以外と DisableAppSpecific 有効時は native に委譲する。cache が有効でもオプションの無効化を優先する。
+- `KexDll/ntcondrv.c` に Ext_NtWriteFile（ordinal313）。KxNt の Nt / Zw の既存 ordinal573 / 598、1821 / 1848 を維持して転送先だけ変更した。通常の File / Pipe には Vista にある native NtWriteFile を呼び、Windows 7 向けの固定 syscall 番号は使わない。
+- console の判定は NULL 除外、下位タグ、GetFileType=CHAR、VerifyConsoleIoHandle の併用。GetConsoleMode だけでは拒否される書込み専用 console も扱う。さらに NtQueryObject の型を調べ、File と console の両方で同じ数値が有効なら **I/O 前に NOT_SUPPORTED**。どちらかへ試し書きして判定しない。予期しない型照会失敗も書込みを推測しない。
+- console の Event / APC / Context / Key 付き要求は NOT_SUPPORTED。通常 File の Event 付き要求はそのまま native に渡す。console offset は NULL、0、現在位置 / EOF の sentinel を扱い、別の seek 位置は INVALID_PARAMETER。
+- IOS の全範囲を I/O 前に検査し、入力を heap に捕捉してから文字コードを変換する。例外は NTSTATUS にし、LastError / LastStatus を維持する。ユーザーメモリーを他スレッドが同時に解放する競合を完全に防ぐものではない。
+- 現在の console output CP で UTF-16 に変換して WriteConsoleW を呼ぶ。UTF-8 と通常の SBCS / DBCS に対応。UTF-7、MaxCharSize>2（UTF-8以外）、使用できない変換フラグは明示的に未対応。不正な文字列は ILLEGAL_CHARACTER とし、欠落や置換を成功として隠さない。入力が INT_MAX を超える場合と不正 offset は拒否し、確保できない場合は NO_MEMORY。
+- IOS.Information は **入力のバイト数**。部分完了では UTF-16 の文字数を UTF-8 / DBCS の消費済みバイト境界へ戻す。途中の surrogate だけが書かれた場合は成功とせず、ILLEGAL_CHARACTER と完全な文字までの消費バイト数を返す。このケースでは console に部分的な副作用が既にあるため、原子的な書込みは保証しない。
+- 既に KxBase がロードされていれば、その WriteConsoleW を使って既存の VT 処理と連携する。参照を取得し finally で解放して unload race を防ぐ。plain output のために KxBase を新しくロードする依存は追加しない。
+
+仕様参照: [WriteConsole](https://learn.microsoft.com/en-us/windows/console/writeconsole)、[Nt / ZwWriteFile の bytes 契約](https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/wdm/nf-wdm-zwwritefile)、[Vista の文字変換・不正入力とコードページの制約](https://learn.microsoft.com/en-us/windows/win32/api/stringapiset/nf-stringapiset-multibytetowidechar)。非公開 VerifyConsoleIoHandle の結果は公開された将来保証とは扱わない。
+
+### Server 2008 での検証
+
+VS2010 / SDK の x86 / x64 ビルド成功。`tests/kxnt_condrv_probe.c` と runner を追加し、両アーキテクチャの KxNt → KexDll の実経路を実行、失敗0。設定はプローブ内の共有データだけで操作し、ユーザーのレジストリを変更しない。
+
+- 実 Zig 0.16.0 std.Io プログラムの私設コピーが、両形式で終了0。専用 screen buffer から本文の **全39文字**、File / Pipe から newline を含む **全40バイト**を読み取り照合した。診断 EXE の import を別コピーで KxNt に向けた検証であり、通常 IFEO / ダブルクリック起動全体の証明ではない。
+- CP437 ASCII、CP932 の日本語、CP65001 の日本語・surrogate pair 入力。Nt / Zw の返却 byte count と TLS、native WriteConsoleW と同じ console cells を確認。ただし CP65001 / raster font の native 出力自体が Unicode を正しく描画しない例を観測した。**native 参照への一致を日本語・絵文字の表示成功とは扱わない。** console の描画基盤の改善は残る。
+- プロファイルの PE32 / PE32+ fixture 各12ケース。短い image、header / section / thunk の範囲逸脱、欠落 import、別 DLL の同名 import、終端のない descriptor を拒否。実プローブの build-id 名をプロセス内で変更した別起動でも native 委譲を確認。
+- 書込み専用 screen buffer（GetConsoleMode 失敗）成功、通常 File / Pipe の内容一致、下位タグ付きの有効な File への書込み、Event 付き File の native 結果・IOS・signal の一致。APC の実 callback / PENDING の非同期パイプは未検証。
+- NULL IOS、アドレス1、不正入力、readonly IOS、入力 / 出力の guard page、長さ0、未知の offset、不正 UTF-8、console 非同期要求。書込み前に拒否するケースで console 内容が不変。部分的な IOS probe 自体や他スレッドによる解放の競合は別の制約。
+- 同じ VM の native File 書込みで IOS の0～7バイトずらしを測定し、全 offsets が成功。互換 console 書込みも Nt / Zw 各8 offsets で status・byte count・構造体前後の canary を照合した。x64 の union の未使用部分まで native のバイトパターンと等しいという主張はしない。
+- 所有する File と console の数値衝突を生成し、Nt / Zw とも NOT_SUPPORTED、File の長さと console 内容は不変。これは曖昧な場合の安全な拒否であり、その console が使用可能になることまで保証しない。
+- 所有する診断 KexDll の WriteConsoleW import だけに部分完了を注入。UTF-8 は2 UTF-16 unitsで4 bytes、DBCS は2 unitsで3 bytesを返す。DBCS の実部分出力内容、UTF-8 の変換入力、surrogate 分割時の明示的エラーを照合。**実 OS が自然に部分完了した測定ではない。** raster font の UTF-8 部分描画は参照 API 自体でも不安定で、完全な描画成功の主張はしない。
+- 4 worker ×1,000回を2フェーズ、各回の status / IOS / TLS を照合。初回は新しい Event が1個増えた。互換書込みを使わず同じ Win32 / NT 補助 API を呼ぶ対照でも同じ Event の増加1。次の4,000回は増加0、handle値・object・type・access・flags の snapshot も一致した。runner は冷間増加が対照と一致することも要求する。Event の作成 stack は未特定であり、cold 起動資源の完全な原因特定とは扱わない。対照は KexDll を読込み済みだが、並行 worker は互換書込み関数を呼ばない。
+- KxBase の SetConsoleMode で VT を有効化し、NtWriteFile 経由の色指定 / reset を含む10 bytes が制御文字として処理され、本文 R を表示することを確認。KxBase の SHA256 も receipt に記録した。
+- 性能カウンタの x86 / x64 回帰成功。全4配布 DLL の既存 ordinal 変更0、Installer の4 DLLは検証ビルドと同一。
+
+証跡: `docs/validation/kxnt-condrv.json`（VM 生ログ、対照、source / DLL / EXE SHA256、明示した制約）、`docs/validation/kxnt-export-ordinals.json`。再実行は `tests/build_kxnt_parity.ps1` → Zig 診断 EXE をビルド・私設コピーを用意 → `tests/run_kxnt_condrv_vm.ps1 -VMX <VMX> -GuestPassword <パスワード>`。私設コピーの用意は前節の `tests/prepare_kxnt_private_image.py` を使う。
+
+今回の配備先は作業ブランチの Installer と VM の `C:\KxNtParity`。システム DLL や Releases は変更していない。Vista クライアント、native 32bit OS、標準ユーザー、通常の IFEO 有効化経路、全コードページ、native での真の部分完了、非同期 console I/O、UTF-8 描画基盤の改善は未検証 / 未対応。移植フェーズ全体は継続中。

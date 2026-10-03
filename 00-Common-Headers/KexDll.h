@@ -286,6 +286,10 @@ typedef PVOID TYPEDEF_TYPE_NAME(DLL_DIRECTORY_COOKIE);
 
 #pragma region Nt* functions
 
+KEXAPI NTSTATUS NTAPI Ext_NtWriteFile(HANDLE FileHandle, HANDLE Event,
+    PIO_APC_ROUTINE ApcRoutine, PVOID ApcContext, PIO_STATUS_BLOCK IoStatusBlock,
+    PVOID Buffer, ULONG Length, PLONGLONG ByteOffset, PULONG Key);
+
 KEXAPI NTSTATUS NTAPI Ext_NtSetInformationFile(
 	IN HANDLE FileHandle,
 	OUT PIO_STATUS_BLOCK IoStatusBlock,

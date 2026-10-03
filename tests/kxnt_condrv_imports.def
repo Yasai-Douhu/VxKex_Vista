@@ -1,0 +1,5 @@
+LIBRARY KxNt.dll
+EXPORTS
+    NtWriteFile
+    NtWaitForAlertByThreadId
+    RtlReportSilentProcessExit

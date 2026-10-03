@@ -292,6 +292,7 @@
     <ClCompile Include="ntjob.c" />
     <ClCompile Include="ntobj.c" />
     <ClCompile Include="ntfile.c" />
+    <ClCompile Include="ntcondrv.c" />
     <ClCompile Include="ntalrtid.c" />
     <ClCompile Include="ntpriv.c" />
     <ClCompile Include="ntps.c" />

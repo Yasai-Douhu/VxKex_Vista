@@ -45,6 +45,7 @@
       "OrdinalChanges": {},
       "NewExports": {
         "Ext_NtSetInformationFile": 307,
+        "Ext_NtWriteFile": 313,
         "KexRtlCanonicalizeDomainName": 300,
         "KexRtlCheckTokenMembershipEx": 306,
         "KexRtlGetDeviceFamilyInfoEnum": 302,
@@ -65,6 +66,7 @@
       "OrdinalChanges": {},
       "NewExports": {
         "Ext_NtSetInformationFile": 307,
+        "Ext_NtWriteFile": 313,
         "KexRtlCanonicalizeDomainName": 300,
         "KexRtlCheckTokenMembershipEx": 306,
         "KexRtlGetDeviceFamilyInfoEnum": 302,
