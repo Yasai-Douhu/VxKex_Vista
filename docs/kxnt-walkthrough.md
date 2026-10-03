@@ -11,7 +11,8 @@
 | RtlCanonicalizeDomainName | 完了 | Server 2008 x86 / x64 成功 |
 | RtlGetDeviceFamilyInfoEnum | 完了 | Server 2008 x86 / x64 成功 |
 | RtlGetPersistedStateLocation | 完了（既定パスへのフォールバック） | Server 2008 x86 / x64 成功 |
-| RtlIsPackageSid / RtlIsCapabilitySid | 未着手 | 未実施 |
+| RtlIsPackageSid | 完了 | Server 2008 x86 / x64、native 参照との比較成功 |
+| RtlIsCapabilitySid | 未着手 | 未実施 |
 | RtlCheckTokenMembershipEx | 未着手 | 未実施 |
 | ZwCompareObjects | 未着手 | 未実施 |
 | 拡張 rename / delete | 未着手 | 未実施 |
@@ -142,3 +143,16 @@ Server 2008 x86 / x64 と native Windows の参照結果で、16 ケースの NT
 ### ビルドの自動化
 
 `tests/build_kxnt_parity.ps1` で KexDll → KxNt → プローブを x86 / x64 で順番にビルドする。途中のコンパイラー・リンカーの終了コードが非ゼロなら停止し、古いバイナリで検証を続けない。詳細ログは `audit/KxNtParity/` に保存する。必要な KexSmp / KexMLS / KexPathCch のライブラリは事前にビルドしておく。
+
+## 2026-10-03: RtlIsPackageSid
+
+- NEXT の native 転送を、Vista にない API の独立した実装へ置き換えた。SID revision 1、identifier authority 15、subauthority count 2 以上、最初の RID 2 を判定する。
+- この関数は SID 系列の分類であり、SID 全体の妥当性やトークンの権限を検査するものではない。native は通常の SID 上限を超える count 16 / 255 も分類するため、この挙動を維持した。権限検査には別途 SID 妥当性検査が必要。
+- 宣言・導入時期は [phnt の RTL 定義](https://github.com/winsiderss/phnt/blob/master/ntrtl.h)で確認。NEXT も Windows 8 以降の native API を転送しており、Vista の native にない関数として移植した。
+- KexDll 304、KxNt 2204 の固定 ordinal で公開。既存公開番号の検査を実施。
+
+### 検証範囲
+
+ホスト native ntdll の x86 / x64 と Server 2008 の KxNt → KexDll を比較。revision、count、authority、RID を組み合わせた 660 ケース、NULL、読み取り可能長 0～16 バイトのガードページ 17 ケースで返却値・例外結果が一致した。NULL や不足した入力は、native と同じアクセス違反をプローブ内の SEH で捕捉した。
+
+参照結果: `docs/validation/kxnt-sid-package-reference.json`。VM ログ・DLL とプローブの SHA256: `docs/validation/kxnt-sid-package.json`。再実行: `tests/run_kxnt_processor_feature_vm.ps1 -Probe sid-package`。SID 分類に AppContainer の作成・隔離機能は含まれない。Vista クライアントと実アプリでの回帰は未実施。

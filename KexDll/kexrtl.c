@@ -37,6 +37,22 @@ KEXAPI BOOLEAN NTAPI KexRtlIsProcessorFeaturePresent(
 	return (BOOLEAN) IsProcessorFeaturePresent(ProcessorFeature);
 }
 
+// These are SID-family classifiers, not full RtlValidSid validation. Native
+// Windows intentionally accepts counts greater than SID_MAX_SUB_AUTHORITIES.
+static BOOLEAN KexRtlpIsApplicationSid(PSID Sid, ULONG FamilyRid)
+{
+	const SID *Value = (const SID *) Sid;
+	static const SID_IDENTIFIER_AUTHORITY Authority = {{0,0,0,0,0,15}};
+	return Value->Revision == SID_REVISION && Value->SubAuthorityCount >= 2 &&
+		memcmp(&Value->IdentifierAuthority, &Authority, sizeof(Authority)) == 0 &&
+		Value->SubAuthority[0] == FamilyRid;
+}
+
+KEXAPI BOOLEAN NTAPI KexRtlIsPackageSid(IN PSID Sid)
+{
+	return KexRtlpIsApplicationSid(Sid, 2);
+}
+
 KEXAPI VOID NTAPI KexRtlGetDeviceFamilyInfoEnum(
 	OUT PULONGLONG UAPInfo OPTIONAL,
 	OUT PULONG DeviceFamily OPTIONAL,

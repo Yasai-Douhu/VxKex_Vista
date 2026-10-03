@@ -421,6 +421,8 @@ KEXAPI NTSTATUS NTAPI KexRtlWow64GetProcessMachines(
 KEXAPI BOOLEAN NTAPI KexRtlIsProcessorFeaturePresent(
 	IN ULONG ProcessorFeature);
 
+KEXAPI BOOLEAN NTAPI KexRtlIsPackageSid(IN PSID Sid);
+
 KEXAPI VOID NTAPI KexRtlGetDeviceFamilyInfoEnum(
 	OUT PULONGLONG UAPInfo OPTIONAL,
 	OUT PULONG DeviceFamily OPTIONAL,

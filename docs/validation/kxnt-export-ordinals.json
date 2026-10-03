@@ -9,6 +9,7 @@
         "RtlCanonicalizeDomainName": 2200,
         "RtlGetDeviceFamilyInfoEnum": 2202,
         "RtlGetPersistedStateLocation": 2203,
+        "RtlIsPackageSid": 2204,
         "RtlIsProcessorFeaturePresent": 2201
       }
     },
@@ -20,6 +21,7 @@
         "RtlCanonicalizeDomainName": 2200,
         "RtlGetDeviceFamilyInfoEnum": 2202,
         "RtlGetPersistedStateLocation": 2203,
+        "RtlIsPackageSid": 2204,
         "RtlIsProcessorFeaturePresent": 2201
       }
     },
@@ -31,6 +33,7 @@
         "KexRtlCanonicalizeDomainName": 300,
         "KexRtlGetDeviceFamilyInfoEnum": 302,
         "KexRtlGetPersistedStateLocation": 303,
+        "KexRtlIsPackageSid": 304,
         "KexRtlIsProcessorFeaturePresent": 301
       }
     },
@@ -42,6 +45,7 @@
         "KexRtlCanonicalizeDomainName": 300,
         "KexRtlGetDeviceFamilyInfoEnum": 302,
         "KexRtlGetPersistedStateLocation": 303,
+        "KexRtlIsPackageSid": 304,
         "KexRtlIsProcessorFeaturePresent": 301
       }
     }
