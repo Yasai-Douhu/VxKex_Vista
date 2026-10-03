@@ -13,7 +13,7 @@
 | RtlGetPersistedStateLocation | 完了（既定パスへのフォールバック） | Server 2008 x86 / x64 成功 |
 | RtlIsPackageSid | 完了 | Server 2008 x86 / x64、native 参照との比較成功 |
 | RtlIsCapabilitySid | 完了 | Server 2008 x86 / x64、native 参照との比較成功 |
-| RtlCheckTokenMembershipEx | 未着手 | 未実施 |
+| RtlCheckTokenMembershipEx | 完了（NT 6.0 の通常トークン） | Server 2008 x86 / x64、native 比較と反復検証成功 |
 | ZwCompareObjects | 未着手 | 未実施 |
 | 拡張 rename / delete | 未着手 | 未実施 |
 | スレッド通知・待機 / Zw 別名 | 未着手 | 未実施 |
@@ -167,3 +167,30 @@ Server 2008 x86 / x64 と native Windows の参照結果で、16 ケースの NT
 Server 2008 x86 / x64 で 660 組み合わせ、NULL、17 ガードページ境界ケースの返却値・例外を native Windows と比較し、一致した。ガードページは Capability SID 自体を入力する。Package SID の全ケースも最新 DLL で再実行し成功。
 
 参照結果: `docs/validation/kxnt-sid-capability-reference.json`。VM ログ・SHA256: `docs/validation/kxnt-sid-capability.json`。再実行: `tests/run_kxnt_processor_feature_vm.ps1 -Probe sid-capability`。分類処理は AppContainer の作成・権限付与・隔離機能ではない。Vista クライアントと実アプリでの回帰は未実施。
+## 2026-10-03: RtlCheckTokenMembershipEx
+
+### 実施内容
+
+- NEXT の native 転送に対し、Vista / Server 2008 の通常トークン向けの独立実装を追加。KexDll 306、KxNt 2206 で公開する。
+- 対象 SID にアクセスを許可する一時 ACL と security descriptor を作り、NtAccessCheck で判定する。SID 一覧の単純検索ではないため、制限 SID と deny-only 属性の判定を NT 6.0 自体に委譲できる。入力サイズに比例するスタック確保はしない。
+- NULL token は現在のスレッドを対象とし、スレッドトークンがない場合だけプロセストークンを偽装トークンに複製する。開いたハンドルを閉じ、呼び出し側のトークンを閉じない。
+- BOOLEAN 出力に 1 バイトだけ書き込み、Win32 LastError を変更せず NTSTATUS を返す。不正フラグを拒否する。
+- Vista の RtlValidSid は読めない SID を FALSE に変えるため、そのまま使用すると native のエラーと異なった。ヘッダー・整列・長さを検査して SID を取り込み、読み取り失敗を NTSTATUS として返すように修正した。
+
+### フラグと対応範囲
+
+CTMF_INCLUDE_APPCONTAINER (1) / CTMF_INCLUDE_LPAC (2) と両者の組み合わせは、NT 6.0 の通常トークンでは通常のアクセスチェックを行う。native Windows でも今回の通常トークンに対して同じ判定になることを測定した。NT 6.0 には AppContainer / LPAC token class がなく、これらの作成・隔離・権限モデルを実装したものではない。その他のフラグは STATUS_INVALID_PARAMETER。API の存在を増やしただけで AppContainer 対応と扱わない。
+
+宣言とフラグ: [phnt](https://github.com/winsiderss/phnt/blob/master/ntrtl.h)。導入時期・通常トークンと AppContainer の区別: [Microsoft CheckTokenMembershipEx](https://learn.microsoft.com/en-us/windows/win32/api/securitybaseapi/nf-securitybaseapi-checktokenmembershipex)。アクセスチェックの偽装トークン・TOKEN_QUERY・security descriptor の要件: [Microsoft AccessCheck](https://learn.microsoft.com/en-us/windows/win32/api/securitybaseapi/nf-securitybaseapi-accesscheck)。Ex は Windows 8 / Server 2012 以降、元の CheckTokenMembership と AccessCheck は Vista でも利用できる。
+
+### 検証範囲
+
+ホスト native ntdll と Server 2008 x86 / x64 を比較し、114 ケースの NTSTATUS・BOOLEAN・例外・前後ガード・LastError が一致した。
+
+- 通常の偽装トークン、NULL token、primary token の拒否、query-only / query 権限なし、匿名偽装。
+- 制限トークン（World と現在ユーザー）、World を deny-only にしたトークン、スレッド偽装中の NULL token。
+- フラグ 0 / 1 / 2 / 3 / 4 / 0xffffffff、不正・別オブジェクト型のハンドル、不正 SID / NULL SID / NULL 出力。
+- subauthority count 0 / 16、読み取り可能長 0～12 バイトの guard page と SID 整列。native 同様に読み取り不可は STATUS_ACCESS_VIOLATION、整列違反は STATUS_DATATYPE_MISALIGNMENT として返す。NULL 出力だけは native と同様にプローブ内で例外を捕捉した。
+- NULL token への 2,000 回の呼び出しで判定が維持され、終了時のプロセスハンドル数増加は 0。
+
+参照結果: `docs/validation/kxnt-membership-reference.json`。VM ログと SHA256: `docs/validation/kxnt-membership.json`。再実行: `tests/run_kxnt_processor_feature_vm.ps1 -Probe membership`。両アーキテクチャのビルドと既存エクスポート番号の維持も確認。Vista クライアント・実アプリ・AppContainer / LPAC は検証範囲に含めていない。

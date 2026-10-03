@@ -423,6 +423,11 @@ KEXAPI BOOLEAN NTAPI KexRtlIsProcessorFeaturePresent(
 
 KEXAPI BOOLEAN NTAPI KexRtlIsPackageSid(IN PSID Sid);
 KEXAPI BOOLEAN NTAPI KexRtlIsCapabilitySid(IN PSID Sid);
+KEXAPI NTSTATUS NTAPI KexRtlCheckTokenMembershipEx(
+	IN HANDLE TokenHandle OPTIONAL,
+	IN PSID SidToCheck,
+	IN ULONG Flags,
+	OUT PBOOLEAN IsMember);
 
 KEXAPI VOID NTAPI KexRtlGetDeviceFamilyInfoEnum(
 	OUT PULONGLONG UAPInfo OPTIONAL,

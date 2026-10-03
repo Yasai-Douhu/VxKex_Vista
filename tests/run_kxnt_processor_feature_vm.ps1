@@ -3,7 +3,7 @@ param(
     [Parameter(Mandatory=$true)][string]$GuestPassword,
     [string]$GuestUser = 'Administrator',
     [string]$GuestDirectory = 'C:\KxNtParity',
-    [ValidateSet('processor-feature','domain','device-family','persisted-state','sid-package','sid-capability')][string]$Probe = 'processor-feature',
+    [ValidateSet('processor-feature','domain','device-family','persisted-state','sid-package','sid-capability','membership')][string]$Probe = 'processor-feature',
     [string]$VMRun = 'C:\Program Files\VMware\VMware Workstation\vmrun.exe'
 )
 $ErrorActionPreference = 'Stop'
@@ -53,7 +53,7 @@ foreach ($arch in @('x86','x64')) {
     if ($Probe -eq 'device-family' -and ($text -notmatch 'OptionalOutputCombinations=8 Failures=0' -or $text -notmatch 'SpoofedVersionCases=3')) {
         throw "Device family checks missing ($arch)"
     }
-    if ($Probe -eq 'domain' -or $Probe -eq 'persisted-state' -or $Probe -like 'sid-*') {
+    if ($Probe -eq 'domain' -or $Probe -eq 'persisted-state' -or $Probe -like 'sid-*' -or $Probe -eq 'membership') {
         $reference = Get-Content -Raw "$root\docs\validation\kxnt-$Probe-reference.json" | ConvertFrom-Json
         $lines = @($text -split '\r?\n' | Where-Object { $_ -and $_ -notmatch '^ProcessBits=' })
         $difference = Compare-Object @($reference.Output) $lines

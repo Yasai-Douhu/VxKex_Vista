@@ -58,6 +58,83 @@ KEXAPI BOOLEAN NTAPI KexRtlIsCapabilitySid(IN PSID Sid)
 	return KexRtlpIsApplicationSid(Sid, 3);
 }
 
+// NT 6.0 has no AppContainer or LPAC token class. The two recognized flags
+// therefore leave its ordinary-token access check unchanged, as on modern
+// Windows for ordinary tokens. This does not emulate AppContainer isolation.
+KEXAPI NTSTATUS NTAPI KexRtlCheckTokenMembershipEx(
+	IN HANDLE TokenHandle OPTIONAL,
+	IN PSID SidToCheck,
+	IN ULONG Flags,
+	OUT PBOOLEAN IsMember)
+{
+	NTSTATUS Status, AccessStatus;
+	HANDLE OwnedToken = NULL, ProcessToken;
+	SECURITY_DESCRIPTOR Descriptor;
+	SECURITY_QUALITY_OF_SERVICE Qos;
+	OBJECT_ATTRIBUTES Attributes;
+	GENERIC_MAPPING Mapping = {1,1,1,1};
+	PRIVILEGE_SET Privileges;
+	ULONG PrivilegeSize = sizeof(Privileges), GrantedAccess, SidLength, AceLength;
+	// One maximum-size SID plus ACE and ACL headers; no input-sized allocation.
+	ULONG AclStorage[(sizeof(ACL) + sizeof(ACCESS_ALLOWED_ACE) + SECURITY_MAX_SID_SIZE + 3) / 4];
+	PACL Acl = (PACL) AclStorage;
+	PACCESS_ALLOWED_ACE Ace = (PACCESS_ALLOWED_ACE) ((PBYTE) Acl + sizeof(ACL));
+
+	*IsMember = FALSE;
+	if (Flags & ~CTMF_VALID_FLAGS) return STATUS_INVALID_PARAMETER;
+	if (!SidToCheck) return STATUS_INVALID_SECURITY_DESCR;
+	Status = RtlCreateAcl(Acl, sizeof(AclStorage), ACL_REVISION);
+	if (!NT_SUCCESS(Status)) return Status;
+	// Capture the SID before token acquisition. RtlValidSid on Vista suppresses
+	// unreadable-input exceptions into FALSE, losing the native status. Probe
+	// the header first, then enforce the kernel SID alignment and capture it.
+	__try {
+		UCHAR Revision = ((volatile SID *) SidToCheck)->Revision;
+		UCHAR Count = ((volatile SID *) SidToCheck)->SubAuthorityCount;
+		if (Revision != SID_REVISION || Count > SID_MAX_SUB_AUTHORITIES) return STATUS_INVALID_SID;
+		if ((ULONG_PTR) SidToCheck & (sizeof(ULONG) - 1)) return STATUS_DATATYPE_MISALIGNMENT;
+		SidLength = 8 + Count * sizeof(ULONG);
+		memcpy(&Ace->SidStart, SidToCheck, SidLength);
+	} __except (EXCEPTION_EXECUTE_HANDLER) {
+		return GetExceptionCode();
+	}
+	AceLength = FIELD_OFFSET(ACCESS_ALLOWED_ACE, SidStart) + SidLength;
+	Ace->Header.AceType = ACCESS_ALLOWED_ACE_TYPE;
+	Ace->Header.AceFlags = 0;
+	Ace->Header.AceSize = (USHORT) AceLength;
+	Ace->Mask = 1;
+	Acl->AceCount = 1;
+	Status = RtlCreateSecurityDescriptor(&Descriptor, SECURITY_DESCRIPTOR_REVISION);
+	if (!NT_SUCCESS(Status)) return Status;
+	Descriptor.Owner = &Ace->SidStart;
+	Descriptor.Group = &Ace->SidStart;
+	Status = RtlSetDaclSecurityDescriptor(&Descriptor, TRUE, Acl, FALSE);
+	if (!NT_SUCCESS(Status)) return Status;
+
+	if (!TokenHandle) {
+		Status = NtOpenThreadToken(NtCurrentThread(), TOKEN_QUERY, FALSE, &OwnedToken);
+		if (Status == STATUS_NO_TOKEN) {
+			Status = NtOpenProcessToken(NtCurrentProcess(), TOKEN_QUERY | TOKEN_DUPLICATE, &ProcessToken);
+			if (!NT_SUCCESS(Status)) return Status;
+			Qos.Length = sizeof(Qos);
+			Qos.ImpersonationLevel = SecurityImpersonation;
+			Qos.ContextTrackingMode = SECURITY_STATIC_TRACKING;
+			Qos.EffectiveOnly = FALSE;
+			InitializeObjectAttributes(&Attributes, NULL, 0, NULL, NULL);
+			Attributes.SecurityQualityOfService = &Qos;
+			Status = NtDuplicateToken(ProcessToken, TOKEN_QUERY, &Attributes, FALSE, TokenImpersonation, &OwnedToken);
+			NtClose(ProcessToken);
+		}
+		if (!NT_SUCCESS(Status)) return Status;
+		TokenHandle = OwnedToken;
+	}
+	Status = NtAccessCheck(&Descriptor, TokenHandle, 1, &Mapping,
+		&Privileges, &PrivilegeSize, &GrantedAccess, &AccessStatus);
+	if (OwnedToken) NtClose(OwnedToken);
+	if (NT_SUCCESS(Status)) *IsMember = (BOOLEAN) NT_SUCCESS(AccessStatus);
+	return Status;
+}
+
 KEXAPI VOID NTAPI KexRtlGetDeviceFamilyInfoEnum(
 	OUT PULONGLONG UAPInfo OPTIONAL,
 	OUT PULONG DeviceFamily OPTIONAL,

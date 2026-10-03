@@ -26,3 +26,5 @@ if ($LASTEXITCODE) { throw "Device family probe build failed ($Architecture)" }
 if ($LASTEXITCODE) { throw "Persisted state probe build failed ($Architecture)" }
 & cl.exe /nologo /MT /O1 /W4 "/Fo$out\sid-class.obj" "/Fe$out\sid-class.exe" "$PSScriptRoot\kxnt_sid_class_probe.c" /link /SUBSYSTEM:CONSOLE,6.0
 if ($LASTEXITCODE) { throw "SID classification probe build failed ($Architecture)" }
+& cl.exe /nologo /MT /O1 /W4 "/Fo$out\membership.obj" "/Fe$out\membership.exe" "$PSScriptRoot\kxnt_membership_probe.c" /link /SUBSYSTEM:CONSOLE,6.0 advapi32.lib
+if ($LASTEXITCODE) { throw "Token membership probe build failed ($Architecture)" }

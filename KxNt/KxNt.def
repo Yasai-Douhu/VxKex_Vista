@@ -1,5 +1,6 @@
 LIBRARY KxNt
 EXPORTS
+	RtlCheckTokenMembershipEx = KexDll.KexRtlCheckTokenMembershipEx @2206
 	RtlIsPackageSid = KexDll.KexRtlIsPackageSid @2204
 	RtlIsCapabilitySid = KexDll.KexRtlIsCapabilitySid @2205
 	RtlGetPersistedStateLocation = KexDll.KexRtlGetPersistedStateLocation @2203

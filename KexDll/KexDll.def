@@ -1,5 +1,6 @@
 LIBRARY "KexDll.dll"
 EXPORTS
+	KexRtlCheckTokenMembershipEx @306
 	KexRtlIsPackageSid @304
 	KexRtlIsCapabilitySid @305
 	KexRtlGetPersistedStateLocation @303

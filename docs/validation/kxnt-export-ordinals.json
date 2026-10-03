@@ -7,6 +7,7 @@
       "OrdinalChanges": {},
       "NewExports": {
         "RtlCanonicalizeDomainName": 2200,
+        "RtlCheckTokenMembershipEx": 2206,
         "RtlGetDeviceFamilyInfoEnum": 2202,
         "RtlGetPersistedStateLocation": 2203,
         "RtlIsCapabilitySid": 2205,
@@ -20,6 +21,7 @@
       "OrdinalChanges": {},
       "NewExports": {
         "RtlCanonicalizeDomainName": 2200,
+        "RtlCheckTokenMembershipEx": 2206,
         "RtlGetDeviceFamilyInfoEnum": 2202,
         "RtlGetPersistedStateLocation": 2203,
         "RtlIsCapabilitySid": 2205,
@@ -33,6 +35,7 @@
       "OrdinalChanges": {},
       "NewExports": {
         "KexRtlCanonicalizeDomainName": 300,
+        "KexRtlCheckTokenMembershipEx": 306,
         "KexRtlGetDeviceFamilyInfoEnum": 302,
         "KexRtlGetPersistedStateLocation": 303,
         "KexRtlIsCapabilitySid": 305,
@@ -46,6 +49,7 @@
       "OrdinalChanges": {},
       "NewExports": {
         "KexRtlCanonicalizeDomainName": 300,
+        "KexRtlCheckTokenMembershipEx": 306,
         "KexRtlGetDeviceFamilyInfoEnum": 302,
         "KexRtlGetPersistedStateLocation": 303,
         "KexRtlIsCapabilitySid": 305,
