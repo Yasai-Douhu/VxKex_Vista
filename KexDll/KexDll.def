@@ -1,5 +1,7 @@
 LIBRARY "KexDll.dll"
 EXPORTS
+	KexRtlUTF8ToUnicodeN @316
+	KexRtlUnicodeToUTF8N @317
 	KexRtlTryAcquireSRWLockExclusive @314
 	KexRtlTryAcquireSRWLockShared @315
 	Ext_NtWriteFile @313

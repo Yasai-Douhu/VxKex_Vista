@@ -318,6 +318,9 @@ KEXAPI NTSTATUS NTAPI KexDataInitialize(
 
 #pragma region KexRtl* functions
 
+KEXAPI NTSTATUS NTAPI KexRtlUTF8ToUnicodeN(PWSTR Destination,ULONG Capacity,PULONG Actual,PCCH Source,ULONG Bytes);
+KEXAPI NTSTATUS NTAPI KexRtlUnicodeToUTF8N(PCHAR Destination,ULONG Capacity,PULONG Actual,PCWSTR Source,ULONG Bytes);
+
 KEXAPI BOOLEAN NTAPI KexRtlTryAcquireSRWLockExclusive(PRTL_SRWLOCK Lock);
 KEXAPI BOOLEAN NTAPI KexRtlTryAcquireSRWLockShared(PRTL_SRWLOCK Lock);
 

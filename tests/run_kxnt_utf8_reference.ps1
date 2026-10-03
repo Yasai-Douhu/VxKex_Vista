@@ -26,6 +26,6 @@ foreach($arch in @('x86','x64')) {
     $receipt += [pscustomobject]@{Architecture=$arch;VMX=$VMX;ProbeSHA256=(Get-FileHash $probe).Hash;SourceSHA256=(Get-FileHash "$PSScriptRoot\kxnt_utf8_probe.c").Hash;Calls=([regex]::Matches($hostOutput,'(?m)^Call=')).Count;HostOutput=$hostOutput;NativeVMExit=$nativeExit;NativeVMOutput=$nativeOutput}
     Write-Host "$arch native UTF conversion reference captured; NT 6.0 exports absent"
 }
-$fixed=@();foreach($row in $receipt){$fixed += ,(($row.HostOutput -split '\r?\n' | Where-Object {$_ -match '^(Call=|Failures=|ExportsPresent=)'}) -join "`n")}
+$fixed=@();foreach($row in $receipt){$fixed += ,(($row.HostOutput -split '\r?\n' | Where-Object {$_ -match '^(Call=|Pointer=|Scalars=|Overlap=|Failures=|ExportsPresent=)'}) -join "`n")}
 if($fixed[0] -ne $fixed[1]){throw 'Architecture references differ; inspect before implementing'}
 $receipt | ConvertTo-Json -Depth 5 | Set-Content -Encoding UTF8 "$results\utf8-reference.json"

@@ -19,7 +19,7 @@
 | スレッド通知・待機 / Zw 別名 | 実装済み（プロセス内の状態管理） | Server 2008 x86 / x64、Nt / Zw の native 比較・4,096スレッド反復・実 ID 再利用・終了後回収成功 |
 | RtlQueryPerformanceCounter / Frequency（既存の未解決転送） | 実装済み | Server 2008 x86 / x64、native 参照・未整列出力・例外・並列照会成功 |
 | RtlTryAcquireSRWLockExclusive / Shared（既存の未解決転送） | NT 6.0 の native SRW と併用する試行取得を実装 | Server 2008 WOW64 / x64、待機者・条件変数・並行取得・例外・native 参照を検証 |
-| RtlUTF8ToUnicodeN / RtlUnicodeToUTF8N（既存の未解決転送） | 実装前の契約測定 | ホスト native 各754ケースを両アーキテクチャで取得、Server 2008 の native 不在を再確認 |
+| RtlUTF8ToUnicodeN / RtlUnicodeToUTF8N（既存の未解決転送） | 部分変換・不正文字置換・サイズ照会を実装 | Server 2008 WOW64 / x64、native比較4,850呼出し・guard・全scalar往復・並行・overlap成功。初期化資源の完全な帰属は未確定 |
 | RtlReportSilentProcessExit（起動時のリンク依存） | 入口のみ追加。NT 6.0 の終了監視は未対応 | 不正ハンドル9ケース比較・未対応エラー・反復・Zig インポート解決を検証。WER の報告成功とは扱わない |
 | ConDrv 向け NtWriteFile / ZwWriteFile | NT-I/O 内容プロファイルに限定した同期書込みを実装 | Server 2008 x86 / x64、実 Zig 標準出力・ファイル・パイプ、境界・衝突・並行・VT 成功。native の UTF-8 描画制限、通常 IFEO 起動の統合検証は残る |
 | WNF / ZwQueryWnfStateData | 調査段階 | 本家にも未実装があるため実機能の対応を判断する必要あり |
@@ -502,3 +502,29 @@ VS2010 / SDK の x86 / x64 ビルド成功。`tests/kxnt_srw_probe.c` をホス�
 これらはホストの特定の native 実装で得た契約測定。Windows 7 の全挙動の証明、全 scalar / 全不正列、guard page / 不正非NULL pointer、overlap、並行変換の検証はまだない。次の実装ではこの基準に加えてそれらを検証する。成功するだけのstubや、変換不能なbyteを黙って削除する処理は追加しない。
 
 証跡: `docs/validation/kxnt-utf8-reference.json`（raw出力とソース / EXE SHA256）。再実行: `tests/build_kxnt_probes.ps1 -Architecture x86` / `x64` → `tests/run_kxnt_utf8_reference.ps1 -VMX <VMX> -GuestPassword <パスワード>`。VMへの追加物は `C:\KxNtParity\x86` / `x64` の診断EXEとログだけ。Installer / システムDLL / Releasesはこの測定では変更していない。
+
+## 2026-10-03: UTF 変換の実装と VM 検証
+
+前節の測定を基に `KexDll/utf8.c` を実装した。KexDll ordinal316 / 317を追加し、KxNtの旧ordinal1231 / 1245（x64）、1249 / 1262（x86）を維持して転送先だけ変更。native API があるOSではnativeに委譲し、関数探索が変える LastError / LastStatusを復元する。native がないOSではheap確保・Win32文字変換・共有mutable文字バッファを使わず、入力を順に変換する。
+
+- UTF-8の1〜4byte文字、UTF-16 surrogate pair、埋込みNULを長さ指定で変換。終端を自動追加しない。無効なUTF-8のprefix消費・U+FFFD置換をnative比較に合わせる。UTF-16の単独surrogateも置換しSOME_NOT_MAPPEDを返す。短い出力を成功にせずBUFFER_TOO_SMALLと実出力bytesを返す。
+- decodeはUTF-16のhigh surrogateまで出力する場合があり、encodeは1文字のUTF-8 bytes全体が入らなければその文字を書かない。NULL出力は必要サイズを照会。UTF-16の奇数入力長は実変換ではINVALID_PARAMETER_5、照会では完全なWCHAR分だけ数える。
+- NULL sourceは長さ0でもINVALID_PARAMETER_4。非NULLの不正pointerによるアクセス違反を成功statusに置換しない。容量0でも入力を読むnativeの順序をguard試験から修正した。
+- encodeのactual countは公開ページのoptional注釈に反し、**測定したnativeではNULLのまま実変換すると出力後にアクセス違反**。decodeはNULLを許容する。この方向差も参照と一致させた。全Windows版の同一挙動を確認した主張ではない。
+- 必要サイズがULONGの上限を超える場合はINTEGER_OVERFLOWで拒否する。4GB付近の実バッファ・nativeの桁溢れ動作は検証していない。この追加の境界方針をnativeの完全再現とは扱わない。
+
+### 実行した検証
+
+VS2010 / SDKの両ビルド成功。ホストnative、ホストKxNtからnativeへの委譲、Server 2008専用KxNt → KexDllを比較し、両アーキテクチャで成功。実装DLLのロードパスも専用フォルダーに限定して照合した。
+
+- 前節754呼出しに、seed固定のランダムUTF-8 / UTF-16各1,024入力の変換とサイズ照会を追加し、各4,850呼出しのstatus、byte count、32出力bytes、例外、TLSが一致。容量外canaryも確認した。全不正byte列を網羅したものではない。
+- 各方向12pointerケース。アドレス1、PAGE_NOACCESS、容量0、入力長0、count不正、guardを跨ぐsource / count、NULL出力による不正sourceの照会。参照と同じ例外・actual sentinel・最初の4出力bytes・TLSを確認。部分faultの全byte書込み順序の証明ではない。
+- **全1,112,064 Unicode scalar value** を連結した入力で、UTF-16全4,321,280 bytesとUTF-8全4,382,592 bytesを変換・往復・サイズ照会。独立したWin32変換をUTF-8の全内容の期待値にし、memcmpで全バッファを照合。nativeでも同じ試験を成功させた。
+- sourceとdestinationの位置差-4〜+4の18overlapケース。奇数アドレス出力も含め、nativeとstatus / count / 更新範囲40bytesが一致。重なる領域の内容は入力の破壊に依存するため、任意overlapを正しい文字列への変換として推奨しない。
+- 初回と次回の各4 worker ×1,000反復、変換2方向と照会2方向で各16,000呼出し。全workerの内容・count・status成功、次回のハンドル増加0。coldでは一度handleが増えた。変換関数を呼ばずnative GetModuleHandle / GetProcAddressだけを並行実行する別プロセス対照で、同じcold増加を確認しrunnerで両countの一致を要求する。
+- リソース観測は終了直後と100ms後を両方記録した。最新x86測定では互換変換と対照のcoldが直後+1、100ms後+6、次回はどちらも0。初期の対照では次回直後に+9も観測しており、直後countだけを安定した最終状態と扱わない。100ms後の比較成功は資源作成stackの帰属や、完全なlifecycle検証の代わりではない。待機による補助APIの初期化も観測対象に含む。**cold資源の作成元と全handle identityは未確認**。
+- 同じ配布DLLでSRW・実Zigコンソール書込み・性能カウンタを両アーキテクチャ回帰。全4配布DLLの旧ordinal変更0。Installerは検証DLLと同一。
+
+証跡: `docs/validation/kxnt-utf8.json` と更新した `kxnt-utf8-reference.json`（native / VM / lookup対照 / source・DLL・EXE SHA256）、回帰receipt。再実行: `tests/build_kxnt_parity.ps1` → `tests/run_kxnt_utf8_vm.ps1 -VMX <VMX> -GuestPassword <パスワード>`。参照採取もrunner内で順番に行い、native不在の終了5以外の失敗を無視しない。
+
+作業ブランチInstallerとVM専用フォルダーへの配備。Vistaクライアント、native32bit OS、標準ユーザー、通常IFEO起動、全scheduler interleaving、4GB入力、全overlap、不正pointerの全配置は未検証。システムDLL / Releasesは変更していない。KxNt移植全体は継続中。
