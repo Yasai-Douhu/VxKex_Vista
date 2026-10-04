@@ -945,3 +945,14 @@ clone exit0、source VMX hash変化なし、clone diskのbounded sparse descript
 - 実KexCfgの2profile解除、実uninstall、C:\VxKex / HKLM product key不在、owned IFEO2key不在、driver exit0 / runner Passedを確認。analyze_kxnt_vista_ifeo.ps1でVista productと280比較、8byte検査、negative control、resource / binding / cleanupを再確認。初回解析は誤ったpackage-root log labelで拒否したので、実driverのlabelに合わせて修正した。製品試験の合否は変更していない。
 
 証跡: docs/validation/kxnt-open-link-vista.json（準備・負guard・baseline・実IFEOの原receipt、build / 解除raw logs、解析）。production DLLは0dcbe68から変更なし。今回完成したのはVista client通常IFEOのregistry open / OPEN_LINK境界であり、詳細RTL / SID / file / alert / performance / SRW / ConDrv suiteのVista runtime、native32bit OS、UTF一般資源gate、backup / restore等の拡張registry flags、WNFと監査の残りは未完了。
+## 2026-10-04: Vista client 通常 IFEO の core 詳細試験24組を確認
+
+前段のopen試験とguest directoryを保存し、同じ独立Vista current-state cloneで詳細suiteを実行した。候補DLLは0dcbe68のままで、production APIの追加や振舞い変更はない。fixtureを両形式で再buildし、VC10のstatic import table検査を通した。buildはConDrv / UTF等のfixtureも生成するが、このrunではcore12種だけを実行した。
+
+- native Vista6.0.6002 / ProductType1 / x64 / driver未注入 / elevated / freshを確認。未登録26imageは全てmain前c0000139、実install8DLL byte一致、KexCfg登録26、通常起動各mainのstatic binding26slot一致 / early KexDllを記録。APIアドレスだけの検査ではなく、下記のbehaviorを実行した。
+- 両形式各12種: processor-feature（valid64 / invalid5）、domain（IDN / IP / invalid / buffer / 2000allocation-free cycle）、device-family（optional output8）、persisted-state（16case）、package / capability SID（各660分類）、通常membership（114case）、Nt / Zw CompareObjects（16case / pinned handle / native identity）、extended file information（96case / rename・deleteの通常flag / unsupported・guard / native forwarding / 1000rename delta0）、thread alert / wait、performance、SRW。
+- alertはNt / Zw両経路、timed wait / current-thread / foreign ID / keyed event / lifetime / 4096thread churn各alias / forced waiter exitを実行。performanceはunaligned16、counter / frequency各4000call / threads4 / invalid outputs10。SRWはtry / native blocking / shared・exclusive condition / mixed4000operations / writers2000とresource snapshotを実行し、このrunは全てPASS。SRW fixtureの診断snapshotを含む試験であり、全資源割当て元や過去非診断失敗を解決したとは主張しない。
+- 通常openも再度各280比較、unsupported7、1000反復delta0を確認。core24組すべてPassed=true / Result=PASS、driver Failures0 / exit0、runner Passed。26owned profile解除・不在、実uninstall、fresh状態復帰を確認した。CDBやprivate ntdll offsetsを使っていない。
+- analyze_kxnt_vista_ifeo.ps1をcoreモードへ拡張。Runtime / ConDrv / CDB receiptは受け付けず、ProductType1、280境界比較、option0/8各140、8byte検査、26negative control / cleanup、arch・kindの全24組、各main26binding / early load、behavior PASSを要求する。従来2image-only結果は2negative / cleanupを要求したまま。
+
+証跡: docs/validation/kxnt-core-ifeo-vista.jsonに原receipt・全詳細raw / native reference / static binding / source・fixture・package hash、両形式build logs、独立解析を収録。旧Server failure / timing-sensitive resource結果を保存したまま、今回Vistaの実行結果を別runとして追記した。原作業ツリーInstaller / 原Vista VM / Releasesは変更なし。ConDrvのVista実Zig stdio、UTF一般resource gate、SilentExitのVista検証、native32bit OS、拡張registry backup/restore、WNF、実アプリに必要な残るnative forwarderの整理は未完了。
