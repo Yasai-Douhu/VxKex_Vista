@@ -956,3 +956,13 @@ clone exit0、source VMX hash変化なし、clone diskのbounded sparse descript
 - analyze_kxnt_vista_ifeo.ps1をcoreモードへ拡張。Runtime / ConDrv / CDB receiptは受け付けず、ProductType1、280境界比較、option0/8各140、8byte検査、26negative control / cleanup、arch・kindの全24組、各main26binding / early load、behavior PASSを要求する。従来2image-only結果は2negative / cleanupを要求したまま。
 
 証跡: docs/validation/kxnt-core-ifeo-vista.jsonに原receipt・全詳細raw / native reference / static binding / source・fixture・package hash、両形式build logs、独立解析を収録。旧Server failure / timing-sensitive resource結果を保存したまま、今回Vistaの実行結果を別runとして追記した。原作業ツリーInstaller / 原Vista VM / Releasesは変更なし。ConDrvのVista実Zig stdio、UTF一般resource gate、SilentExitのVista検証、native32bit OS、拡張registry backup/restore、WNF、実アプリに必要な残るnative forwarderの整理は未完了。
+## 2026-10-04: Vista client 通常 IFEO の限定 ConDrv / 実 Zig stdio を検証
+
+- 独立current-state cloneのVista6.0.6002 / ProductType1 / AMD64 / driver未注入 / elevated / freshでConDrvSuiteを実行。直前core buildの両形式fixtureを使用し、source / fixture / package / driver hashをreceiptへ保存。production DLLは0dcbe68から変更なし。旧guest core結果は別directoryへ保持した。
+- 未登録ConDrv親2imageと実Zig child2imageは各c0000139 / main前失敗。実install8copyのbyte一致、実KexCfgで親2 / Zig child2profile登録を確認。各親mainのstatic26slot / early KexDll一致、拡張子なしmapped kxntで内容profileが選ばれることを確認した。アプリ名・固定addressによる特例は追加していない。
+- 両形式の実Zig console childは各2回natural exit0、期待39UTF16 unitsの全内容一致。通常fileとpipeは各40byte / exit0 / 内容一致。VT、codepage437 / 932 / 65001、UTF8 / DBCS / surrogate部分書込み6call（owned KexDll IATの診断）、profile PE bounds / import signature / suffix・未終端の拒否を実行した。
+- ambiguous native File衝突はNt / Zw ×通常 / STDOUT alias / STDERR alias計6caseで明示拒否。元console / file内容が変わらず、standard handle設定も復元した。旧Serverで見つけたcurrent-directory readonly File aliasの対応を使う実ZigがVistaでも成功したが、今回そのnative objectの割当てstackを新規取得したとは主張しない。
+- adapterとunprofiled native controlで4thread / 4000write、cold delta1 / 1、warm delta0 / 0、handle identity維持。単にcold増加を無視したのではなく、同じfixtureのnative経路対照と比較した。診断snapshotの影響や一般UTF資源gateをこの結果で解決扱いしない。
+- 親2mainの全詳細PASS、driverFailures0 / exit0、runnerPassed。4owned IFEOを解除・不在確認、実uninstallとfresh復帰を確認。CDBは使っていない。analyze_kxnt_vista_condrv.ps1はVista通常receiptだけを受け付け、実Zig内容・natural exit、6拒否、VT・partial6call、resource対照、static26binding、installbytesとcleanupを要求する。初回解析はZig child cleanupのlabelが誤っていたため拒否し、実driver labelへ合わせた。製品試験結果は変更していない。
+
+証跡: docs/validation/kxnt-condrv-ifeo-vista.json（原receiptの詳細 / native-control / binding / hashes、独立解析）。機能範囲は内容profileを持つZigのlegacy console writeと通常file / pipeのnative委譲。full ConDrv namespace、任意NT handle変換、native32bit OS、UTF一般資源gate、SilentExitのVista検証、backup / restore、WNF、監査の残るnative転送は未完了。原Vista VM / 原Installer / Releasesには変更を適用していない。
