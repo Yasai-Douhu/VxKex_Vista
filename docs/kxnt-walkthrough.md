@@ -1115,3 +1115,16 @@ tests/summarize_kxnt_parity.ps1を追加した。current InstallerのKexDll / Kx
 - Release一覧をgh CLIでread-only確認し、現在latestはv2.0.0.2232、source vautogen.hも2.0.0.2232であることを確認。今回の主要KxNt移植を新しい配布として公開する準備では、共通version resourceとtag一致、current worktreeからの両形式build、更新candidateの主要回帰、Installer全体のZIP / checksum / release notes / source commit対応を確認する。既存latest assetsを確認なく上書きしたり、主要検証がない更新binaryを公開したりしない。source/metadata更新に伴う回帰はuserの追加試験条件に合致する。
 
 証跡: docs/validation/kxnt-java25-dependency-imports.json（read-only copy receipt、12file全importとcandidates / native tables / hashes）。archiveはaudit/KxNtParity/imports-java25-dependencies-20261004。現時点で新規portをP1へ繰り上げるmissing ntdll実importは見つかっていない。未実装WNF等は既知の低優先度制限として保持し、主要機能を妨げる新たな具体的callが出た場合に再評価する。Releases公開準備・公開確認はまだ未完了であり、goalは継続する。
+## 2026-10-04: 公開前の一括ビルドを修復し、両形式の生成物を確認
+
+新Vista full cloneの再確認ではVMware Tools認証・ファイル転送が成功。直接vmrunのcmd.exeはexit1だったが、既存native-launch経由のCreateProcess flags0 / cmd.exe exit0は再度成功した。追加logをaudit/KxNtParity/vista-reclone-20261004/launch-recheck.txtへ保存。元VMは変更していない。
+
+公開準備でbuild_all.ps1 / build_all_x86.ps1を確認し、子scriptがexit0を使用するため同一PowerShell内の呼出しでは残りのphaseを終了する問題、別worktreeの依存library/headerへの固定path、x86のextended DLLs phase欠落を修正した。各子scriptはWindows PowerShell 5の別processで順次実行し、missing script / dependencyとnonzero exitは失敗とする。依存libは同じworktreeのbuild結果から配置する。
+
+初回x64はKexShlExリンクのkernel32_x64.lib検索失敗で停止し、原logを保持。shellの依存pathを自身のworktreeへ修正し、import library directoryをLIBへ追加。x86 shellが指定していたmsvcrt_x64.libもmsvcrt_x86.libへ修正。KexDll両形式のheader searchとx86 KxBaseも自身のtreeへ変更した。修正後x64 / x86の一括buildはextended phaseを含む最後まで終了0。header検索修正後のKexDll両形式も独立再buildが終了0。成功log内のcompiler / linker fatal errorを検査した。
+
+tests/capture_kxnt_release_build_readiness.ps1で30 DLL + 12 static librariesの全42出力についてarchive作成後の更新時刻、DLLのMZ/PE/header bounds / expected machine / DLL flagを確認し、実生成bytesをarchiveへ保存・SHA256一致を確認。docs/validation/kxnt-release-build-readiness.jsonへ出力hash / bytes / version有無 / 4成功logと8scriptのhashを保存した。これは一括buildの成立証拠であり、source全体の再現可能build保証やruntime成功を主張しない。
+
+Installerは置換していない。現Installer4 DLLと以前のVista通常IFEO主要30pair、actual exports12追加/7保持の一致をsummarize_kxnt_parityで再確認し、current-major-status.jsonをarchive保存。buildによるtracked生成noiseは今回の開始時clean状態へ戻し、新生成bytesはarchiveに保持。元worktreeにはwalkthroughと新validation JSONのみmirrorし、code / Installer / unrelated changesを変更しない。
+
+次はrelease version/tag整合、全配布frontendを含むcandidate stagingとversion resources確認、candidateの主要VM回帰、ZIP/checksum/release notesの作成・公開確認。今回のbuild readinessだけでReleases公開やgoal完了とは判定しない。既知のbounded diagnostic resource差分/WNF等の保留は前項のpolicyと優先度を維持する。

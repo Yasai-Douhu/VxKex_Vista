@@ -10,14 +10,14 @@ function Run-BuildScript([string]$scriptName, [string]$compName) {
     Write-Host "========================================" -ForegroundColor Cyan
     $script = Join-Path $ScriptDir $scriptName
     if (Test-Path $script) {
-        & $script
+        & "$env:SystemRoot\System32\WindowsPowerShell\v1.0\powershell.exe" -NoProfile -ExecutionPolicy Bypass -File $script
         if ($LASTEXITCODE -ne 0 -and $LASTEXITCODE -ne $null) {
             Write-Host "BUILD FAILED: $compName" -ForegroundColor Red
             exit 1
         }
         Write-Host "$compName built successfully" -ForegroundColor Green
     } else {
-        Write-Host "WARNING: $scriptName not found, skipping" -ForegroundColor Yellow
+        throw "Required build script missing: $scriptName"
     }
 }
 
@@ -33,12 +33,13 @@ Run-BuildScript "build_kexpathcch.ps1" "KexPathCch"
 Run-BuildScript "build_kexsmp.ps1" "KexSmp"
 Run-BuildScript "build_kexmls.ps1" "KexMls"
 
-$PREBUILT_LIBS_DIR = "C:\Users\YamaR\Desktop\AI_Datas\VxKex_Vista\x64\Release"
+$PREBUILT_LIBS_DIR = Join-Path $ScriptDir "x64\Release"
 $depDLLs = @("KexPathCch\KexPathCch.lib", "KexSmp\KexSmp.lib", "KexMLS\KexMls.lib")
 foreach ($dep in $depDLLs) {
     $srcPath = Join-Path $PREBUILT_LIBS_DIR $dep
     $destPath = Join-Path $OUTPUT_DIR (Split-Path $dep -Leaf)
-    if (Test-Path $srcPath) { Copy-Item -Path $srcPath -Destination $destPath -Force }
+    if (!(Test-Path $srcPath)) { throw "Required dependency missing: $srcPath" }
+    Copy-Item -LiteralPath $srcPath -Destination $destPath -Force
 }
 
 # Build in correct dependency order

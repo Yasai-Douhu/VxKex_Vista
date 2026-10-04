@@ -1,0 +1,436 @@
+{
+  "State": "UnifiedBuildReadinessVerified",
+  "Files": [
+    {
+      "Path": "x64\\Release\\KexDll\\KexDll.dll",
+      "Architecture": "x64",
+      "Machine": 34404,
+      "Bytes": 263168,
+      "SHA256": "D28CB8FA76AD267CEC00146A959422382F3013970647064BEE07B986B1A65C90",
+      "ModifiedUTC": "2026-10-04T05:29:10.3293190Z",
+      "FileVersion": "2.0.0.2232"
+    },
+    {
+      "Path": "x64\\Release\\KexShlEx\\KexShlEx.dll",
+      "Architecture": "x64",
+      "Machine": 34404,
+      "Bytes": 38912,
+      "SHA256": "3C6D0F3C4BC2C69E90F38D557367143C23FA1D8598A07BE1BA8C43C21A09ABAE",
+      "ModifiedUTC": "2026-10-04T05:27:47.9801326Z",
+      "FileVersion": "2.0.0.2232"
+    },
+    {
+      "Path": "x64\\Release\\KxNt\\KxNt.dll",
+      "Architecture": "x64",
+      "Machine": 34404,
+      "Bytes": 121856,
+      "SHA256": "4E75D1112EF1F46DB09C63887477A5522F1BE255078D22BCED4EDBC0E7AF2C37",
+      "ModifiedUTC": "2026-10-04T05:27:42.3256320Z",
+      "FileVersion": null
+    },
+    {
+      "Path": "x64\\Release\\KxBase\\KxBase.dll",
+      "Architecture": "x64",
+      "Machine": 34404,
+      "Bytes": 154112,
+      "SHA256": "CAC2EFE2A65A109375DC07B3DE0C20CA36F19F09C35AA026C8D075FA8D22D41B",
+      "ModifiedUTC": "2026-10-04T05:27:46.5993397Z",
+      "FileVersion": null
+    },
+    {
+      "Path": "x64\\Release\\KxAdvapi\\KxAdvapi.dll",
+      "Architecture": "x64",
+      "Machine": 34404,
+      "Bytes": 57344,
+      "SHA256": "46DEAD4BF865C20980554831162E4BC979112BC53F85AD1D6CC5651C4F101625",
+      "ModifiedUTC": "2026-10-04T05:27:48.7402201Z",
+      "FileVersion": null
+    },
+    {
+      "Path": "x64\\Release\\KxCom\\KxCom.dll",
+      "Architecture": "x64",
+      "Machine": 34404,
+      "Bytes": 50688,
+      "SHA256": "0FD3FADDACB3D7BFF3B4E278EB0F817A31F1BAD7BF91F8E9C4AE7B126CAEBF47",
+      "ModifiedUTC": "2026-10-04T05:27:51.3974138Z",
+      "FileVersion": null
+    },
+    {
+      "Path": "x64\\Release\\KxCrt\\KxCrt.dll",
+      "Architecture": "x64",
+      "Machine": 34404,
+      "Bytes": 54272,
+      "SHA256": "7C5A5B41AF8374A1AEF386A002233BF1EA7BA7E0091BA73FC2825DDEA6225430",
+      "ModifiedUTC": "2026-10-04T05:27:51.6768373Z",
+      "FileVersion": null
+    },
+    {
+      "Path": "x64\\Release\\KxCryp\\KxCryp.dll",
+      "Architecture": "x64",
+      "Machine": 34404,
+      "Bytes": 28160,
+      "SHA256": "F2C22764EF5DAB49542FDED56B0F3CE5306755217E5ABF68C4895E74EA0D1064",
+      "ModifiedUTC": "2026-10-04T05:27:52.5350448Z",
+      "FileVersion": null
+    },
+    {
+      "Path": "x64\\Release\\KxDw\\KxDw.dll",
+      "Architecture": "x64",
+      "Machine": 34404,
+      "Bytes": 3072,
+      "SHA256": "14A1FBBCD8283E9472FE17C89C578E61F1DABDF84B18B9173B36134DDF3963C7",
+      "ModifiedUTC": "2026-10-04T05:27:52.8968684Z",
+      "FileVersion": null
+    },
+    {
+      "Path": "x64\\Release\\KxDx\\KxDx.dll",
+      "Architecture": "x64",
+      "Machine": 34404,
+      "Bytes": 30720,
+      "SHA256": "93904CB8E27F781B3BB70C0F3C941279F317818819E0CA666DEEA156C35BEAD9",
+      "ModifiedUTC": "2026-10-04T05:27:54.8125970Z",
+      "FileVersion": null
+    },
+    {
+      "Path": "x64\\Release\\KxMi\\KxMi.dll",
+      "Architecture": "x64",
+      "Machine": 34404,
+      "Bytes": 21504,
+      "SHA256": "DA9E984E0CE638DBE215A8796DF35FAAE90B3EF9231E906857D33CC46DF16D9C",
+      "ModifiedUTC": "2026-10-04T05:27:55.7697477Z",
+      "FileVersion": null
+    },
+    {
+      "Path": "x64\\Release\\KxNet\\KxNet.dll",
+      "Architecture": "x64",
+      "Machine": 34404,
+      "Bytes": 34816,
+      "SHA256": "0ACB4C75048B52E49F18E14ED17E8F4BE5CAE0D802327A181594EC76C5D4A7FC",
+      "ModifiedUTC": "2026-10-04T05:27:56.6640267Z",
+      "FileVersion": null
+    },
+    {
+      "Path": "x64\\Release\\KxSChanl\\KxSChanl.dll",
+      "Architecture": "x64",
+      "Machine": 34404,
+      "Bytes": 70656,
+      "SHA256": "04458A0186E8B90147AFAF3C92B7ADC8462A6B889D421D334F0E767FD4E2A56F",
+      "ModifiedUTC": "2026-10-04T05:28:00.4069051Z",
+      "FileVersion": null
+    },
+    {
+      "Path": "x64\\Release\\KxUia\\KxUia.dll",
+      "Architecture": "x64",
+      "Machine": 34404,
+      "Bytes": 9728,
+      "SHA256": "FE4063958B2E7B83CC9D95F8E4B0B180AFDA7A4949453891677F66A2F2E3302C",
+      "ModifiedUTC": "2026-10-04T05:28:00.7449935Z",
+      "FileVersion": null
+    },
+    {
+      "Path": "x64\\Release\\KxUser\\KxUser.dll",
+      "Architecture": "x64",
+      "Machine": 34404,
+      "Bytes": 115200,
+      "SHA256": "4C4D56039FE7004D302DE0299B2E09F2FEAA8445960CAEF53BE1B3BD361F6B3F",
+      "ModifiedUTC": "2026-10-04T05:28:03.4429425Z",
+      "FileVersion": null
+    },
+    {
+      "Path": "x64\\Release\\KexPathCch\\KexPathCch.lib",
+      "Architecture": "x64",
+      "Machine": null,
+      "Bytes": 225068,
+      "SHA256": "B2738ECD6AC1C4DA5C0758EC42F2A29FC51C55BDFD354E346D6F21917ED65F77",
+      "ModifiedUTC": "2026-10-04T05:27:29.5325489Z",
+      "FileVersion": null
+    },
+    {
+      "Path": "x64\\Release\\KexSmp\\KexSmp.lib",
+      "Architecture": "x64",
+      "Machine": null,
+      "Bytes": 197794,
+      "SHA256": "13BBE05738C805D0FDEF7351CC3BE1E56F9022C88C16CA2D23981A111BD47FF8",
+      "ModifiedUTC": "2026-10-04T05:27:29.9118511Z",
+      "FileVersion": null
+    },
+    {
+      "Path": "x64\\Release\\KexMls\\KexMls.lib",
+      "Architecture": "x64",
+      "Machine": null,
+      "Bytes": 226094,
+      "SHA256": "D135E91DFB26DAF33D6AF1952326A23DD6908E8D69B1C85FFC5B29297A0FA475",
+      "ModifiedUTC": "2026-10-04T05:27:30.2806537Z",
+      "FileVersion": null
+    },
+    {
+      "Path": "x64\\Release\\KexW32ML\\KexW32ML.lib",
+      "Architecture": "x64",
+      "Machine": null,
+      "Bytes": 747228,
+      "SHA256": "FFB591B13210DB840960387B63AA042FA62E7C130363FDE2FE578CAB8EF72C95",
+      "ModifiedUTC": "2026-10-04T05:27:37.0104968Z",
+      "FileVersion": null
+    },
+    {
+      "Path": "x64\\Release\\KxCfgHlp\\KxCfgHlp.lib",
+      "Architecture": "x64",
+      "Machine": null,
+      "Bytes": 3865560,
+      "SHA256": "A01A458F70DB7E364751F9ECC4DF2DA1112FAB64EC79E3D117416D89EFD6CD2A",
+      "ModifiedUTC": "2026-10-04T05:27:40.2046909Z",
+      "FileVersion": null
+    },
+    {
+      "Path": "x64\\Release\\KexGui\\KexGui.lib",
+      "Architecture": "x64",
+      "Machine": null,
+      "Bytes": 1895194,
+      "SHA256": "060C3F021E2284447EFD6CF6CE382331129F577556823621B761A144BC876090",
+      "ModifiedUTC": "2026-10-04T05:27:41.8358013Z",
+      "FileVersion": null
+    },
+    {
+      "Path": "Win32\\Release\\KexDll\\KexDll.dll",
+      "Architecture": "x86",
+      "Machine": 332,
+      "Bytes": 260096,
+      "SHA256": "EA69810BD51F94D70E79AD6CA18C0540AD0EA786719F83E669C8A6AAADF7C5F8",
+      "ModifiedUTC": "2026-10-04T05:29:16.0490482Z",
+      "FileVersion": "2.0.0.2232"
+    },
+    {
+      "Path": "Win32\\Release\\KexShlEx\\KexShlEx.dll",
+      "Architecture": "x86",
+      "Machine": 332,
+      "Bytes": 31232,
+      "SHA256": "B9DABFAB750D494B21A57B46D6F2FE6C32174D57EBD7E86F40E0FA33C6E93B71",
+      "ModifiedUTC": "2026-10-04T05:28:24.0491085Z",
+      "FileVersion": "2.0.0.2232"
+    },
+    {
+      "Path": "Win32\\Release\\KxNt\\KxNt.dll",
+      "Architecture": "x86",
+      "Machine": 332,
+      "Bytes": 123904,
+      "SHA256": "1A9EABF064CDF81F9898E5E22BE7FDD369174D0E5570B67907414AFD7F173FDB",
+      "ModifiedUTC": "2026-10-04T05:28:18.0578319Z",
+      "FileVersion": null
+    },
+    {
+      "Path": "Win32\\Release\\KxBase\\KxBase.dll",
+      "Architecture": "x86",
+      "Machine": 332,
+      "Bytes": 143872,
+      "SHA256": "C5842C758B85C26D172E7EAAA420804E8DB5A7972B8F52391EC7B352A859983F",
+      "ModifiedUTC": "2026-10-04T05:28:22.5180854Z",
+      "FileVersion": null
+    },
+    {
+      "Path": "Win32\\Release\\KxAdvapi\\KxAdvapi.dll",
+      "Architecture": "x86",
+      "Machine": 332,
+      "Bytes": 55808,
+      "SHA256": "CAFD97BC803BAA814BFF50C09BA09C7981317AC9DA9AAE933EB554C4A123FEA4",
+      "ModifiedUTC": "2026-10-04T05:28:24.8235398Z",
+      "FileVersion": null
+    },
+    {
+      "Path": "Win32\\Release\\KxCom\\KxCom.dll",
+      "Architecture": "x86",
+      "Machine": 332,
+      "Bytes": 41984,
+      "SHA256": "13825BD46D88D5666862A80EDB37AAD36A6048B92D71E40A7158A363F7B4CA1B",
+      "ModifiedUTC": "2026-10-04T05:28:27.4435410Z",
+      "FileVersion": null
+    },
+    {
+      "Path": "Win32\\Release\\KxCrt\\KxCrt.dll",
+      "Architecture": "x86",
+      "Machine": 332,
+      "Bytes": 58880,
+      "SHA256": "C2ABD70CA56B2246DA460DD0D115141BF1E66B9AB8EA9BBAC7A780240C453197",
+      "ModifiedUTC": "2026-10-04T05:28:27.7238538Z",
+      "FileVersion": null
+    },
+    {
+      "Path": "Win32\\Release\\KxCryp\\KxCryp.dll",
+      "Architecture": "x86",
+      "Machine": 332,
+      "Bytes": 24576,
+      "SHA256": "756DE2925821F0DAED869E8F5869F958B5CEAD277AE9FD2EB855F03D03166A9E",
+      "ModifiedUTC": "2026-10-04T05:28:28.5915670Z",
+      "FileVersion": null
+    },
+    {
+      "Path": "Win32\\Release\\KxDw\\KxDw.dll",
+      "Architecture": "x86",
+      "Machine": 332,
+      "Bytes": 2560,
+      "SHA256": "7336A7C83C8D27563140B420C3C8D2C7BE6360978855A7C5DCC9631A08A44214",
+      "ModifiedUTC": "2026-10-04T05:28:28.9570158Z",
+      "FileVersion": null
+    },
+    {
+      "Path": "Win32\\Release\\KxDx\\KxDx.dll",
+      "Architecture": "x86",
+      "Machine": 332,
+      "Bytes": 28672,
+      "SHA256": "B96940D9CB8D836338B4E1C83CF8C341F978C334D71F916A9B03C0687535D619",
+      "ModifiedUTC": "2026-10-04T05:28:30.8119565Z",
+      "FileVersion": null
+    },
+    {
+      "Path": "Win32\\Release\\KxMi\\KxMi.dll",
+      "Architecture": "x86",
+      "Machine": 332,
+      "Bytes": 20480,
+      "SHA256": "6B718AB8292E7581C24482C6AADC853354C86568C37DDD9B1C43856CD4F39C01",
+      "ModifiedUTC": "2026-10-04T05:28:31.7368399Z",
+      "FileVersion": null
+    },
+    {
+      "Path": "Win32\\Release\\KxNet\\KxNet.dll",
+      "Architecture": "x86",
+      "Machine": 332,
+      "Bytes": 34304,
+      "SHA256": "87B357EE13B87858C6D7F40F6516C1749A981FB0AB98CBD80012BFE5F493368E",
+      "ModifiedUTC": "2026-10-04T05:28:32.5368190Z",
+      "FileVersion": null
+    },
+    {
+      "Path": "Win32\\Release\\KxSChanl\\KxSChanl.dll",
+      "Architecture": "x86",
+      "Machine": 332,
+      "Bytes": 56832,
+      "SHA256": "E6BDEC8E17F242D92A4C5A3ED16EEC16CC7B80CB538CF76C57F0EEB0CCFADD9C",
+      "ModifiedUTC": "2026-10-04T05:28:36.0022015Z",
+      "FileVersion": null
+    },
+    {
+      "Path": "Win32\\Release\\KxUia\\KxUia.dll",
+      "Architecture": "x86",
+      "Machine": 332,
+      "Bytes": 9728,
+      "SHA256": "5885C74D67422757D9F27C6C768C9784BD5E142BD4E7B3851D1190AE119712A7",
+      "ModifiedUTC": "2026-10-04T05:28:36.3719066Z",
+      "FileVersion": null
+    },
+    {
+      "Path": "Win32\\Release\\KxUser\\KxUser.dll",
+      "Architecture": "x86",
+      "Machine": 332,
+      "Bytes": 112128,
+      "SHA256": "5C8E4700B0E6BD8B8F9AE5E06DE5980DC41A7B84951EF03A0B6B60E40410FFAC",
+      "ModifiedUTC": "2026-10-04T05:28:39.0099414Z",
+      "FileVersion": null
+    },
+    {
+      "Path": "Win32\\Release\\KexPathCch\\KexPathCch.lib",
+      "Architecture": "x86",
+      "Machine": null,
+      "Bytes": 218998,
+      "SHA256": "35BED12F14F0B498FE82B8CD60D7F1907F5E8FD5A9800C32217EE29C9F29F9FF",
+      "ModifiedUTC": "2026-10-04T05:28:04.6769903Z",
+      "FileVersion": null
+    },
+    {
+      "Path": "Win32\\Release\\KexSmp\\KexSmp.lib",
+      "Architecture": "x86",
+      "Machine": null,
+      "Bytes": 191490,
+      "SHA256": "FD0A3F3AF7E60064202D68B84B9C2076FC8F2554A89E26AC2EA6534DFF53483F",
+      "ModifiedUTC": "2026-10-04T05:28:05.0748495Z",
+      "FileVersion": null
+    },
+    {
+      "Path": "Win32\\Release\\KexMls\\KexMls.lib",
+      "Architecture": "x86",
+      "Machine": null,
+      "Bytes": 219804,
+      "SHA256": "12ABBEB117E50F0E5BE4733B6AF869695A70ADF2DA303D10B8C85B300CF0D296",
+      "ModifiedUTC": "2026-10-04T05:28:05.4757679Z",
+      "FileVersion": null
+    },
+    {
+      "Path": "Win32\\Release\\KexW32ML\\KexW32ML.lib",
+      "Architecture": "x86",
+      "Machine": null,
+      "Bytes": 722794,
+      "SHA256": "D2EBA596C4C26B6FAFCA3F4269F61D81A82CC1C9ACFCF5520202B92E924B2F74",
+      "ModifiedUTC": "2026-10-04T05:28:12.1419961Z",
+      "FileVersion": null
+    },
+    {
+      "Path": "Win32\\Release\\KxCfgHlp\\KxCfgHlp.lib",
+      "Architecture": "x86",
+      "Machine": null,
+      "Bytes": 3743104,
+      "SHA256": "A635650CB499BF8AEB7076C32D89DD1EBB0F4B7F1557674A2D519DB23D5D17EC",
+      "ModifiedUTC": "2026-10-04T05:28:15.6510616Z",
+      "FileVersion": null
+    },
+    {
+      "Path": "Win32\\Release\\KexGui\\KexGui.lib",
+      "Architecture": "x86",
+      "Machine": null,
+      "Bytes": 1834312,
+      "SHA256": "51ACA7C216E476634E2A5EAF71C80D44BE8BC88F6C81F5D499A6D3064F2E1918",
+      "ModifiedUTC": "2026-10-04T05:28:17.5251631Z",
+      "FileVersion": null
+    }
+  ],
+  "Logs": [
+    {
+      "Path": "all-x64-second.txt",
+      "SHA256": "D8397E0BB030624C3595AB8747BA562C84D8799EAF487DA4B176F6A406C36CCF"
+    },
+    {
+      "Path": "all-x86-first.txt",
+      "SHA256": "5DBFDBC803CDB9CFCC66FB3C11A139CC28E7AC642F17931D89E470842B1F84B7"
+    },
+    {
+      "Path": "kexdll-local-headers-x64.txt",
+      "SHA256": "347DD0BEC6E91F76D998244907B963B358DABF139385140B989B48DE517BEDEB"
+    },
+    {
+      "Path": "kexdll-local-headers-x86.txt",
+      "SHA256": "89411B6BCA7E6C5A6C42CDD95B36F57180C2C55B51DE31EBCE877B0C4905157E"
+    }
+  ],
+  "Scripts": [
+    {
+      "Path": "build_all.ps1",
+      "SHA256": "78BDCF2A4A03BCE8477A6B3B37EA74DD94C32BBD8B6D274CC277A31460357598"
+    },
+    {
+      "Path": "build_all_x86.ps1",
+      "SHA256": "5D6E557357133545332C88F717E62F5F5BFC25C733C2EAFA4510E8C46E185E2C"
+    },
+    {
+      "Path": "build_kexdll.ps1",
+      "SHA256": "F29EDABE966837D581B21C3F2A0222439AA2C37A13F6A2CAC3ECBA36A112D721"
+    },
+    {
+      "Path": "build_kexdll_x86.ps1",
+      "SHA256": "5273FDE4EC951EDE103CBAAFC8353DB244209A8FA20106009B08DA4210990513"
+    },
+    {
+      "Path": "build_kexshlex.ps1",
+      "SHA256": "F2F2EFB019D42558F36DA7CC3488954A064CE95ACE452E6B62B6ED3911B64430"
+    },
+    {
+      "Path": "build_kexshlex_x86.ps1",
+      "SHA256": "8D4831F83DBFA6F10012C7BEEE18E1081AD514E596A388EEB6581CA9E01EE08E"
+    },
+    {
+      "Path": "build_kxbase_x86.ps1",
+      "SHA256": "931A42C1906A9A38720334F027C4DE337260D9553802FD2C3D72CD4E3CE550E6"
+    },
+    {
+      "Path": "tests\\capture_kxnt_release_build_readiness.ps1",
+      "SHA256": "C424A7ECF3F8FCD65E8AA45DD2EDF5500D6360B758CC0122233340AABF1A97E4"
+    }
+  ],
+  "Limits": "Build readiness only. Freshness, PE architecture and archive hashes verified for 30 DLLs and 12 static libraries. No Installer replacement, version bump, VM behavior or release publication is implied. First x64 failed log remains in the archive."
+}

@@ -9,14 +9,14 @@ function Run-BuildScript([string]$scriptName, [string]$compName) {
     Write-Host "========================================" -ForegroundColor Cyan
     $script = Join-Path $ScriptDir $scriptName
     if (Test-Path $script) {
-        & $script
+        & "$env:SystemRoot\System32\WindowsPowerShell\v1.0\powershell.exe" -NoProfile -ExecutionPolicy Bypass -File $script
         if ($LASTEXITCODE -ne 0 -and $LASTEXITCODE -ne $null) {
             Write-Host "BUILD FAILED: $compName" -ForegroundColor Red
             exit 1
         }
         Write-Host "$compName built successfully" -ForegroundColor Green
     } else {
-        Write-Host "WARNING: $scriptName not found, skipping" -ForegroundColor Yellow
+        throw "Required build script missing: $scriptName"
     }
 }
 
@@ -30,6 +30,11 @@ function Copy-BuiltLib([string]$subDir, [string]$name) {
 Run-BuildScript "build_kexpathcch_x86.ps1" "KexPathCch"
 Run-BuildScript "build_kexsmp_x86.ps1" "KexSmp"
 Run-BuildScript "build_kexmls_x86.ps1" "KexMLS"
+foreach ($dependency in @('KexPathCch','KexSmp','KexMls')) {
+    $source = Join-Path $ScriptDir "Win32\Release\$dependency\$dependency.lib"
+    if (!(Test-Path -LiteralPath $source)) { throw "Required dependency missing: $source" }
+    Copy-Item -LiteralPath $source -Destination (Join-Path $OUTPUT_DIR "$dependency.lib") -Force
+}
 
 Run-BuildScript "build_kexdll_x86.ps1" "KexDll"
 Copy-BuiltLib "KexDll" "KexDll"
@@ -51,5 +56,7 @@ Copy-BuiltLib "KxBase" "KxBase"
 
 Run-BuildScript "build_kexshlex_x86.ps1" "KexShlEx"
 Copy-BuiltLib "KexShlEx" "KexShlEx"
+
+Run-BuildScript "build_extended_x86.ps1" "Extended DLLs"
 
 Write-Host "`nWIN32 BUILD COMPLETED SUCCESSFULLY" -ForegroundColor Green

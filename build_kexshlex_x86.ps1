@@ -113,7 +113,7 @@ Write-Host "[3/3] Linking KexShlEx.dll..." -ForegroundColor Yellow
 # Use libraries
 $kexGuiLib = Join-Path $ScriptDirAbs "Win32\Release\KexGui\KexGui.lib"
 
-$PREBUILT_LIBS_DIR = "C:\Users\YamaR\Desktop\AI_Datas\VxKex_Vista\Win32\Release"
+$PREBUILT_LIBS_DIR = Join-Path $ScriptDirAbs "Win32\Release"
 $kexDllLib = Join-Path $PREBUILT_LIBS_DIR "KexDll\KexDll.lib"
 $kexPathCchLib = Join-Path $PREBUILT_LIBS_DIR "KexPathCch\KexPathCch.lib"
 $kexSmpLib = Join-Path $PREBUILT_LIBS_DIR "KexSmp\KexSmp.lib"
@@ -121,9 +121,10 @@ $kexMlsLib = Join-Path $PREBUILT_LIBS_DIR "KexMLS\KexMls.lib"
 $kexCfgHlpLib = Join-Path $ScriptDirAbs "Win32\Release\KxCfgHlp\KxCfgHlp.lib"
 $kexW32MlLib = Join-Path $ScriptDirAbs "Win32\Release\KexW32ML\KexW32ML.lib"
 
-$IMPORT_LIBS_DIR = "C:\Users\YamaR\Desktop\AI_Datas\VxKex_Vista\00-Import-Libraries"
+$IMPORT_LIBS_DIR = Join-Path $ScriptDirAbs "00-Import-Libraries"
+$env:LIB += ";$IMPORT_LIBS_DIR"
 $ntdllLib = Join-Path $IMPORT_LIBS_DIR "ntdll_x86.lib"
-$msvcrtLib = Join-Path $IMPORT_LIBS_DIR "msvcrt_x64.lib"
+$msvcrtLib = Join-Path $IMPORT_LIBS_DIR "msvcrt_x86.lib"
 $kernel32Lib = Join-Path $IMPORT_LIBS_DIR "kernel32_x86.lib"
 $user32Lib = Join-Path $IMPORT_LIBS_DIR "user32_x86.lib"
 
