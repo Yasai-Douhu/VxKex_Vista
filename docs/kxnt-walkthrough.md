@@ -1104,3 +1104,14 @@ tests/summarize_kxnt_parity.ps1を追加した。current InstallerのKexDll / Kx
 既存import監査では未解決native名がx64 182 / x86 166。実読取り3file（x64のjava.exe / jvm.dll / Code.exe）の直接ntdll / kxnt importとのintersectionは0。x86実アプリはこの3file監査に含まれていない。未使用証明ではなく、依存DLL / dynamic lookup / 別アプリは別途必要に応じて調べる。次の実用調査は、既に長時間追跡した有限Eventではなく、依存DLLや実call情報から未解決APIの優先度を絞ることとする。
 
 証跡: docs/validation/kxnt-major-verification-status.jsonにcurrent candidate hash付き主要検証一覧、actual exports、既存30IFEO詳細pairとの照合、今回最後の診断Failed receipt / critical-section解析 / 負対照拒否を収録。主要移植の完了と低優先度TODOを分離し、元監査の全scopeを保持した。これまでの原Installer / Releases更新やmain mergeはこのphaseには含まない。
+## 2026-10-04: Java25の依存DLLをread-only監査し、公開準備の要件を確認
+
+前回は現行candidateと主要30IFEO検証pairの一致・追加12public names / Vista固有7names保持を確認し、低優先度TODOを分離した進捗。今回は主要機能を完了ブロックしないという更新基準を維持し、実アプリ依存DLLの静的監査を追加した。user goalに「完成と判断した場合はReleasesへ公開」が追加されたため、公開も最終deliverableに含める。
+
+- tests/audit_kxnt_guest_dependencies.ps1を追加。明示・重複しないliteral DLL / EXE filenamesのみを受け取り、fresh archiveへvmrun copyFileFromGuestToHostを行う。guest実行・write・install・registry変更はない。全copyのguest path / bytes / SHA256、collectorとscanner hashesを保存し、失敗はIncomplete receipt / 元logを保持して停止する。既存のstrict PE import scannerを使い、ordinary / RVA-delayのnamed ntdll / kxnt importとcurrent missing forwarderを照合する。
+- 元Server2008でC:\Program Files\Java\jdk-25.0.4.1\binのjava / nio / net / jimage / jli / zip / sunmscapi / awt / management / management_ext / verify / instrument各DLL、計12fileをcopyしてx64 PEを確認。全importを取得し、ntdll / kxntのnamed直接importと未解決転送のintersectionは全て0。指定watch names NtQuerySystemInformationEx / NtQueryWnfStateData / RtlUnsubscribeWnfNotificationWaitForCompletionもこの12fileでは0。
+- java.dllの_itoa_s / wcscat_s、awt.dllのwcscpy_s / wcsncpy_s文字列をcandidateとして検出したが、通常import module contextも記録している。文字列の一致だけをntdll API呼出しの証拠にしない。cached native baselineのhashはscanner reportへ保存し、現在system DLLの再採取・全依存DLL列挙・dynamic lookup不在・Java runtime成功をこの静的結果で証明したとは扱わない。
+- VMware MCP guest_lsはvmcli引数解析がguest pathを拒否したため使えなかった。VMを再起動せず、CLIのread-only copyで成功した。connectorの引数不具合とguest認証/OS障害は区別する。
+- Release一覧をgh CLIでread-only確認し、現在latestはv2.0.0.2232、source vautogen.hも2.0.0.2232であることを確認。今回の主要KxNt移植を新しい配布として公開する準備では、共通version resourceとtag一致、current worktreeからの両形式build、更新candidateの主要回帰、Installer全体のZIP / checksum / release notes / source commit対応を確認する。既存latest assetsを確認なく上書きしたり、主要検証がない更新binaryを公開したりしない。source/metadata更新に伴う回帰はuserの追加試験条件に合致する。
+
+証跡: docs/validation/kxnt-java25-dependency-imports.json（read-only copy receipt、12file全importとcandidates / native tables / hashes）。archiveはaudit/KxNtParity/imports-java25-dependencies-20261004。現時点で新規portをP1へ繰り上げるmissing ntdll実importは見つかっていない。未実装WNF等は既知の低優先度制限として保持し、主要機能を妨げる新たな具体的callが出た場合に再評価する。Releases公開準備・公開確認はまだ未完了であり、goalは継続する。
