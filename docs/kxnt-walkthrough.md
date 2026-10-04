@@ -1155,3 +1155,10 @@ release-notes-v2.0.0.2233.mdを作成。次の公開工程はcurrent candidate�
 配布source commit463af9dをpush済み。compiled candidate manifestのtracked581sourceのうち578hashがcurrentと一致。残る3件はbuild後のbaseline capture / VM runnerの固定VistaReclone許可とinventoryの新証跡選択であり、product source差ではない。execution-time runner hashesは新VM receiptsへ保存している。last functional fix0dcbe68からKexDll/KxNt/KxBase/shared headersの差はvautogen版情報のみとgit diffで確認。Serverの以前の実装/OS差証拠と現在のVista30pairのscopeを分離する。docs/validation/kxnt-release2233-completion-audit.jsonに元監査/安全・境界/architecture/OS/通常経路/保留の優先度/進捗/配布/公開の要件別証拠と制限を記録。
 
 tools/Package-KxNtRelease.ps1でcurrent Installerと候補全58fileのbytes/hash一致を確認しfresh ZIPを作成。全ZIP entryの個数・path・length・展開stream SHA256がmanifestと一致。ZIPは2715226bytes、SHA256 AD5E4648003BCC888C25CB2C1EAEF2B1B472EB02DE80222F46030AFC15306D60。checksumも作成しaudit/KxNtRelease-2.0.0.2233-publication/receipt.jsonへ保存。remote v2.0.0.2233 tag未存在を確認。残る必須作業はReleases公開・external digest/tag/latest statusの確認と記録。
+### 2.0.0.2233 Releases公開と完了
+
+https://github.com/Yasai-Douhu/VxKex_Vista/releases/tag/v2.0.0.2233 を正式版として公開。tagのremote commitはae4799f136685dcdb9b011d841c3d74ef59db5eeで、push済みsource/Installer/主要回帰/完了監査を含む。GitHub release read-backでdraft=false / prerelease=false、latest APIでv2.0.0.2233を確認。ZIP2715226bytesとchecksum94bytesの両assetがuploaded、GitHub sha256 digestがlocal package/checksumと一致。検証結果はdocs/validation/kxnt-release2233-publication.jsonへ保存。版番号2.0.0.2233とtag一致、元v2.0.0.2232 assetは置換していない。
+
+元portability auditに沿う実現可能な主要KxNt port、意味/境界/安全性の主要検証、x64/WOW64・Vista/Server差確認、通常IFEO/実Zig経路、機能別commit/push、進捗一元化、再利用script化、配布更新と公開確認を完了と判断する。対応がないWNFの実働基盤、AppContainer/UMS/fullConDrv/WER等の独立拡張、未対応flags、native32bit OS、bounded native/observer Eventの追加説明は既知の制限・条件付きTODOとして維持する。失敗した診断資料を成功へ書換えていない。current release30主要pairとcurrent hashは一致し、全アプリ/API/subsystemの互換性を保証したとは主張しない。
+
+今回の公開はcodex/next-parity-highの検証済みcommitを対象とし、main mergeはこのgoalの必須項目ではない。原Gemini branch/code/Installer/user VMsは保持し、原walkthroughと新証跡JSONをmirrorした。検証cloneは最後の実uninstallが成功し、試験状態と資料を保持している。
