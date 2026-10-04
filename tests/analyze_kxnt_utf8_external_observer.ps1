@@ -1,4 +1,4 @@
-param([Parameter(Mandatory=$true)][string]$Receipt,[Parameter(Mandatory=$true)][string]$Output,[switch]$RequirePhaseIdentity)
+param([Parameter(Mandatory=$true)][string]$Receipt,[Parameter(Mandatory=$true)][string]$Output,[switch]$RequirePhaseIdentity,[switch]$RequireSteadyState)
 $ErrorActionPreference='Stop'
 if(Test-Path $Output){throw 'Preserve earlier analysis'}
 $r=Get-Content $Receipt -Raw|ConvertFrom-Json
@@ -49,7 +49,29 @@ foreach($arch in @('x86','x64')){
    $targetCount=[regex]::Match($text,'ExternalTargetHandleCount=(\d+)')
    if(!$targetCount.Success -or [int]$targetCount.Groups[1].Value -ne $phaseStates[1].AfterHandles){throw 'Target handle count changed before external read'}
   }
-  $results+=[pscustomobject]@{Architecture=$arch;Mode=$mode;TargetPID=$pidValue;ColdDelta=$deltas[0];WarmDelta=$deltas[1];LoaderSemaphore=$semaphore;EventObjectIdentity=$objectIdentity;PairResourceGatePassed=$suite[0].Passed;PhaseStates=$phaseStates;Measured=$true}
+  $steady=$null
+  if($RequireSteadyState){
+   $workers=[regex]::Match($detail,'SteadyWorkers=4 CacheWarmFromLegacyCalls=1 IDs=(\d+),(\d+),(\d+),(\d+)')
+   if(!$workers.Success -or @(@(1..4|ForEach-Object {$workers.Groups[$_].Value})|Select-Object -Unique).Count -ne 4){throw 'Four distinct surviving workers not recorded'}
+   $phases=@([regex]::Matches($detail,'(?m)^SteadyPhase=(\d+) Calls=(\d+) Errors=0 BeforeHandles=(\d+) AfterHandles=(\d+) HandleDelta=0\r?$'))
+   if($phases.Count -ne 8){throw 'Steady resource phase failed or missing'}
+   foreach($phase in @(0..7)){
+    $m=$phases[$phase]
+    if([int]$m.Groups[1].Value -ne $phase -or [int]$m.Groups[2].Value -ne $calls -or $m.Groups[3].Value -cne $m.Groups[4].Value -or $m.Groups[3].Value -cne $phases[0].Groups[3].Value){throw 'Steady phase/count inconsistent or drift between phases'}
+   }
+   $life=[regex]::Match($detail,'SteadyLifecycle BeforeHandles=(\d+) AfterHandles=(\d+) Delta=(-?\d+) OwnedHandlesClosed=12')
+   if(!$life.Success -or [int]$life.Groups[2].Value-[int]$life.Groups[1].Value -ne [int]$life.Groups[3].Value){throw 'Owned worker resources not closed or lifecycle count inconsistent'}
+   $total=$calls*8
+   if($detail -notmatch "SteadyPhases=8 TotalCalls=$total Failures=0 Result=PASS"){throw 'Steady calls or worker exit failed'}
+   $steady=[pscustomobject]@{Phases=8;TotalCalls=$total;AllPhaseHandleDeltas=0;Workers=4;OwnedHandlesClosed=12;ThreadLifecycleDelta=[int]$life.Groups[3].Value;Passed=$true;Limits='Caches already populated by legacy calls; measures conversions with existing workers, not cold initialization or thread lifecycle'}
+  }
+  $results+=[pscustomobject]@{Architecture=$arch;Mode=$mode;TargetPID=$pidValue;ColdDelta=$deltas[0];WarmDelta=$deltas[1];LoaderSemaphore=$semaphore;EventObjectIdentity=$objectIdentity;PairResourceGatePassed=$suite[0].Passed;PhaseStates=$phaseStates;SteadyState=$steady;Measured=$true}
  }
 }
-[pscustomobject]@{State='Measured';SourceReceiptState=$r.State;PhaseIdentityRequired=[bool]$RequirePhaseIdentity;ReceiptSHA256=(Get-FileHash $Receipt).Hash;Results=$results;Scope='External read after parallel measurements, with a test-only 3s hold and optional inline NT6 semaphore/count state. NewNativeEventVerified identifies the event in the recorded phase; no allocation stack or attribution of older runs, balanced hidden allocations or general resource completion. Resource gates remain unchanged.'}|ConvertTo-Json -Depth 7|Set-Content $Output -Encoding UTF8
+$lifecycleComparisons=@()
+if($RequireSteadyState){foreach($arch in @('x86','x64')){
+ $adapter=@($results|Where-Object {$_.Architecture -eq $arch -and $_.Mode -eq 'adapter'})[0]
+ $control=@($results|Where-Object {$_.Architecture -eq $arch -and $_.Mode -eq 'control'})[0]
+ $lifecycleComparisons+=[pscustomobject]@{Architecture=$arch;AdapterDelta=$adapter.SteadyState.ThreadLifecycleDelta;ControlDelta=$control.SteadyState.ThreadLifecycleDelta;Matched=($adapter.SteadyState.ThreadLifecycleDelta -eq $control.SteadyState.ThreadLifecycleDelta);Scope='Counts include startup/exit outside surviving-worker API phases; ownership of additional handles not inferred'}
+}}
+[pscustomobject]@{State='Measured';SourceReceiptState=$r.State;PhaseIdentityRequired=[bool]$RequirePhaseIdentity;SteadyStateRequired=[bool]$RequireSteadyState;ReceiptSHA256=(Get-FileHash $Receipt).Hash;Results=$results;LifecycleComparisons=$lifecycleComparisons;Scope='External read after parallel measurements, with a test-only 3s hold and optional inline NT6 semaphore/count state. NewNativeEventVerified identifies the event in the recorded phase; optional steady-state gate measures warmed APIs with surviving workers. LifecycleComparisons keeps startup/exit differences separate and unresolved. No allocation stack or attribution of older runs, balanced hidden allocations or general resource completion. Legacy resource gates remain unchanged.'}|ConvertTo-Json -Depth 7|Set-Content $Output -Encoding UTF8

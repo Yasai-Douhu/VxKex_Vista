@@ -1032,3 +1032,15 @@ clone exit0、source VMX hash変化なし、clone diskのbounded sparse descript
 - 両runでUTF値・buffer・status・TLSの4893行一致、SilentExit両形式PASS、install8copyのbyte一致、owned profile4解除、実uninstallとfresh復帰を確認。旧guest dirsは保存し、owned Server cloneはsoft停止。原Server / 原Vistaと新Vista再cloneには今回変更なし。
 
 証跡: docs/validation/kxnt-utf8-inline-loader-server.jsonに2runのFailed原receipt、前後・外部照合の独立Measured解析、負対照拒否と旧receipt互換解析を保存。raw archivesはaudit/KxNtParity/ifeo-server-utf8-inline-20261004-first / second、build logsはutf8-inline-loader-build-x86 / x64.txt。今回は具体的warm増加のnative cache識別を完了したが、一般UTF資源gate完成、balancedな他資源割当ての不存在、native32bit OSを証明していない。次はスレッド生成・終了のnative待機Eventと、存続中workerでの変換API自体の資源測定を独立に検証し、既存lifecycle失敗を上書きせず残す。元監査のWNF、拡張registry、必要なnative forwarders等も継続中。
+## 2026-10-04: 存続workerでの UTF 反復資源測定を追加、lifecycle側の2handle増加を新規記録
+
+前回は実warm増加の前後・外部native Event識別を完了した進捗。今回はcold / warmの従来thread lifecycle試験をそのまま実行した後、別の同一4workerを終了させずに使う8phaseを追加した。既存Failed receiptsやgateを変更していない。
+
+- tests/kxnt_utf8_probe.cの追加workerは各専用auto-reset start / done Eventで起床・完了を同期する。4worker ready確認後にhandle数を測定し、phaseごと各1000loopの内容・status・TLS比較を実行。同じthread ID / STILL_ACTIVEを確認、全worker完了後100msのhandle数も比較する。全8phaseが終わるまでthreadを作り直したり終了させたりしない。前段legacy呼出しでnative API lookup cachesが初期化済みであることを出力する。cold初期化の検証をこの測定で置き換えない。
+- 最後にstopを通知して全threadのnatural exit0を確認し、4threadと8Eventの計12owned handlesをCloseHandle成功で確認。API phase外のworker作成・終了を含む総count差もSteadyLifecycleに別出力する。初期化失敗やtimeoutはowned診断processを終了9とし、成功扱いにしない。
+- x86 / x64をVC10 / SDK7.1でbuild、独立Server cloneに実install8copy / 実KexCfg4profile登録して通常IFEOを実行した。external modeの前段hold / inline-state / native-owner観測を維持。mainの全26staticbinding / early KexDll、native comparison4893行一致、SilentExit両形式PASS、profile4解除、実uninstall / fresh復帰を確認した。
+- adapter両形式は8phase ×16000call = 各128000call、controlは各64000lookup call。全phase Errors0 / HandleDelta0、phase間も同じcountを維持し、worker退出とowned12closeが成功。APIの初期化済み反復に限った実測成功であり、全heap / balanced allocation / cold / process全体の無漏洩証明ではない。
+- 今回は前段legacy adapter / controlも両形式cold1 / warm0で、driverFailures0 / exit0、runnerMeasured。ただし追加SteadyLifecycleはx64 adapter17→19 / delta2、x64 control17→17 / delta0。x86双方25→25 / delta0。この2handleのtype / ownershipはまだ未取得。追加API phaseのPASSやrunnerMeasuredを、資源全体の完成に置き換えない。以前のwarm1失敗も保存したまま。
+- analyzerのRequireSteadyStateは4distinct ID、8phaseのcalls / Errors0 / 前後count一致 / phase間count不変、実owned12close / 全exit成功、計call数を要求する。API phaseとThreadLifecycleDeltaを別項目にし、adapter / controlのLifecycleComparisonsはx64Matched=falseを明記する。Errorsを1へ改変した負対照は拒否。従来inline-only receiptも解析可能。独立Server cloneはsoft停止、原VMは変更していない。
+
+証跡: docs/validation/kxnt-utf8-steady-state-server.json（原Measured receipt、全raw / native参考 / actual binding / provenance、count continuity解析、負対照拒否、従来receipt互換）。archiveはaudit/KxNtParity/ifeo-server-utf8-steady-20261004-first、build logsはutf8-steady-build-x86 / x64.txt。次に未識別のx64 lifecycle増加2handleを、追加worker前後の外部handle表で識別する必要がある。一般UTF資源検証、native32bit OS、WNF / 拡張registry / 実利用の未解決forwarders等、元監査の残項目は継続中。production DLLを修正した段階ではない。

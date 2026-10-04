@@ -114,6 +114,60 @@ static void parallel_cases(CONVERT from,CONVERT to,unsigned phase) {
     else utf8_snapshot("warm100ms");
 #endif
 }
+typedef struct {HANDLE start,done,thread;DWORD id,errors;volatile LONG stop;} STEADY_WORKER;
+static DWORD WINAPI steady_worker(PVOID data){
+    STEADY_WORKER *worker=(STEADY_WORKER*)data;
+    SetEvent(worker->done); /* Initial readiness, before resource baseline. */
+    for(;;){
+        if(WaitForSingleObject(worker->start,10000)!=WAIT_OBJECT_0)return 9;
+        if(InterlockedCompareExchange(&worker->stop,0,0))return 0;
+        worker->errors=parallel_worker(NULL);
+        if(!SetEvent(worker->done))return 9;
+    }
+}
+static void steady_cases(void){
+    STEADY_WORKER workers[4]={0};HANDLE done[4],threads[4];
+    DWORD initial,before,after,final,exitCode,total,closed=0;unsigned i,phase,localFailures=0;
+    GetProcessHandleCount(GetCurrentProcess(),&initial);
+    for(i=0;i<4;++i){
+        workers[i].start=CreateEventW(NULL,FALSE,FALSE,NULL);
+        workers[i].done=CreateEventW(NULL,FALSE,FALSE,NULL);done[i]=workers[i].done;
+        if(!workers[i].start || !workers[i].done)goto Fatal;
+        workers[i].thread=CreateThread(NULL,0,steady_worker,&workers[i],0,&workers[i].id);threads[i]=workers[i].thread;
+        if(!threads[i])goto Fatal;
+    }
+    if(WaitForMultipleObjects(4,done,TRUE,10000)!=WAIT_OBJECT_0)goto Fatal;
+    fprintf(out,"SteadyWorkers=4 CacheWarmFromLegacyCalls=1 IDs=%lu,%lu,%lu,%lu\n",workers[0].id,workers[1].id,workers[2].id,workers[3].id);
+    /* Workers survive all eight phases. Thread initialization and termination
+       are outside these measurements; legacy lifecycle gates still run above. */
+    for(phase=0;phase<8;++phase){
+        GetProcessHandleCount(GetCurrentProcess(),&before);
+        for(i=0;i<4;++i)if(!SetEvent(workers[i].start))goto Fatal;
+        if(WaitForMultipleObjects(4,done,TRUE,10000)!=WAIT_OBJECT_0)goto Fatal;
+        total=0;
+        for(i=0;i<4;++i){
+            total+=workers[i].errors;
+            if(!GetExitCodeThread(threads[i],&exitCode) || exitCode!=STILL_ACTIVE || GetThreadId(threads[i])!=workers[i].id)++total;
+        }
+        Sleep(100);GetProcessHandleCount(GetCurrentProcess(),&after);
+        fprintf(out,"SteadyPhase=%u Calls=%u Errors=%lu BeforeHandles=%lu AfterHandles=%lu HandleDelta=%ld\n",phase,lookupControl?8000:16000,total,before,after,(LONG)after-(LONG)before);
+        if(total || before!=after)++localFailures;
+    }
+    for(i=0;i<4;++i){InterlockedExchange(&workers[i].stop,1);if(!SetEvent(workers[i].start))goto Fatal;}
+    if(WaitForMultipleObjects(4,threads,TRUE,10000)!=WAIT_OBJECT_0)goto Fatal;
+    for(i=0;i<4;++i){
+        if(!GetExitCodeThread(threads[i],&exitCode) || exitCode)++localFailures;
+        if(CloseHandle(workers[i].thread))++closed;else ++localFailures;
+        if(CloseHandle(workers[i].done))++closed;else ++localFailures;
+        if(CloseHandle(workers[i].start))++closed;else ++localFailures;
+    }
+    Sleep(100);GetProcessHandleCount(GetCurrentProcess(),&final);
+    fprintf(out,"SteadyLifecycle BeforeHandles=%lu AfterHandles=%lu Delta=%ld OwnedHandlesClosed=%lu\n",initial,final,(LONG)final-(LONG)initial,closed);
+    fprintf(out,"SteadyPhases=8 TotalCalls=%u Failures=%u Result=%s\n",lookupControl?64000:128000,localFailures,localFailures?"FAIL":"PASS");
+    failures+=localFailures;return;
+Fatal:
+    fprintf(out,"Owned steady UTF workers failed to initialize or finish\n");fflush(out);TerminateProcess(GetCurrentProcess(),9);
+}
 static void overlap_cases(const char *direction,CONVERT fn,const void *original,ULONG bytes) {
     BYTE buffer[128];int offset;ULONG actual,i;LONG status,exception;
     for(offset=-4;offset<=4;++offset) {
@@ -206,6 +260,7 @@ int main(int argc,char **argv) {
         for(i=0;i<2;++i)fprintf(out,"InlineLoaderState Phase=%u BeforeLock=%p BeforeSemaphore=%p BeforeRead=%d AfterLock=%p AfterSemaphore=%p AfterRead=%d BeforeHandles=%lu AfterHandles=%lu\n",i,loaderStates[i][0].lock,loaderStates[i][0].semaphore,loaderStates[i][0].read,loaderStates[i][1].lock,loaderStates[i][1].semaphore,loaderStates[i][1].read,phaseCounts[i][0],phaseCounts[i][1]);
         fprintf(out,"ExternalObservationReady=1 PID=%lu\n",GetCurrentProcessId());fflush(out);Sleep(3000);
     }
+    steady_cases();
     if(lookupControl){fprintf(out,"Failures=%u Result=%s\n",failures,failures?"FAIL":"CONTROL");fclose(out);return failures?1:0;}
     for(i=0;i<sizeof(utf8)/sizeof(utf8[0]);++i){for(cap=0;cap<=24;++cap)call("decode",from,&utf8[i],cap,FALSE,TRUE);call("decode",from,&utf8[i],0,TRUE,TRUE);call("decode",from,&utf8[i],1,TRUE,TRUE);call("decode",from,&utf8[i],32,FALSE,FALSE);call("decode",from,&utf8[i],0,TRUE,FALSE);}
     for(i=0;i<sizeof(utf16)/sizeof(utf16[0]);++i){for(cap=0;cap<=24;++cap)call("encode",to,&utf16[i],cap,FALSE,TRUE);call("encode",to,&utf16[i],0,TRUE,TRUE);call("encode",to,&utf16[i],1,TRUE,TRUE);call("encode",to,&utf16[i],32,FALSE,FALSE);call("encode",to,&utf16[i],0,TRUE,FALSE);}
