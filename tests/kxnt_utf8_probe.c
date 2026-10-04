@@ -261,6 +261,7 @@ int main(int argc,char **argv) {
         fprintf(out,"ExternalObservationReady=1 PID=%lu\n",GetCurrentProcessId());fflush(out);Sleep(3000);
     }
     steady_cases();
+    if(externalObservation){fprintf(out,"ExternalObservationReady=2 PID=%lu\n",GetCurrentProcessId());fflush(out);Sleep(3000);}
     if(lookupControl){fprintf(out,"Failures=%u Result=%s\n",failures,failures?"FAIL":"CONTROL");fclose(out);return failures?1:0;}
     for(i=0;i<sizeof(utf8)/sizeof(utf8[0]);++i){for(cap=0;cap<=24;++cap)call("decode",from,&utf8[i],cap,FALSE,TRUE);call("decode",from,&utf8[i],0,TRUE,TRUE);call("decode",from,&utf8[i],1,TRUE,TRUE);call("decode",from,&utf8[i],32,FALSE,FALSE);call("decode",from,&utf8[i],0,TRUE,FALSE);}
     for(i=0;i<sizeof(utf16)/sizeof(utf16[0]);++i){for(cap=0;cap<=24;++cap)call("encode",to,&utf16[i],cap,FALSE,TRUE);call("encode",to,&utf16[i],0,TRUE,TRUE);call("encode",to,&utf16[i],1,TRUE,TRUE);call("encode",to,&utf16[i],32,FALSE,FALSE);call("encode",to,&utf16[i],0,TRUE,FALSE);}

@@ -12,24 +12,25 @@ typedef struct {USHORT length,maximum;PWSTR buffer;} NAME;
 typedef struct {PVOID object;ULONG_PTR pid,handle;ULONG access;USHORT trace,type;ULONG flags,reserved;} ENTRY;
 typedef struct {ULONG_PTR count,reserved;ENTRY entries[1];} TABLE;
 static FILE *out;
-static BOOL ready(PCWSTR path,DWORD pid){
-    FILE *file=_wfopen(path,L"r");char line[512];BOOL found=FALSE;DWORD value;
+static BOOL ready(PCWSTR path,DWORD pid,unsigned stage){
+    FILE *file=_wfopen(path,L"r");char line[512];BOOL found=FALSE;DWORD value,phase;
     if(!file)return FALSE;
-    while(fgets(line,sizeof(line),file))if(sscanf(line,"ExternalObservationReady=1 PID=%lu",&value)==1 && value==pid){found=TRUE;break;}
+    while(fgets(line,sizeof(line),file))if(sscanf(line,"ExternalObservationReady=%lu PID=%lu",&phase,&value)==2 && phase==stage && value==pid){found=TRUE;break;}
     fclose(file);return found;
 }
-static BOOL observe(HANDLE process,DWORD pid){
+static BOOL observe(HANDLE process,DWORD pid,unsigned stage){
     HMODULE native=GetModuleHandleW(L"ntdll.dll");
     QUERY basic=(QUERY)GetProcAddress(native,"NtQueryInformationProcess"),object=(QUERY)GetProcAddress(native,"NtQueryObject");
     SYSTEM_QUERY system=(SYSTEM_QUERY)GetProcAddress(native,"NtQuerySystemInformation");
     PVOID info[6]={0},lock=NULL;SIZE_T read=0;RTL_CRITICAL_SECTION cs;
     MODULEENTRY32W module;HANDLE modules,duplicate=NULL;BOOL owner=FALSE,typed=FALSE,identity=FALSE;DWORD handles=0;
-    BYTE typeBuffer[4096];NAME *type=(NAME*)typeBuffer;ULONG needed=0,capacity=4*1024*1024;TABLE *table=NULL;LONG status;ULONG_PTR i;
+    BYTE typeBuffer[4096];NAME *type=(NAME*)typeBuffer;ULONG needed=0,capacity=4*1024*1024;TABLE *table=NULL;LONG status;ULONG_PTR i,entries=0;
 #ifdef _WIN64
     const ULONG loaderOffset=0x110;
 #else
     const ULONG loaderOffset=0xa0;
 #endif
+    fprintf(out,"ExternalObservationStage=%u\n",stage);
     if(!basic || !object || !system || basic(process,0,info,sizeof(info),NULL)<0 ||
        !ReadProcessMemory(process,(BYTE*)info[1]+loaderOffset,&lock,sizeof(lock),&read) || read!=sizeof(lock) || !lock ||
        !ReadProcessMemory(process,lock,&cs,sizeof(cs),&read) || read!=sizeof(cs))return FALSE;
@@ -44,8 +45,8 @@ static BOOL observe(HANDLE process,DWORD pid){
     fprintf(out,"ExternalLoaderLock PEB=%p Lock=%p Semaphore=%p LockCount=%ld Recursion=%ld NativeOwner=%d PrivateLayout=NT6-diagnostic\n",info[1],lock,cs.LockSemaphore,cs.LockCount,cs.RecursionCount,owner);
     if(owner)fprintf(out,"ExternalNativeModule Base=%p Size=%lu Path=%ls Offset=%Ix\n",module.modBaseAddr,module.modBaseSize,module.szExePath,(ULONG_PTR)lock-(ULONG_PTR)module.modBaseAddr);
     if(!owner)return FALSE;
-    if(!cs.LockSemaphore){fprintf(out,"ExternalSemaphore Absent=1\n");return TRUE;}
-    if(DuplicateHandle(process,cs.LockSemaphore,GetCurrentProcess(),&duplicate,0,FALSE,DUPLICATE_SAME_ACCESS)){
+    if(!cs.LockSemaphore){fprintf(out,"ExternalSemaphore Absent=1\n");typed=TRUE;identity=TRUE;}
+    if(cs.LockSemaphore && DuplicateHandle(process,cs.LockSemaphore,GetCurrentProcess(),&duplicate,0,FALSE,DUPLICATE_SAME_ACCESS)){
         status=object(duplicate,2,typeBuffer,sizeof(typeBuffer),&needed);
         /* Query returns a counted name within this caller-owned buffer. */
         if(status>=0 && (BYTE*)type->buffer>=typeBuffer && (BYTE*)type->buffer<=typeBuffer+sizeof(typeBuffer) && type->length<=sizeof(typeBuffer)-(SIZE_T)((BYTE*)type->buffer-typeBuffer)){
@@ -61,14 +62,34 @@ static BOOL observe(HANDLE process,DWORD pid){
     }while(status==(LONG)0xc0000004 && capacity<=32*1024*1024);
     if(status>=0 && table && table->count<=(capacity-2*sizeof(ULONG_PTR))/sizeof(ENTRY))for(i=0;i<table->count;++i){
         ENTRY *entry=&table->entries[i];if(entry->pid!=pid)continue;
+        ++entries;
         fprintf(out,"ExternalHandle PID=%lu Handle=%Ix Object=%p Access=%08lx LoaderSemaphore=%d\n",pid,entry->handle,entry->object,entry->access,entry->handle==(ULONG_PTR)cs.LockSemaphore);
         if(entry->handle==(ULONG_PTR)cs.LockSemaphore)identity=TRUE;
+        duplicate=NULL;
+        if(DuplicateHandle(process,(HANDLE)entry->handle,GetCurrentProcess(),&duplicate,0,FALSE,DUPLICATE_SAME_ACCESS)){
+            status=object(duplicate,2,typeBuffer,sizeof(typeBuffer),&needed);
+            if(status>=0 && (BYTE*)type->buffer>=typeBuffer && (BYTE*)type->buffer<=typeBuffer+sizeof(typeBuffer) && type->length<=sizeof(typeBuffer)-(SIZE_T)((BYTE*)type->buffer-typeBuffer)){
+                fprintf(out,"ExternalType Handle=%Ix Type=%.*ls\n",entry->handle,type->length/2,type->buffer);
+                if(type->length==12 && !memcmp(type->buffer,L"Thread",12)){
+                    QUERY thread=(QUERY)GetProcAddress(native,"NtQueryInformationThread");PVOID startAddress=NULL;DWORD threadExit=0xffffffff;
+                    GetExitCodeThread(duplicate,&threadExit);
+                    if(thread && thread(duplicate,9,&startAddress,sizeof(startAddress),NULL)>=0)fprintf(out,"ExternalThread Handle=%Ix ID=%lu Start=%p Exit=%08lx\n",entry->handle,GetThreadId(duplicate),startAddress,threadExit);
+                }
+                /* Never query arbitrary File names: drivers may block queries. */
+                if(type->length==10 && !memcmp(type->buffer,L"Event",10)){
+                    BYTE nameBuffer[4096];NAME *name=(NAME*)nameBuffer;
+                    if(object(duplicate,1,nameBuffer,sizeof(nameBuffer),&needed)>=0 && (BYTE*)name->buffer>=nameBuffer && (BYTE*)name->buffer<=nameBuffer+sizeof(nameBuffer) && name->length<=sizeof(nameBuffer)-(SIZE_T)((BYTE*)name->buffer-nameBuffer))fprintf(out,"ExternalEventName Handle=%Ix Name=%.*ls\n",entry->handle,name->length/2,name->buffer);
+                }
+            }
+            CloseHandle(duplicate);
+        }
     }
+    fprintf(out,"ExternalTable Entries=%Iu\n",entries);fflush(out);
     free(table);return owner && typed && identity;
 }
 int wmain(int argc,WCHAR **argv){
     STARTUPINFOW si;PROCESS_INFORMATION pi;WCHAR command[4096];OSVERSIONINFOEXW version;
-    DWORD start,wait,exitCode=0xffffffff;BOOL verified=FALSE,sameBits=FALSE,targetWow=FALSE,selfWow=FALSE;
+    DWORD start,wait,exitCode=0xffffffff;unsigned stage;BOOL verified=TRUE,sameBits=FALSE,targetWow=FALSE,selfWow=FALSE,seen;
     /* image provider target-log observer-log adapter|control */
     if(argc!=6 || (wcscmp(argv[5],L"adapter") && wcscmp(argv[5],L"control")))return 87;
     out=_wfopen(argv[4],L"w");if(!out)return 2;
@@ -81,10 +102,13 @@ int wmain(int argc,WCHAR **argv){
     if(!CreateProcessW(argv[1],command,NULL,NULL,FALSE,0,NULL,L"C:\\Windows",&si,&pi)){fprintf(out,"CreateProcessError=%lu\n",GetLastError());fclose(out);return 3;}
     fprintf(out,"KXNT_TARGET_PID=%lx\n",pi.dwProcessId);fflush(out);
     sameBits=IsWow64Process(GetCurrentProcess(),&selfWow) && IsWow64Process(pi.hProcess,&targetWow) && selfWow==targetWow;
-    start=GetTickCount();
-    while(sameBits && GetTickCount()-start<45000 && WaitForSingleObject(pi.hProcess,0)==WAIT_TIMEOUT){
-        if(ready(argv[3],pi.dwProcessId)){verified=observe(pi.hProcess,pi.dwProcessId);break;}
-        Sleep(25);
+    for(stage=1;stage<=2;++stage){
+        seen=FALSE;start=GetTickCount();
+        while(sameBits && GetTickCount()-start<20000 && WaitForSingleObject(pi.hProcess,0)==WAIT_TIMEOUT){
+            if(ready(argv[3],pi.dwProcessId,stage)){seen=observe(pi.hProcess,pi.dwProcessId,stage);break;}
+            Sleep(25);
+        }
+        if(!seen){verified=FALSE;break;}
     }
     wait=WaitForSingleObject(pi.hProcess,10000);
     if(wait!=WAIT_OBJECT_0){TerminateProcess(pi.hProcess,0xdead);WaitForSingleObject(pi.hProcess,5000);}
