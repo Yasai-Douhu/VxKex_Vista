@@ -169,7 +169,7 @@ Cleanup:
 int main(int argc,char **argv) {
     HMODULE module,native=GetModuleHandleW(L"ntdll.dll");CONVERT from,to;unsigned i;ULONG cap;char path[MAX_PATH];
     if(argc!=3 && argc!=4)return 2;out=fopen(argv[2],"w");if(!out)return 3;
-    lookupControl=argc==4 && !strcmp(argv[3],"lookup-control");
+    lookupControl=argc==4 && (!strcmp(argv[3],"lookup-control") || !strcmp(argv[3],"lookup-control-observe"));
     SetErrorMode(SEM_FAILCRITICALERRORS|SEM_NOGPFAULTERRORBOX|SEM_NOOPENFILEERRORBOX);
     getstatus=(GET_STATUS)GetProcAddress(native,"RtlGetLastNtStatus");seedstatus=(SET_STATUS)GetProcAddress(native,"RtlSetLastWin32ErrorAndNtStatusFromNtStatus");
     module=!strcmp(argv[1],"native")?native:LoadLibraryA(argv[1]);if(!module || !getstatus || !seedstatus)return 4;
@@ -179,6 +179,11 @@ int main(int argc,char **argv) {
     if(GetModuleHandleW(L"KexDll.dll")){GetModuleFileNameA(GetModuleHandleW(L"KexDll.dll"),path,sizeof(path));fprintf(out,"Implementation=%s\n",path);}
     fprintf(out,"ExportsPresent=1\n");
     parallel_cases(from,to,0);parallel_cases(from,to,1);
+    /* External observer reads only after both original resource measurements.
+       No module/object query is added inside the measured phases. */
+    if(argc==4 && (!strcmp(argv[3],"external-observation") || !strcmp(argv[3],"lookup-control-observe"))){
+        fprintf(out,"ExternalObservationReady=1 PID=%lu\n",GetCurrentProcessId());fflush(out);Sleep(3000);
+    }
     if(lookupControl){fprintf(out,"Failures=%u Result=%s\n",failures,failures?"FAIL":"CONTROL");fclose(out);return failures?1:0;}
     for(i=0;i<sizeof(utf8)/sizeof(utf8[0]);++i){for(cap=0;cap<=24;++cap)call("decode",from,&utf8[i],cap,FALSE,TRUE);call("decode",from,&utf8[i],0,TRUE,TRUE);call("decode",from,&utf8[i],1,TRUE,TRUE);call("decode",from,&utf8[i],32,FALSE,FALSE);call("decode",from,&utf8[i],0,TRUE,FALSE);}
     for(i=0;i<sizeof(utf16)/sizeof(utf16[0]);++i){for(cap=0;cap<=24;++cap)call("encode",to,&utf16[i],cap,FALSE,TRUE);call("encode",to,&utf16[i],0,TRUE,TRUE);call("encode",to,&utf16[i],1,TRUE,TRUE);call("encode",to,&utf16[i],32,FALSE,FALSE);call("encode",to,&utf16[i],0,TRUE,FALSE);}

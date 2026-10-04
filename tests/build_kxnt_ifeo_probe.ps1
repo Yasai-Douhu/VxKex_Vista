@@ -36,6 +36,8 @@ if($Suite -or $RuntimeSuite){
   $table|Set-Content -Encoding UTF8 "$suiteOut\$kind-imports.txt"
  }
 }
+& cl.exe /nologo /MT /O1 /W4 "/Fo$out\utf8-observer.obj" "/Fe$out\utf8-observer-$Architecture.exe" "$PSScriptRoot\kxnt_utf8_external_observer.c" /link /SUBSYSTEM:CONSOLE,6.0
+if($LASTEXITCODE){throw 'External UTF observer failed'}
 if($Architecture -eq 'x64'){
  & cl.exe /nologo /MT /O1 /W4 "/Fo$out\ifeo-deployment.obj" "/Fe$out\ifeo-deployment.exe" "$PSScriptRoot\kxnt_ifeo_deployment_probe.c" /link /SUBSYSTEM:CONSOLE,6.0 advapi32.lib shell32.lib
  if($LASTEXITCODE){throw 'Guarded IFEO driver failed'}

@@ -1003,3 +1003,21 @@ clone exit0、source VMX hash変化なし、clone diskのbounded sparse descript
 [Microsoftのcritical sectionの説明](https://devblogs.microsoft.com/oldnewthing/20061211-00/?p=28763)では競合時に待機用Eventが必要に応じて作られる。今回の診断でnative cacheとの一致を実測したが、通常FAIL runのwarm新Eventを同じ機構と直接同定したわけではない。snapshot内のGetProcAddress / module query / object queryや待機がタイミングへ影響するので、診断PASSを一般UTF資源gateの完成に置き換えない。通常失敗での割当て元を次に捕捉する必要がある。
 
 証跡: docs/validation/kxnt-utf8-loader-snapshot-server.jsonに通常Failed / 初回診断 / 第二回Measuredの原receipt、diagnostic build logs、4組のnative LoaderLock identity解析。productionDLLは変更なし。既存Server失敗、Vistaの通常成功、CDBでの過去イベント観測は別証拠として維持した。元ユーザーVM・原Installer・Releasesは変更していない。WNF / 拡張registry / native32bit OS / 実利用native転送など元監査の残りも引き続き未完了。
+## 2026-10-04: ユーザー指定による Vista VM 再クローン
+
+元Vista VMの停止をVMware REST power_state=poweredOffとvmrunの稼働一覧で確認し、現在状態からfull cloneを新規作成した。既存のcurrent / snapshot検証クローンと証跡は保持。新VMXは C:\Users\YamaR\Documents\Virtual Machines\VxKex-Vista-Reclone-20261004\Vista-Reclone.vmx。元VMXのSHA256がclone前後一致し、clone終了0、独立ディスクの存在を確認した。
+
+新cloneだけnetworkの起動時接続とHGFSを無効化して起動。VistaユーザーのVMware Tools認証とプロセス一覧取得に成功し、unprofiled native-launchでcmd.exe /d /c exit 0のCreateProcess成功 / natural exit0を確認した。新cloneは起動状態で保持。インストーラー適用・製品試験の再実行はこの準備確認に含まない。証跡はfeature worktreeのaudit/KxNtParity/vista-reclone-20261004/receipt.jsonとclone.txt / launch.txt。元VMと以前の検証環境は変更していない。
+## 2026-10-04: UTF parallel 測定後の外部 observer で warm 増加時の native Event を確認
+
+前回は元Vista停止後の再clone作成・起動・native command終了0という検証準備の進捗があった。今回は未完了のServer UTF一般資源gateを継続し、production実装は変更していない。
+
+- tests/kxnt_utf8_external_observer.cを追加。unprofiledな同bitnessプロセスがCreateProcess flags0 / current directory C:\Windowsで実IFEO対象を起動する。UTF fixtureは明示引数を受けた場合だけ、従来のcold / warm測定終了後にready行をflushし3秒待機する。測定中のmodule / object診断API追加はない。通常引数とresource gateは維持した。
+- observerは実PEBをremote readし、NT6診断用LoaderLock pointer offsetから公開critical-section fieldsを読む。module snapshotでnative ntdll ownershipを確認し、Eventのduplicateをobserver内で型検査してduplicateだけ閉じる。元target semaphoreを閉じたり、production DLLへprivate layoutを導入したりしない。global handle表ではtarget PID / handle / opaque object identityを記録。診断はactual NT6 Server / same bitness / observer未注入を要求する。
+- build helperで両形式observerを生成。runnerの-Utf8ObserverはServer clone / RuntimeSuite / 通常fixtureだけを許し、CDB・snapshot・Vistaとの混用を拒否。driverはactual target PIDをobserver logから取得してstatic bindingsを保存する。targetの自然終了と失敗codeを保持し、全体PASS時も診断はMeasured扱い。
+- 第一回はadapter両形式cold0 / warm0でnative loader semaphoreも0、lookup controlはcold1 / warm0でEventが存在した。observerが未作成semaphoreを誤ってdiagnostic failure8として扱ったためdriverFailures2。原receipt Failedを保存。第二回は未作成状態を明示的な有効観測として扱うよう修正し、外部target handle countも追加した。cold対照一致やwarm0のgateは変更していない。
+- 第二回はx64 adapter/controlともcold1 / warm0。x86 adapterはcold0 / warm1 / Failures1、controlはcold1 / warm0。warm増加を初めて外部観測版で再現し、測定後のx86 native LoaderLock.LockSemaphore=0x74がEvent型、target handle表のobject identity=05344040と確認できた。observerは未注入、targetは自然exit1、driverFailures1 / exit1、runnerFailed。測定後のnative Eventとの一致は確認できたが、測定前の同一handleの不存在や割当てstackは未取得であり、以前の全FAILや一般資源問題の解決とは扱わない。
+- UTF値・status・buffer・TLS等4893行は両形式ともhost native比較と完全一致。mainのstatic26binding / early KexDll、SilentExit両形式PASS、実install8copy byte一致、profile4解除、実uninstall / fresh復帰を確認。previous run directoryと全raw結果を保持した。owned Server cloneはsoft shutdown、新Vista再cloneは起動状態で保持した。
+- analyze_kxnt_utf8_external_observer.ps1はFailed receiptの観測だけを別のMeasured結果として解析できる。native product / cleanup / actual binding / 4893完全比較、target PID、同bitness自然終了、native ownership、Event型・handle identityまたは明示未作成を要求する。欠落Observed=0への負対照は拒否。NT10 host上の両形式observerは起動前87で拒否。通常UTF gateを通過したことに置き換えない。
+
+証跡: docs/validation/kxnt-utf8-external-observer-server.jsonに第一回Failed / 第二回Failed原receipt、外部4観測の独立解析、negative rejection、source hashes、Vista再clone準備receiptを収録。raw archivesはaudit/KxNtParity/ifeo-server-utf8-external-20261004-first / second。通常fixtureの両形式ビルドを維持。次はwarm測定前後の識別情報を、測定のタイミングを大きく変えずに取得する必要がある。WNF / 拡張registry / native32bit OS / 必要な未解決native forwarderなど元監査の残件も未完了。

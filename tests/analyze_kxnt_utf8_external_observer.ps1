@@ -1,0 +1,42 @@
+param([Parameter(Mandatory=$true)][string]$Receipt,[Parameter(Mandatory=$true)][string]$Output)
+$ErrorActionPreference='Stop'
+if(Test-Path $Output){throw 'Preserve earlier analysis'}
+$r=Get-Content $Receipt -Raw|ConvertFrom-Json
+if(!$r.Utf8Observer -or $r.Utf8ResourceSnapshot -or $r.ClientVista -or $r.EventTrace -or !$r.RuntimeSuite -or $r.State -notin @('Measured','Failed')){throw 'Require explicit external observation on Server clone'}
+if($r.DriverOutput -notmatch 'OSVersion=6\.0\.[0-9]+ ProductType=3 NativeArchitecture=9 DriverKexDllLoaded=0' -or $r.DriverOutput -notmatch 'PASS fresh deployment state restored' -or @([regex]::Matches($r.DriverOutput,'(?m)^PASS owned IFEO key absent after cleanup')).Count -ne 4){throw 'Native product or cleanup not verified'}
+$unexpected=@($r.DriverOutput -split '\r?\n'|Where-Object {$_ -match '^FAIL ' -and $_ -notmatch '^FAIL (registered static imports and detailed comparisons|native lookup-only resource control completed) Error='})
+if($unexpected.Count -or $r.DebuggerFiles.Count -ne 2 -or $r.EventResults.Count -ne 4){throw 'Non-resource deployment failure or incomplete observation'}
+$results=@()
+foreach($arch in @('x86','x64')){
+ $suite=@($r.SuiteResults|Where-Object {$_.Architecture -eq $arch -and $_.Probe -eq 'utf8'})
+ if($suite.Count -ne 1 -or $suite[0].Bindings -notmatch 'StaticBindingCount=26 Matches=26 EarlyKexDllLoaded=1 Result=PASS'){throw 'Actual static binding missing'}
+ $actual=@($suite[0].Output -split '\r?\n'|Where-Object {$_ -match '^(Call=|Pointer=|Scalars=|Overlap=)'})
+ $expected=@($suite[0].ReferenceOutput -split '\r?\n'|Where-Object {$_ -match '^(Call=|Pointer=|Scalars=|Overlap=)'})
+ if($actual.Count -ne 4893 -or ($actual -join "`n") -cne ($expected -join "`n")){throw 'Conversion semantics differ from native reference'}
+ foreach($mode in @('adapter','control')){
+  $observation=@($r.EventResults|Where-Object {$_.Architecture -eq $arch -and $_.Mode -eq $mode})
+  if($observation.Count -ne 1){throw 'Missing unique observation'}
+  $text=$observation[0].Output
+  $bits=if($arch -eq 'x64'){64}else{32}
+  if($text -notmatch "ObserverBits=$bits KexDllLoaded=0 OS=6\.0 ProductType=3" -or $text -notmatch 'SameBitness=1 Observed=1 TargetWait=00000000 TargetExit=0000000[01]'){throw 'Observer did not read a naturally exiting same-bitness target'}
+  $detail=if($mode -eq 'adapter'){$suite[0].Output}else{$suite[0].LookupControlOutput}
+  $pidMatch=[regex]::Match($text,'KXNT_TARGET_PID=([0-9a-f]+)');$pidValue=[Convert]::ToUInt32($pidMatch.Groups[1].Value,16)
+  if($detail -notmatch "ExternalObservationReady=1 PID=$pidValue\b"){throw 'Observation not linked to measured target'}
+  $loader=[regex]::Match($text,'ExternalLoaderLock PEB=([0-9A-Fa-f]+) Lock=([0-9A-Fa-f]+) Semaphore=([0-9A-Fa-f]+) LockCount=-1 Recursion=0 NativeOwner=1 PrivateLayout=NT6-diagnostic')
+  if(!$loader.Success -or $text -notmatch '(?i)ExternalNativeModule Base=[0-9a-f]+ Size=\d+ Path=C:\\Windows\\(System32|SysWOW64)\\ntdll\.dll Offset=[0-9a-f]+'){throw 'Native loader owner not verified'}
+  $semaphore=[Convert]::ToUInt64($loader.Groups[3].Value,16);$objectIdentity=$null
+  if(!$semaphore){if($text -notmatch 'ExternalSemaphore Absent=1'){throw 'Missing explicit absence observation'}}else{
+   $handle=[regex]::Match($text,"ExternalHandle PID=$pidValue Handle=([0-9a-f]+) Object=([0-9A-Fa-f]+) Access=([0-9a-f]+) LoaderSemaphore=1")
+   if(!$handle.Success -or [Convert]::ToUInt64($handle.Groups[1].Value,16) -ne $semaphore -or $text -notmatch 'ExternalSemaphore Type=Event Status=00000000 DuplicateClosed=1'){throw 'Remote semaphore type/identity not verified'}
+   $objectIdentity=$handle.Groups[2].Value
+  }
+  $calls=if($mode -eq 'adapter'){16000}else{8000};$deltas=@()
+  foreach($phase in @(0,1)){
+   $m=[regex]::Match($detail,"Parallel=4 Phase=$phase Calls=$calls Errors=0 HandleDelta=(-?\d+)")
+   if(!$m.Success){throw 'Parallel conversion/lookup failed or phase missing'}
+   $deltas+=[int]$m.Groups[1].Value
+  }
+  $results+=[pscustomobject]@{Architecture=$arch;Mode=$mode;TargetPID=$pidValue;ColdDelta=$deltas[0];WarmDelta=$deltas[1];LoaderSemaphore=$semaphore;EventObjectIdentity=$objectIdentity;PairResourceGatePassed=$suite[0].Passed;Measured=$true}
+ }
+}
+[pscustomobject]@{State='Measured';SourceReceiptState=$r.State;ReceiptSHA256=(Get-FileHash $Receipt).Hash;Results=$results;Scope='External read after original parallel measurements, with a test-only 3s hold. Conversion reference and actual early IFEO binding verified. Records absent or native loader-lock Event without changing resource gates. Scheduling and absence of a before-phase identity prevent attribution of older failed runs or general resource completion.'}|ConvertTo-Json -Depth 6|Set-Content $Output -Encoding UTF8
