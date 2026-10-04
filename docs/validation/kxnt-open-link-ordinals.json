@@ -1,0 +1,29 @@
+{
+  "BaseCommit": "a49b784",
+  "Results": [
+    {
+      "Path": "Installer/KxNt.dll",
+      "BaselineNames": 2027,
+      "OrdinalChanges": {},
+      "NewExports": {}
+    },
+    {
+      "Path": "Installer/Kex32/KxNt.dll",
+      "BaselineNames": 2067,
+      "OrdinalChanges": {},
+      "NewExports": {}
+    },
+    {
+      "Path": "Installer/KexDll.dll",
+      "BaselineNames": 122,
+      "OrdinalChanges": {},
+      "NewExports": {}
+    },
+    {
+      "Path": "Installer/Kex32/KexDll.dll",
+      "BaselineNames": 122,
+      "OrdinalChanges": {},
+      "NewExports": {}
+    }
+  ]
+}

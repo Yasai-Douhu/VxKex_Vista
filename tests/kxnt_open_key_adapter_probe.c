@@ -37,7 +37,7 @@ int main(int argc,char **argv){
     HMODULE native=GetModuleHandleW(L"ntdll.dll"),provider,implementation;char path[MAX_PATH];HANDLE root=NULL,h;
     STRING name;ATTR a;RESULT before,after;BYTE unaligned[sizeof(ATTR)+16];PVOID guard,readonly;
     ACCESS_MASK access[]={KEY_READ,0,MAXIMUM_ALLOWED,KEY_READ|KEY_WOW64_32KEY,KEY_READ|KEY_WOW64_64KEY};
-    ULONG options[]={1,4,8,12,16,24,32,0xffffffff};unsigned i,j,k;DWORD protect,startCount,endCount;LONG s;BOOL nativePresent;
+    ULONG options[]={1,4,8,12,16,24,32,0xffffffff};unsigned i,j,k,linkOption;DWORD protect,startCount,endCount;LONG s;BOOL nativePresent;
     if(argc!=3)return 2;out=fopen(argv[2],"w");if(!out)return 3;
 #ifdef KXNT_IFEO_IMPORT
     /* This image imports ntdll!NtOpenKeyEx. AVRF must rewrite it before main;
@@ -63,18 +63,18 @@ int main(int argc,char **argv){
     if(old(&root,KEY_READ,&a)<0)return 7;
     guard=VirtualAlloc(NULL,4096,MEM_RESERVE|MEM_COMMIT,PAGE_NOACCESS);readonly=VirtualAlloc(NULL,4096,MEM_RESERVE|MEM_COMMIT,PAGE_READWRITE);if(!guard || !readonly)return 8;
     *(HANDLE*)readonly=(HANDLE)(ULONG_PTR)0x12345678;if(!VirtualProtect(readonly,4096,PAGE_READONLY,&protect))return 9;
-    for(i=0;i<14;++i)for(j=0;j<2;++j)for(k=0;k<5;++k){
+    for(linkOption=0;linkOption<2;++linkOption)for(i=0;i<14;++i)for(j=0;j<2;++j)for(k=0;k<5;++k){
         ATTR *input=&a;PHANDLE output=&h;
         const WCHAR *text=i==1?L"\\Registry\\Machine\\SYSTEM\\CurrentControlSet":i==2?L"\\Registry\\Machine\\SYSTEM\\VxKexMissing_69133742":i==3?L"CurrentControlSet":i==4?L"":L"\\Registry\\Machine\\SYSTEM";
         name.Buffer=(PWSTR)text;name.Length=(USHORT)(wcslen(text)*2);name.Maximum=name.Length;
         ZeroMemory(&a,sizeof(a));a.Length=sizeof(a);a.Root=(i==3 || i==4)?root:NULL;a.Name=&name;a.Attributes=0x40|(j?0x100:0);
         if(i==5)input=NULL;if(i==6)a.Length=0;if(i==7)a.Name=NULL;if(i==8){name.Buffer=(PWSTR)guard;name.Length=name.Maximum=2;}if(i==9)input=(ATTR*)guard;if(i==10)output=NULL;if(i==11){memcpy(unaligned+1,&a,sizeof(a));input=(ATTR*)(unaligned+1);}if(i==12)output=(PHANDLE)readonly;if(i==13)a.Root=(HANDLE)(ULONG_PTR)0x12345678;
         h=(HANDLE)(ULONG_PTR)0x12345678;before=measure(FALSE,output,access[k],input,0);
-        h=(HANDLE)(ULONG_PTR)0x12345678;after=measure(TRUE,output,access[k],input,0);
+        h=(HANDLE)(ULONG_PTR)0x12345678;after=measure(TRUE,output,access[k],input,linkOption?8:0);
         s=memcmp(&before,&after,sizeof(before));if(s)++failures;
-        fprintf(out,"Case=%u Attr=%u Access=%08lx Status=%08lx Match=%d Granted=%08lx Error=%08lx TLS=%08lx\n",i,j,access[k],after.Status,s==0,after.Access,after.Error,after.TLS);
+        fprintf(out,"Case=%u Option=%u Attr=%u Access=%08lx Status=%08lx Match=%d Granted=%08lx Error=%08lx TLS=%08lx\n",i,linkOption?8:0,j,access[k],after.Status,s==0,after.Access,after.Error,after.TLS);
     }
-    if(!nativePresent)for(i=0;i<8;++i){h=(HANDLE)(ULONG_PTR)0x12345678;after=measure(TRUE,&h,KEY_READ,NULL,options[i]);if(after.Status!=(LONG)0xc00000bb || after.Changed)++failures;fprintf(out,"Unsupported=%08lx Status=%08lx OutputUntouched=%d\n",options[i],after.Status,!after.Changed);}
+    if(!nativePresent)for(i=0;i<8;++i){if(options[i]==8)continue;h=(HANDLE)(ULONG_PTR)0x12345678;after=measure(TRUE,&h,KEY_READ,NULL,options[i]);if(after.Status!=(LONG)0xc00000bb || after.Changed)++failures;fprintf(out,"Unsupported=%08lx Status=%08lx OutputUntouched=%d\n",options[i],after.Status,!after.Changed);}
     name.Buffer=L"\\Registry\\Machine\\SYSTEM";name.Length=(USHORT)(wcslen(name.Buffer)*2);name.Maximum=name.Length;ZeroMemory(&a,sizeof(a));a.Length=sizeof(a);a.Name=&name;a.Attributes=0x40;
     if(nativePresent)for(i=0;i<8;++i){
         OPENEX adapter=ex;

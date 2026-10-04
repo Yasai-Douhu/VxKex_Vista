@@ -93,7 +93,7 @@ try {
   if(!$LASTEXITCODE){
    $text=[IO.File]::ReadAllText("$archive\applied-$arch.txt")
    $providerPattern=if($arch -eq 'x86'){'Provider=C:\\VxKex\\Kex32\\KxNt.dll'}else{'Provider=C:\\Windows\\System32\\KxNt.dll'}
-   $passed=$text -match $providerPattern -and $text -match 'StaticImportEqual=1 EarlyKexDllLoaded=1' -and $text -match 'Implementation=C:\\Windows\\(system32|System32|SysWOW64)\\KexDll.dll NativePresent=0 AliasEqual=1' -and [regex]::Matches($text,'(?m)^Case=').Count -eq 140 -and $text -notmatch 'Match=0' -and $text -match 'Repeated=1000 HandleDelta=0' -and [regex]::Matches($text,'(?m)^Unsupported=.*Status=c00000bb OutputUntouched=1').Count -eq 8 -and $text -match 'Failures=0 Result=PASS'
+   $passed=$text -match $providerPattern -and $text -match 'StaticImportEqual=1 EarlyKexDllLoaded=1' -and $text -match 'Implementation=C:\\Windows\\(system32|System32|SysWOW64)\\KexDll.dll NativePresent=0 AliasEqual=1' -and [regex]::Matches($text,'(?m)^Case=').Count -eq 280 -and $text -notmatch 'Match=0' -and $text -match 'Repeated=1000 HandleDelta=0' -and [regex]::Matches($text,'(?m)^Unsupported=.*Status=c00000bb OutputUntouched=1').Count -eq 7 -and $text -match 'Failures=0 Result=PASS'
    $results+=[pscustomobject]@{Architecture=$arch;Passed=$passed;FixtureSHA256=(Get-FileHash "$root\audit\KxNtParity\$arch\KxNtIfeoOpen-$arch.exe").Hash;Output=$text}
   }
  }

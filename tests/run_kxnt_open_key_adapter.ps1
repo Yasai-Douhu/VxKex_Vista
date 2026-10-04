@@ -14,8 +14,8 @@ $rows=@();$state='Incomplete'
 function Guest([string[]]$Arguments){& $VMRun -T ws -gu $GuestUser -gp $GuestPassword @Arguments;if($LASTEXITCODE){throw "VMware failed: $($Arguments[0])"}}
 function Check([string]$Text,[string]$Directory,[int]$Native){
  if($Text -notmatch [regex]::Escape("Provider=$Directory\KxNt.dll") -or $Text -notmatch [regex]::Escape("Implementation=$Directory\KexDll.dll NativePresent=$Native AliasEqual=1")){throw 'Wrong runtime DLL path or native route'}
- if([regex]::Matches($Text,'(?m)^Case=').Count -ne 140 -or $Text -match 'Match=0' -or $Text -notmatch 'Repeated=1000 HandleDelta=0' -or $Text -notmatch 'Failures=0 Result=PASS'){throw 'Native pair/resource comparison failed'}
- if(!$Native -and [regex]::Matches($Text,'(?m)^Unsupported=.*Status=c00000bb OutputUntouched=1').Count -ne 8){throw 'Unimplemented extended option rejection failed'}
+ if([regex]::Matches($Text,'(?m)^Case=').Count -ne 280 -or $Text -match 'Match=0' -or $Text -notmatch 'Repeated=1000 HandleDelta=0' -or $Text -notmatch 'Failures=0 Result=PASS'){throw 'Native pair/resource comparison failed'}
+ if(!$Native -and [regex]::Matches($Text,'(?m)^Unsupported=.*Status=c00000bb OutputUntouched=1').Count -ne 7){throw 'Unimplemented extended option rejection failed'}
  if($Native -and [regex]::Matches($Text,'(?m)^Delegated=.*Match=1').Count -ne 8){throw 'Native extended-option delegation failed'}
 }
 try {
@@ -30,7 +30,7 @@ try {
   Guest @('copyFileFromGuestToHost',$VMX,"$guest\open-key-adapter.txt","$archive\$arch-vm.txt")
   $text=[IO.File]::ReadAllText("$archive\$arch-vm.txt");Check $text $guest 0
   $sources=@{};foreach($file in @('KexDll/openkeyex.c','KexDll/KexDll.def','KxNt/forwards.c','00-Common-Headers/KexDll.h','tests/kxnt_open_key_adapter_probe.c','tests/run_kxnt_open_key_adapter.ps1')){$sources[$file]=(Get-FileHash "$root\$file").Hash}
-  $rows+=[pscustomobject]@{Architecture=$arch;VMX=$VMX;GuestUser=$GuestUser;Hashes=$hashes;SourceSHA256=$sources;HostOutput=$hostText;Output=$text;Scope='OpenOptions=0 only on NT 6.0; native delegation when available; all nonzero options explicitly unsupported on NT 6.0; scratch load, no normal IFEO or backup/restore support'}
+  $rows+=[pscustomobject]@{Architecture=$arch;VMX=$VMX;GuestUser=$GuestUser;Hashes=$hashes;SourceSHA256=$sources;HostOutput=$hostText;Output=$text;Scope='OpenOptions=0 / REG_OPTION_OPEN_LINK on NT 6.0, preserving native OBJECT_ATTRIBUTES; native delegation when available; other nonzero options explicitly unsupported on NT 6.0; scratch load, no normal IFEO or backup/restore support'}
   Write-Host "$arch registry ordinary open: PASS"
  }
  $state='Passed'

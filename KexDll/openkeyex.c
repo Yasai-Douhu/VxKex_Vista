@@ -22,7 +22,11 @@ KEXAPI NTSTATUS NTAPI KexNtOpenKeyEx(
         return ((KEX_OPEN_KEY_EX)Address)(KeyHandle,DesiredAccess,ObjectAttributes,OpenOptions);
     // Preserve native probing, alignment, ACL, relative roots and handle output.
     // Do not capture or modify OBJECT_ATTRIBUTES in user mode.
-    if(!OpenOptions)return NtOpenKey(KeyHandle,DesiredAccess,ObjectAttributes);
+    // Native comparisons of owned registry links show that OBJ_OPENLINK in
+    // ObjectAttributes selects the link itself with options 0 or 8 alike.
+    // Preserve those attributes; do not synthesize OBJ_OPENLINK from option 8.
+    if(!OpenOptions || OpenOptions==8 /* REG_OPTION_OPEN_LINK */)
+        return NtOpenKey(KeyHandle,DesiredAccess,ObjectAttributes);
     // Extended options remain unsupported on NT 6.0. Never create a missing key
     // or silently drop backup/restore privileges or registry virtualization flags.
     return STATUS_NOT_SUPPORTED;
