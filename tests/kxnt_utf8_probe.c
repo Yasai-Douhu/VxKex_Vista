@@ -3,6 +3,7 @@
 #include <windows.h>
 #include <stdio.h>
 #include <string.h>
+#include <intrin.h>
 typedef LONG (WINAPI *CONVERT)(PVOID,ULONG,PULONG,const void*,ULONG);
 typedef LONG (WINAPI *GET_STATUS)(void);
 typedef VOID (WINAPI *SET_STATUS)(LONG);
@@ -43,7 +44,24 @@ static const WCHAR maxunicode[]={0,0x7f,0x80,0x7ff,0x800,0xffff,0xd800,0xdc00,0x
 #define ENTRY(x) {#x,x,sizeof(x)}
 static UTF_INPUT utf8[]={ENTRY(ascii),ENTRY(valid),ENTRY(continuation),ENTRY(truncated2),ENTRY(truncated3),ENTRY(truncated4),ENTRY(overlong2),ENTRY(overlong3),ENTRY(surrogate),ENTRY(overmax),ENTRY(invalidlead),ENTRY(interrupted),ENTRY(extremes),{"empty",ascii,0},{"null-empty",NULL,0},{"null-nonempty",NULL,1}};
 static UTF_INPUT utf16[]={ENTRY(unicode),ENTRY(lonehigh),ENTRY(lonelow),ENTRY(badpair),ENTRY(maxunicode),{"odd",unicode,3},{"odd-one",unicode,1},{"empty",unicode,0},{"null-empty",NULL,0},{"null-nonempty",NULL,2}};
-static CONVERT parallelFrom,parallelTo;static BOOL lookupControl;
+static CONVERT parallelFrom,parallelTo;static BOOL lookupControl,externalObservation;
+typedef struct {PVOID lock;HANDLE semaphore;BOOL read;} LOADER_STATE;
+static LOADER_STATE loaderStates[2][2];static DWORD phaseCounts[2][2];
+static LOADER_STATE loader_state(void){
+    LOADER_STATE state={0};BYTE *peb;
+    /* Explicit NT6 diagnostic mode only. Memory loads, no loader/object API. */
+    __try{
+#ifdef _WIN64
+        peb=(BYTE*)__readgsqword(0x60);
+        state.lock=*(PVOID volatile *)(peb+0x110);
+#else
+        peb=(BYTE*)__readfsdword(0x30);
+        state.lock=*(PVOID volatile *)(peb+0xa0);
+#endif
+        if(state.lock){state.semaphore=((volatile RTL_CRITICAL_SECTION*)state.lock)->LockSemaphore;state.read=TRUE;}
+    }__except(EXCEPTION_EXECUTE_HANDLER){state.read=FALSE;}
+    return state;
+}
 static DWORD WINAPI parallel_worker(PVOID ignored) {
     WCHAR decoded[16];BYTE encoded[32];ULONG actual,i;LONG status;DWORD errors=0;
     static const WCHAR expected[]={0x41,0xa2,0x65e5,0xd83d,0xde00,0};
@@ -74,6 +92,7 @@ static void parallel_cases(CONVERT from,CONVERT to,unsigned phase) {
     KxNtIfeoResourcePhase(phase*2);
 #endif
     GetProcessHandleCount(GetCurrentProcess(),&before);
+    if(externalObservation){phaseCounts[phase][0]=before;loaderStates[phase][0]=loader_state();}
     for(i=0;i<4;++i)threads[i]=CreateThread(NULL,0,parallel_worker,NULL,0,NULL);
     wait=WaitForMultipleObjects(4,threads,TRUE,10000);
     if(wait!=WAIT_OBJECT_0){fprintf(out,"Owned UTF workers failed to finish\n");fflush(out);TerminateProcess(GetCurrentProcess(),9);}
@@ -83,6 +102,7 @@ static void parallel_cases(CONVERT from,CONVERT to,unsigned phase) {
     if(!phase)utf8_snapshot("immediate");
 #endif
     Sleep(100);GetProcessHandleCount(GetCurrentProcess(),&after);
+    if(externalObservation){phaseCounts[phase][1]=after;loaderStates[phase][1]=loader_state();}
 #ifdef KXNT_IFEO_RESOURCE_PHASES
     KxNtIfeoResourcePhase(phase*2+1);
 #endif
@@ -170,6 +190,7 @@ int main(int argc,char **argv) {
     HMODULE module,native=GetModuleHandleW(L"ntdll.dll");CONVERT from,to;unsigned i;ULONG cap;char path[MAX_PATH];
     if(argc!=3 && argc!=4)return 2;out=fopen(argv[2],"w");if(!out)return 3;
     lookupControl=argc==4 && (!strcmp(argv[3],"lookup-control") || !strcmp(argv[3],"lookup-control-observe"));
+    externalObservation=argc==4 && (!strcmp(argv[3],"external-observation") || !strcmp(argv[3],"lookup-control-observe"));
     SetErrorMode(SEM_FAILCRITICALERRORS|SEM_NOGPFAULTERRORBOX|SEM_NOOPENFILEERRORBOX);
     getstatus=(GET_STATUS)GetProcAddress(native,"RtlGetLastNtStatus");seedstatus=(SET_STATUS)GetProcAddress(native,"RtlSetLastWin32ErrorAndNtStatusFromNtStatus");
     module=!strcmp(argv[1],"native")?native:LoadLibraryA(argv[1]);if(!module || !getstatus || !seedstatus)return 4;
@@ -181,7 +202,8 @@ int main(int argc,char **argv) {
     parallel_cases(from,to,0);parallel_cases(from,to,1);
     /* External observer reads only after both original resource measurements.
        No module/object query is added inside the measured phases. */
-    if(argc==4 && (!strcmp(argv[3],"external-observation") || !strcmp(argv[3],"lookup-control-observe"))){
+    if(externalObservation){
+        for(i=0;i<2;++i)fprintf(out,"InlineLoaderState Phase=%u BeforeLock=%p BeforeSemaphore=%p BeforeRead=%d AfterLock=%p AfterSemaphore=%p AfterRead=%d BeforeHandles=%lu AfterHandles=%lu\n",i,loaderStates[i][0].lock,loaderStates[i][0].semaphore,loaderStates[i][0].read,loaderStates[i][1].lock,loaderStates[i][1].semaphore,loaderStates[i][1].read,phaseCounts[i][0],phaseCounts[i][1]);
         fprintf(out,"ExternalObservationReady=1 PID=%lu\n",GetCurrentProcessId());fflush(out);Sleep(3000);
     }
     if(lookupControl){fprintf(out,"Failures=%u Result=%s\n",failures,failures?"FAIL":"CONTROL");fclose(out);return failures?1:0;}

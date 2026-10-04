@@ -1,4 +1,4 @@
-param([Parameter(Mandatory=$true)][string]$Receipt,[Parameter(Mandatory=$true)][string]$Output)
+param([Parameter(Mandatory=$true)][string]$Receipt,[Parameter(Mandatory=$true)][string]$Output,[switch]$RequirePhaseIdentity)
 $ErrorActionPreference='Stop'
 if(Test-Path $Output){throw 'Preserve earlier analysis'}
 $r=Get-Content $Receipt -Raw|ConvertFrom-Json
@@ -36,7 +36,20 @@ foreach($arch in @('x86','x64')){
    if(!$m.Success){throw 'Parallel conversion/lookup failed or phase missing'}
    $deltas+=[int]$m.Groups[1].Value
   }
-  $results+=[pscustomobject]@{Architecture=$arch;Mode=$mode;TargetPID=$pidValue;ColdDelta=$deltas[0];WarmDelta=$deltas[1];LoaderSemaphore=$semaphore;EventObjectIdentity=$objectIdentity;PairResourceGatePassed=$suite[0].Passed;Measured=$true}
+  $phaseStates=@()
+  if($RequirePhaseIdentity){
+   foreach($phase in @(0,1)){
+    $m=[regex]::Match($detail,"InlineLoaderState Phase=$phase BeforeLock=([0-9A-Fa-f]+) BeforeSemaphore=([0-9A-Fa-f]+) BeforeRead=1 AfterLock=([0-9A-Fa-f]+) AfterSemaphore=([0-9A-Fa-f]+) AfterRead=1 BeforeHandles=(\d+) AfterHandles=(\d+)")
+    if(!$m.Success -or [Convert]::ToUInt64($m.Groups[1].Value,16) -ne [Convert]::ToUInt64($loader.Groups[2].Value,16) -or $m.Groups[1].Value -cne $m.Groups[3].Value){throw 'Inline phase lock differs from externally owned native lock'}
+    $beforeSem=[Convert]::ToUInt64($m.Groups[2].Value,16);$afterSem=[Convert]::ToUInt64($m.Groups[4].Value,16)
+    if(($phase -eq 1 -and $afterSem -ne $semaphore) -or ($afterSem -ne 0 -and $afterSem -ne $semaphore) -or ($beforeSem -ne 0 -and $beforeSem -ne $semaphore) -or [int]$m.Groups[6].Value-[int]$m.Groups[5].Value -ne $deltas[$phase]){throw 'Inline state/count inconsistent with measurement or remote semaphore'}
+    $phaseStates+=[pscustomobject]@{Phase=$phase;BeforeSemaphore=$beforeSem;AfterSemaphore=$afterSem;BeforeHandles=[int]$m.Groups[5].Value;AfterHandles=[int]$m.Groups[6].Value;NewNativeEventVerified=($beforeSem -eq 0 -and $afterSem -ne 0 -and $deltas[$phase] -eq 1 -and $null -ne $objectIdentity)}
+   }
+   if($phaseStates[0].AfterSemaphore -ne $phaseStates[1].BeforeSemaphore){throw 'Native semaphore changed between phases'}
+   $targetCount=[regex]::Match($text,'ExternalTargetHandleCount=(\d+)')
+   if(!$targetCount.Success -or [int]$targetCount.Groups[1].Value -ne $phaseStates[1].AfterHandles){throw 'Target handle count changed before external read'}
+  }
+  $results+=[pscustomobject]@{Architecture=$arch;Mode=$mode;TargetPID=$pidValue;ColdDelta=$deltas[0];WarmDelta=$deltas[1];LoaderSemaphore=$semaphore;EventObjectIdentity=$objectIdentity;PairResourceGatePassed=$suite[0].Passed;PhaseStates=$phaseStates;Measured=$true}
  }
 }
-[pscustomobject]@{State='Measured';SourceReceiptState=$r.State;ReceiptSHA256=(Get-FileHash $Receipt).Hash;Results=$results;Scope='External read after original parallel measurements, with a test-only 3s hold. Conversion reference and actual early IFEO binding verified. Records absent or native loader-lock Event without changing resource gates. Scheduling and absence of a before-phase identity prevent attribution of older failed runs or general resource completion.'}|ConvertTo-Json -Depth 6|Set-Content $Output -Encoding UTF8
+[pscustomobject]@{State='Measured';SourceReceiptState=$r.State;PhaseIdentityRequired=[bool]$RequirePhaseIdentity;ReceiptSHA256=(Get-FileHash $Receipt).Hash;Results=$results;Scope='External read after parallel measurements, with a test-only 3s hold and optional inline NT6 semaphore/count state. NewNativeEventVerified identifies the event in the recorded phase; no allocation stack or attribution of older runs, balanced hidden allocations or general resource completion. Resource gates remain unchanged.'}|ConvertTo-Json -Depth 7|Set-Content $Output -Encoding UTF8
