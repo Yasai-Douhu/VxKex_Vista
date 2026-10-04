@@ -9,6 +9,7 @@ param(
  [switch]$Utf8Trace,
  [switch]$ConDrvSuite,
  [switch]$ConDrvTrace,
+ [switch]$ClientVista,
  [string]$VMRun='C:\Program Files\VMware\VMware Workstation\vmrun.exe'
 )
 $ErrorActionPreference='Stop'
@@ -19,6 +20,10 @@ if($RuntimeSuite){if($EventTrace -and !$Utf8Trace){throw 'Select one diagnostic 
 if($EventTrace -and !$Suite){throw 'EventTrace uses the static-import suite fixtures; also specify Suite'}
 $root=Split-Path $PSScriptRoot
 $allowed='C:\Users\YamaR\Documents\Virtual Machines\VxKex-Next-Parity-Test\Server2008-SetupParity.vmx'
+if($ClientVista){
+ $allowed='C:\Users\YamaR\Documents\Virtual Machines\VxKex-Vista-Current-Parity-Test\Vista-CurrentParity.vmx'
+ if($EventTrace){throw 'CDB private-image diagnostics are guarded for the Server clone only'}
+}
 if([IO.Path]::GetFullPath($VMX) -ine $allowed){throw 'This installer-changing runner only accepts the disposable clone, never the user VM'}
 $archive="$root\audit\KxNtParity\ifeo-$RunName";$guest='C:\VxKexProbe\KxNtIfeo'
 if(Test-Path $archive){throw 'Use a fresh RunName to retain earlier evidence'}
@@ -84,10 +89,13 @@ try {
   $debuggerFiles+=[pscustomobject]@{Name='cdb.exe';SHA256=(Get-FileHash "$archive\cdb.exe").Hash}
  }
  [string[]]$driverArgs=@('runProgramInGuest',$VMX,"$guest\deployment.exe");if($ConDrvTrace){$driverArgs+='--condrv-trace'}elseif($ConDrvSuite){$driverArgs+='--condrv-suite'}elseif($Utf8Trace){$driverArgs+='--utf8-trace'}elseif($RuntimeSuite){$driverArgs+='--runtime-suite'}elseif($EventTrace){$driverArgs+='--event-trace'}elseif($Suite){$driverArgs+='--suite'}
+ if($ClientVista){$driverArgs+='--vista'}
  & $VMRun -T ws -gu $GuestUser -gp $GuestPassword @driverArgs
  $driverExit=$LASTEXITCODE
  Guest @('copyFileFromGuestToHost',$VMX,"$guest\deployment.txt","$archive\deployment.txt")
  $driver=[IO.File]::ReadAllText("$archive\deployment.txt")
+ $product=if($ClientVista){1}else{3}
+ if($driver -notmatch "OSVersion=6\.0\.[0-9]+ ProductType=$product NativeArchitecture=9 DriverKexDllLoaded=0"){throw 'Unexpected actual native OS, product or injected driver'}
  foreach($arch in @(if(!$EventTrace -and !$RuntimeSuite -and !$ConDrvSuite){'x86';'x64'})){
   & $VMRun -T ws -gu $GuestUser -gp $GuestPassword copyFileFromGuestToHost $VMX "$guest\applied-$arch.txt" "$archive\applied-$arch.txt"
   if(!$LASTEXITCODE){
@@ -185,5 +193,5 @@ try {
  if($driverExit -ne 0 -or $driver -match '(?m)^FAIL ' -or $driver -notmatch 'Failures=0 Result=PASS' -or (!$EventTrace -and !$RuntimeSuite -and !$ConDrvSuite -and ($results.Count -ne 2 -or ($results|Where-Object {!$_.Passed})))){throw 'IFEO integration or deployment cleanup failed; preserve raw logs'}
  if($EventTrace){if($eventResults.Count -ne $(if($Utf8Trace){1}else{2}) -or ($eventResults|Where-Object {!$_.Measured})){throw 'Incomplete event trace'};$state='Measured'}elseif(!$ConDrvTrace){$state='Passed'}
 } finally {
- [pscustomobject]@{State=$state;VMX=$VMX;GuestUser=$GuestUser;RunName=$RunName;SourceSHA256=$sources;PackageFiles=$files;DriverSHA256=(Get-FileHash "$root\audit\KxNtParity\x64\ifeo-deployment.exe").Hash;DriverExit=$driverExit;DriverOutput=$driver;Results=$results;SuiteIncluded=[bool]$Suite;RuntimeSuite=[bool]$RuntimeSuite;Utf8Trace=[bool]$Utf8Trace;ConDrvSuite=[bool]$ConDrvSuite;ConDrvTrace=[bool]$ConDrvTrace;ZigWriteTraces=$zigTraces;SuiteResults=$suiteResults;EventTrace=[bool]$EventTrace;EventResults=$eventResults;DebuggerFiles=$debuggerFiles;Scope='Disposable Server 2008 clone, native x64 and WOW64; real install/KexCfg/AVRF/static ntdll import rewrite/ordinary-open comparison and optional detailed suite with exact import-slot equality; event trace is observation under CDB and never replaces failed resource gates; no native x86 OS, Vista IFEO or UTF resource completion; binding an API is not proof of its behavior unless covered by the executed detailed probe'}|ConvertTo-Json -Depth 8|Set-Content -Encoding UTF8 "$archive\receipt.json"
+ [pscustomobject]@{State=$state;ClientVista=[bool]$ClientVista;VMX=$VMX;GuestUser=$GuestUser;RunName=$RunName;SourceSHA256=$sources;PackageFiles=$files;DriverSHA256=(Get-FileHash "$root\audit\KxNtParity\x64\ifeo-deployment.exe").Hash;DriverExit=$driverExit;DriverOutput=$driver;Results=$results;SuiteIncluded=[bool]$Suite;RuntimeSuite=[bool]$RuntimeSuite;Utf8Trace=[bool]$Utf8Trace;ConDrvSuite=[bool]$ConDrvSuite;ConDrvTrace=[bool]$ConDrvTrace;ZigWriteTraces=$zigTraces;SuiteResults=$suiteResults;EventTrace=[bool]$EventTrace;EventResults=$eventResults;DebuggerFiles=$debuggerFiles;Scope='Disposable NT6 clone (ClientVista identifies Vista client; otherwise Server 2008), native x64 and WOW64; real install/KexCfg/AVRF/static ntdll import rewrite/ordinary-open comparison and optional detailed suite with exact import-slot equality; event trace is observation under CDB and never replaces failed resource gates; no native x86 OS or general UTF resource completion; Vista client IFEO is proven only by a ClientVista receipt with passed executed probes; binding an API is not proof of its behavior unless covered by the executed detailed probe'}|ConvertTo-Json -Depth 8|Set-Content -Encoding UTF8 "$archive\receipt.json"
 }

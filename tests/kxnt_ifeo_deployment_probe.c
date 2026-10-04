@@ -20,14 +20,16 @@ static DWORD run(PCWSTR file,PCWSTR args){WCHAR command[4096];STARTUPINFOW si;PR
 int main(int argc,char **argv){
  const char marker[]="VxKex setup lifecycle disposable VM 20261001";char data[sizeof(marker)];HANDLE f,token=NULL;DWORD bytes,count;PTOKEN_USER user=NULL;PWSTR sid=NULL;
  WCHAR args[2048],image[MAX_PATH],name[MAX_PATH],profile[MAX_PATH],source[MAX_PATH],dest[MAX_PATH];BOOL attempted=FALSE,profileAttempted[32]={FALSE},zigAttempted[2]={FALSE};unsigned arch,index,test,countTests;
- BOOL runtime=argc==2 && (!strcmp(argv[1],"--runtime-suite") || !strcmp(argv[1],"--utf8-trace"));BOOL trace=argc==2 && (!strcmp(argv[1],"--event-trace") || !strcmp(argv[1],"--utf8-trace"));BOOL suite=runtime || trace || (argc==2 && (!strcmp(argv[1],"--suite") || !strcmp(argv[1],"--condrv-suite") || !strcmp(argv[1],"--condrv-trace")));
+ BOOL clientVista=argc>=2 && !strcmp(argv[argc-1],"--vista");
+ BOOL runtime=argc>=2 && (!strcmp(argv[1],"--runtime-suite") || !strcmp(argv[1],"--utf8-trace"));BOOL trace=argc>=2 && (!strcmp(argv[1],"--event-trace") || !strcmp(argv[1],"--utf8-trace"));BOOL suite=runtime || trace || (argc>=2 && (!strcmp(argv[1],"--suite") || !strcmp(argv[1],"--condrv-suite") || !strcmp(argv[1],"--condrv-trace")));
  OSVERSIONINFOEXW version;SYSTEM_INFO system;
  const WCHAR *arches[]={L"x64",L"x86"};const WCHAR *names[]={L"KexDll.dll",L"KxNt.dll"};
- if(argc!=1 && !suite)return 87;utfTrace=argc==2 && !strcmp(argv[1],"--utf8-trace");consoleTrace=argc==2 && !strcmp(argv[1],"--condrv-trace");consoleSuite=consoleTrace || (argc==2 && !strcmp(argv[1],"--condrv-suite"));countTests=consoleSuite?32:(runtime?30:(suite?26:2));
+ if(argc>3 || (argc==3 && !clientVista) || (argc!=1 && !suite && !(argc==2 && clientVista)))return 87;utfTrace=argc>=2 && !strcmp(argv[1],"--utf8-trace");consoleTrace=argc>=2 && !strcmp(argv[1],"--condrv-trace");consoleSuite=consoleTrace || (argc>=2 && !strcmp(argv[1],"--condrv-suite"));countTests=consoleSuite?32:(runtime?30:(suite?26:2));
  SetErrorMode(SEM_FAILCRITICALERRORS|SEM_NOGPFAULTERRORBOX|SEM_NOOPENFILEERRORBOX);
  out=fopen("C:\\VxKexProbe\\KxNtIfeo\\deployment.txt","w");if(!out)return 2;
  ZeroMemory(&version,sizeof(version));version.dwOSVersionInfoSize=sizeof(version);check(GetVersionExW((OSVERSIONINFOW*)&version),"read actual clone OS version");GetNativeSystemInfo(&system);
  fprintf(out,"OSVersion=%lu.%lu.%lu ProductType=%u NativeArchitecture=%u DriverKexDllLoaded=%d\n",version.dwMajorVersion,version.dwMinorVersion,version.dwBuildNumber,version.wProductType,system.wProcessorArchitecture,GetModuleHandleW(L"KexDll.dll")!=NULL);
+ check(version.dwMajorVersion==6 && version.dwMinorVersion==0 && version.wProductType==(clientVista?VER_NT_WORKSTATION:VER_NT_SERVER) && system.wProcessorArchitecture==PROCESSOR_ARCHITECTURE_AMD64 && !GetModuleHandleW(L"KexDll.dll"),"actual native NT6 product matches requested clone");
  f=CreateFileW(L"C:\\VxKexProbe\\NextParity\\DisposableVM.txt",GENERIC_READ,FILE_SHARE_READ,NULL,OPEN_EXISTING,0,NULL);
  check(f!=INVALID_HANDLE_VALUE && ReadFile(f,data,sizeof(data),&count,NULL) && count==sizeof(marker)-1 && !memcmp(data,marker,count),"exact disposable VM marker");if(f!=INVALID_HANDLE_VALUE)CloseHandle(f);
  check(IsUserAnAdmin(),"elevated operator");

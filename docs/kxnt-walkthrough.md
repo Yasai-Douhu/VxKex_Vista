@@ -917,3 +917,31 @@ tests/kxnt_open_key_adapter_probe.c に KXNT_IFEO_IMPORT 時だけ有効な静�
 証跡: docs/validation/kxnt-open-link-server.jsonに7原receipt・build log・解析結果、kxnt-open-link-ordinals.json。tests/run_kxnt_registry_link_native.ps1は使い捨てVMX / credentials / 未使用RunNameを取り、-Adapterで候補の実path / hashとNativeEx presenceを記録する。tests/analyze_kxnt_open_link.ps1はNativeReceipt / LinkReceipt / AdapterReceipt / IfeoReceipt / 未使用Outputを取り、属性とoptionの独立4組、実opened-name末尾、full fixture一致、各280行、残る拒否7種、static importとcleanupを検査する。既存run_kxnt_ifeo_vm / open_key_adapterの現行gateは280行・拒否7種に更新したが、過去receiptの140行や8拒否の意味・合否は変更しない。
 
 今回完成したのは通常openとOPEN_LINK相当の対応・両形式の意味と通常IFEO境界検証。nativeEx実測は現行ホストであり、全Windows版のregistry差異を網羅したものではない。backup / restoreと権限迂回、任意security descriptor / QOS、registry virtualization、transaction root、削除競合、Vista client IFEO / native32bit OS、UTF一般資源gate、WNFと元監査の残りは未完了。
+
+## 2026-10-04: Vista client 通常 IFEO 検証の準備（未検証）
+
+- 元 Vista VM の CleanEnv_1 が参照する親なしの Vista.vmdk を、vmware-vdiskmanager -r / -t 0 で独立したディスクへ変換した。元の live delta を複製対象にしていない。元 VM の停止・復元・snapshot 統合は行わず、元ディスク descriptor / 更新時刻 / VMSD が変わらないことを確認した。prepare_kxnt_vista_clone.ps1 と audit/KxNtParity/vista-clone-20261004/receipt.json に準備を保存。DiskPrepared は OS と API の検証成功を意味しない。
+- 独立したディスクのみを参照する Vista-SetupParity.vmx を起動し、vmrun list と checkToolsState=running を確認した。ネットワークは無効。通常の full clone は元 VM 起動中のため拒否されたので、この disk-only cold clone を用いた。saved memory state は移植していない。
+- run_kxnt_ifeo_vm.ps1 に ClientVista を追加し、検証専用 Vista VMX の完全一致と native OS 6.0 / ProductType=1 / AMD64 / driver KexDll 未注入を要求する。Server 用の private CDB offset 診断は Vista では拒否する。deployment driver にも native product 確認を追加し、検査失敗時は install 前に終了する。
+- x64 静的 import fixture と変更した deployment driver を VC10 / SDK7.1 で build。vista-ifeo-build-x64.txt にコンパイラー出力を保存。PowerShell runner の構文検査成功。これは Vista runtime 検証を証明しない。
+- Tools 応答後の guest listProcesses は Vista と Administrator の既知資格情報でいずれも Invalid user name or password。保存時点のゲストアカウント確認を依頼した。guest guard 配置、候補 install、通常 IFEO 起動、Vista client API / cleanup はまだ実行していない。原 VM の system DLL と設定は変更していない。
+
+この準備は機能検証の完了として数えない。認証後に通常 open / OPEN_LINK の 280 比較、静的 import / early KexDll、7 unsupported gate、反復資源、実 uninstall を確認し、詳細 suite の behavior 検証へ進める。元監査の残りと既存の資源 gate の失敗履歴は引き続き未完了。
+### Vista clone 準備の続き: 現在状態を full clone
+
+ユーザー確認で CleanEnv1 はパスワード未設定と判明した。現在の元 Vista VM をユーザーが shutdown した後、vmrun list に元 VM が含まれないことを確認し、snapshot パラメーターなしの full clone を新規 VxKex-Vista-Current-Parity-Test に作成した。以前の disk-only clone は soft stop し、ディスクと証跡は削除しなかった。prepare_kxnt_vista_current_clone.ps1 に powered-off / destination未使用 / sourceVMX hash維持 / clone disk参照検査を追加した。
+
+clone exit0、source VMX hash変化なし、clone diskのbounded sparse descriptorにparentCID=ffffffff / parentFileNameHintなしを確認。新cloneのnetwork / HGFSを無効にし、memoryを4GBへ調整してnogui start exit0。証跡はaudit/KxNtParity/vista-current-clone-20261004。準備receiptのClonedNotBootedはcloneコマンド終了時のstateであり、その後のstart成功とguest認証・runtime検証を混同しない。IFEO runnerのClientVista許可先は新しいVista-CurrentParity.vmxへ変更。元VMへは変更を適用していない。新cloneの認証、実OS、既存install baseline、通常IFEOの動作は引き続き未検証。
+新 current-state clone で VMware Tools=running、Vista アカウントで listProcesses 成功。guard / Package を置かない負の pre-install 検査として deployment driver --vista を実行した。native OSVersion=6.0.6002 / ProductType=1 / AMD64 / DriverKexDllLoaded=0、elevated operator、owned IFEO 2key 未登録を確認した。marker未配置とfresh deployment不成立の2FAIL、driver exit1でinstall前に終了した。これは想定した準備ガードの結果であり、API試験のPASSではない。証跡baseline-guard.txt / baseline-guard.json。cloneのC:\VxKexProbe\KxNtIfeoにはこのdriverとlogのみを新規配置した。
+
+認証待ちは解消した。現在状態のcloneには既存VxKexが含まれるため、クリーンな実install検証へ進む前に、clone内だけの既存設定とバイナリのbaselineを保存し、その後の解除処理を記録する必要がある。元Vista VMをuninstallしない。新クローンでは実API動作と実install / uninstallがまだ未検証なので、今回の準備を機能移植完了としてcommitしない。
+## 2026-10-04: Vista client の通常 IFEO で registry open / OPEN_LINK 境界を検証完了
+
+- 現在状態の独立 full clone で native Vista SP2 6.0.6002 / ProductType=1 / AMD64 / driver未注入 / elevated operator を実測。前段のbaselineを保存し、clone内の旧VxKexを実VistaSetup --uninstall-remove / 実operator SIDで除去した。transaction stage=remove-files status0、cmd child natural exit0。元Vista VMのインストールと設定は変更していない。
+- baseline capture 初回はHKCU VXsoft exportが利用できず、command exit12の失敗。native-launch logと取得済みmachine / IFEO regを保存した。二回目はユーザーexportの取得可否を別項目に記録し、HKLM設定 / IFEO export、native command exit0、両形式のsystem KexDll / KxNt 4DLLをhash付きで保存した。UserRegistryExported=falseをキー不在の証明には使わない。これらはclone内のbaseline資料であり、原ユーザー環境のバックアップを完成したとは主張しない。
+- markerなしの前段FAILを専用guest directoryへ保持した後、使い捨てmarkerを明示的に配置。run_kxnt_ifeo_vm -ClientVista は新Vista-CurrentParity.vmxだけを許可し、Serverのprivate CDB offsetsは使わない。通常IFEO fixtureのstatic ntdll!NtOpenKeyEx importは未登録なら2形式ともc0000139、main前に失敗した。
+- 候補を実installし、System32 / SysWOW64 / C:\VxKex / Kex32に置かれたKexDll / KxNt計8copyのbyte一致を確認。実KexCfgで2imageを登録し、main開始時のearly KexDll / static import address一致、実module path、NativePresent=0 / Nt-Zw alias一致を確認した。
+- 両形式それぞれoption0 / 8各140、計280境界caseでnative NtOpenKeyと全MATCH。pointer / alignment / relative root / OBJ_OPENLINK / access / handle出力 / TLSの比較、残るunsupported7種のc00000bb / output untouched、1000通常open反復のhandle delta0、Failures0 / PASS。独立owned registry link生成matrixは以前のServer / host scratch証拠であり、今回Vista IFEOで新生成したとは主張しない。
+- 実KexCfgの2profile解除、実uninstall、C:\VxKex / HKLM product key不在、owned IFEO2key不在、driver exit0 / runner Passedを確認。analyze_kxnt_vista_ifeo.ps1でVista productと280比較、8byte検査、negative control、resource / binding / cleanupを再確認。初回解析は誤ったpackage-root log labelで拒否したので、実driverのlabelに合わせて修正した。製品試験の合否は変更していない。
+
+証跡: docs/validation/kxnt-open-link-vista.json（準備・負guard・baseline・実IFEOの原receipt、build / 解除raw logs、解析）。production DLLは0dcbe68から変更なし。今回完成したのはVista client通常IFEOのregistry open / OPEN_LINK境界であり、詳細RTL / SID / file / alert / performance / SRW / ConDrv suiteのVista runtime、native32bit OS、UTF一般資源gate、backup / restore等の拡張registry flags、WNFと監査の残りは未完了。
