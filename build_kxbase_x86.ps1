@@ -175,6 +175,10 @@ $linkArgs += @(
     "version.lib"
 )
 
+$resource = Join-Path $OUT_DIR "KxBase.res"
+& rc.exe /nologo /i $HDR_DIR /fo $resource (Join-Path $KXBASE_DIR "KxBase.rc")
+if ($LASTEXITCODE) { throw 'KxBase resource compilation failed' }
+$linkArgs += $resource
 Write-Host "  Linking KxBase.dll..." -NoNewline
 & link.exe $linkArgs
 if ($LASTEXITCODE -ne 0) {

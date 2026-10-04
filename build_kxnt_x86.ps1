@@ -136,6 +136,10 @@ $linkArgs += @(
     "shlwapi.lib"
 )
 
+$resource = Join-Path $OUT_DIR "KxNt.res"
+& rc.exe /nologo /i $HDR_DIR /fo $resource (Join-Path $KXNT_DIR "KxNt.rc")
+if ($LASTEXITCODE) { throw 'KxNt resource compilation failed' }
+$linkArgs += $resource
 Write-Host "  Linking KxNt.dll..." -NoNewline
 & link.exe @linkArgs | Out-Host
 if ($LASTEXITCODE -ne 0) {

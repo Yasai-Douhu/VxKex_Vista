@@ -1,0 +1,3174 @@
+{
+  "State": "CandidateStagedVistaCoreRuntimePassed",
+  "Manifest": {
+    "State": "StagedPendingRuntimeVerification",
+    "Version": "2.0.0.2233",
+    "StartedUTC": "2026-10-04T05:35:09.3696799Z",
+    "Package": "C:\\Users\\YamaR\\Desktop\\AI_Datas\\VxKex_Vista_KxNt\\audit\\KxNtRelease-2.0.0.2233-candidate",
+    "Replacements": [
+      {
+        "Path": "KexDll.dll",
+        "Source": "C:\\Users\\YamaR\\Desktop\\AI_Datas\\VxKex_Vista_KxNt\\x64\\Release\\KexDll\\KexDll.dll",
+        "SHA256": "0D93AC4B2B3E4283BA2702B6705A93B1169FABE6057AA2B41FD1AB3228F074B9",
+        "Version": "2.0.0.2233",
+        "Machine": 34404
+      },
+      {
+        "Path": "KxNt.dll",
+        "Source": "C:\\Users\\YamaR\\Desktop\\AI_Datas\\VxKex_Vista_KxNt\\x64\\Release\\KxNt\\KxNt.dll",
+        "SHA256": "E0A5C616CD40A8C1E72A9F52F9C5BECFBB8957F2B13B76F397A704A2DEC6A4EA",
+        "Version": "2.0.0.2233",
+        "Machine": 34404
+      },
+      {
+        "Path": "KxBase.dll",
+        "Source": "C:\\Users\\YamaR\\Desktop\\AI_Datas\\VxKex_Vista_KxNt\\x64\\Release\\KxBase\\KxBase.dll",
+        "SHA256": "1AE510BCC2138DE3862C26FD28F19D4469369FFC8CA37B5CB0BCB02EE116CE03",
+        "Version": "2.0.0.2233",
+        "Machine": 34404
+      },
+      {
+        "Path": "KxAdvapi.dll",
+        "Source": "C:\\Users\\YamaR\\Desktop\\AI_Datas\\VxKex_Vista_KxNt\\x64\\Release\\KxAdvapi\\KxAdvapi.dll",
+        "SHA256": "8EC55EA7068DC3BA9042232F177C3AC7DF7C1B92009A6AE132657DA122644204",
+        "Version": "2.0.0.2233",
+        "Machine": 34404
+      },
+      {
+        "Path": "KxCom.dll",
+        "Source": "C:\\Users\\YamaR\\Desktop\\AI_Datas\\VxKex_Vista_KxNt\\x64\\Release\\KxCom\\KxCom.dll",
+        "SHA256": "0C78CD70553BCE2160EDE24E33218D8443B2E4459D225C04AB17447CA288A4C8",
+        "Version": "2.0.0.2233",
+        "Machine": 34404
+      },
+      {
+        "Path": "KxCrt.dll",
+        "Source": "C:\\Users\\YamaR\\Desktop\\AI_Datas\\VxKex_Vista_KxNt\\x64\\Release\\KxCrt\\KxCrt.dll",
+        "SHA256": "DD9F59A3A85ABC32EA2C4EB555E905F5CF9154F8AFF6C8C18E013CB37F554F70",
+        "Version": "2.0.0.2233",
+        "Machine": 34404
+      },
+      {
+        "Path": "KxCryp.dll",
+        "Source": "C:\\Users\\YamaR\\Desktop\\AI_Datas\\VxKex_Vista_KxNt\\x64\\Release\\KxCryp\\KxCryp.dll",
+        "SHA256": "6CC4174DC7BD5D4A47F466E87DDCE25B63A541933288BC3B6FBE5B82BDA52440",
+        "Version": "2.0.0.2233",
+        "Machine": 34404
+      },
+      {
+        "Path": "KxDw.dll",
+        "Source": "C:\\Users\\YamaR\\Desktop\\AI_Datas\\VxKex_Vista_KxNt\\x64\\Release\\KxDw\\KxDw.dll",
+        "SHA256": "854CEDABAE299DFBDE05DEFE4FEB4634C8FA85353B52CE6D0E34D4751B72A7EC",
+        "Version": "2.0.0.2233",
+        "Machine": 34404
+      },
+      {
+        "Path": "KxDx.dll",
+        "Source": "C:\\Users\\YamaR\\Desktop\\AI_Datas\\VxKex_Vista_KxNt\\x64\\Release\\KxDx\\KxDx.dll",
+        "SHA256": "58CDAABED58A5B8965E39BEC74E0C5BBD7D99B7363A60919776E33E6972DB955",
+        "Version": "2.0.0.2233",
+        "Machine": 34404
+      },
+      {
+        "Path": "KxMi.dll",
+        "Source": "C:\\Users\\YamaR\\Desktop\\AI_Datas\\VxKex_Vista_KxNt\\x64\\Release\\KxMi\\KxMi.dll",
+        "SHA256": "B655426A3F96A1B1D06017C49B9B66955640D21CF73F6784637ECE4FB6ADACAF",
+        "Version": "2.0.0.2233",
+        "Machine": 34404
+      },
+      {
+        "Path": "KxNet.dll",
+        "Source": "C:\\Users\\YamaR\\Desktop\\AI_Datas\\VxKex_Vista_KxNt\\x64\\Release\\KxNet\\KxNet.dll",
+        "SHA256": "42B8C6A7E36C081B1BD2252418618E4012FFBB0E43E5F3AE4AD220FD6BD7C9F7",
+        "Version": "2.0.0.2233",
+        "Machine": 34404
+      },
+      {
+        "Path": "KxSChanl.dll",
+        "Source": "C:\\Users\\YamaR\\Desktop\\AI_Datas\\VxKex_Vista_KxNt\\x64\\Release\\KxSChanl\\KxSChanl.dll",
+        "SHA256": "433ADBCD891F6B8495C6942A114B3823726144F88F3BF008926290C5039A5C06",
+        "Version": "2.0.0.2233",
+        "Machine": 34404
+      },
+      {
+        "Path": "KxUia.dll",
+        "Source": "C:\\Users\\YamaR\\Desktop\\AI_Datas\\VxKex_Vista_KxNt\\x64\\Release\\KxUia\\KxUia.dll",
+        "SHA256": "BC1B0DE32AE83BB417B920B5358EB0D92E4C3473FDB345636E5F2C705EF4E3C2",
+        "Version": "2.0.0.2233",
+        "Machine": 34404
+      },
+      {
+        "Path": "KxUser.dll",
+        "Source": "C:\\Users\\YamaR\\Desktop\\AI_Datas\\VxKex_Vista_KxNt\\x64\\Release\\KxUser\\KxUser.dll",
+        "SHA256": "A053663062A3AB4E31ACEA720AC4C1312965308429BCEFF30D01E3245829C067",
+        "Version": "2.0.0.2233",
+        "Machine": 34404
+      },
+      {
+        "Path": "KexCfg.exe",
+        "Source": "C:\\Users\\YamaR\\Desktop\\AI_Datas\\VxKex_Vista_KxNt\\audit\\KxNtRelease-2.0.0.2233-build\\x64\\KexCfg\\KexCfg.exe",
+        "SHA256": "D01F048449B23F89D3707766EB1E9CBD4CC73A9F8E0F6179A5388465E8C1A96E",
+        "Version": "2.0.0.2233",
+        "Machine": 34404
+      },
+      {
+        "Path": "VxlView.exe",
+        "Source": "C:\\Users\\YamaR\\Desktop\\AI_Datas\\VxKex_Vista_KxNt\\audit\\KxNtRelease-2.0.0.2233-build\\x64\\VxlView\\VxlView.exe",
+        "SHA256": "2A3AA9CDAF7470D3C35D2204CAD92EE9DF8BFD596082175CF66A89E54F895B1F",
+        "Version": "2.0.0.2233",
+        "Machine": 34404
+      },
+      {
+        "Path": "Kex32\\KexDll.dll",
+        "Source": "C:\\Users\\YamaR\\Desktop\\AI_Datas\\VxKex_Vista_KxNt\\Win32\\Release\\KexDll\\KexDll.dll",
+        "SHA256": "7BC0E614566A5762FF8F3DC3991487A25C382FD57E8BDE0A512DDD880FE4CF37",
+        "Version": "2.0.0.2233",
+        "Machine": 332
+      },
+      {
+        "Path": "Kex32\\KxNt.dll",
+        "Source": "C:\\Users\\YamaR\\Desktop\\AI_Datas\\VxKex_Vista_KxNt\\Win32\\Release\\KxNt\\KxNt.dll",
+        "SHA256": "26CF5A00E372A52742AB3655FAD797F8832C7CD1E558C770CFFA997FA026A6C9",
+        "Version": "2.0.0.2233",
+        "Machine": 332
+      },
+      {
+        "Path": "Kex32\\KxBase.dll",
+        "Source": "C:\\Users\\YamaR\\Desktop\\AI_Datas\\VxKex_Vista_KxNt\\Win32\\Release\\KxBase\\KxBase.dll",
+        "SHA256": "497E7D08CF7491B86800667E164D31A8E151BC24548133D9470A0449BB3DA0D2",
+        "Version": "2.0.0.2233",
+        "Machine": 332
+      },
+      {
+        "Path": "Kex32\\KxAdvapi.dll",
+        "Source": "C:\\Users\\YamaR\\Desktop\\AI_Datas\\VxKex_Vista_KxNt\\Win32\\Release\\KxAdvapi\\KxAdvapi.dll",
+        "SHA256": "5E0BDF32422B7289B231E5BF9564BDE357C88EC496C5BA2562B006933B4CD852",
+        "Version": "2.0.0.2233",
+        "Machine": 332
+      },
+      {
+        "Path": "Kex32\\KxCom.dll",
+        "Source": "C:\\Users\\YamaR\\Desktop\\AI_Datas\\VxKex_Vista_KxNt\\Win32\\Release\\KxCom\\KxCom.dll",
+        "SHA256": "6B0CC43619EE6C38F3054B0BB571474EE24C7471D6DECAE9AB923A2E8236B938",
+        "Version": "2.0.0.2233",
+        "Machine": 332
+      },
+      {
+        "Path": "Kex32\\KxCrt.dll",
+        "Source": "C:\\Users\\YamaR\\Desktop\\AI_Datas\\VxKex_Vista_KxNt\\Win32\\Release\\KxCrt\\KxCrt.dll",
+        "SHA256": "08C5DF5751C859635360A4D893F8DFCB909F9AC43BE30EA52C382D194DC601E4",
+        "Version": "2.0.0.2233",
+        "Machine": 332
+      },
+      {
+        "Path": "Kex32\\KxCryp.dll",
+        "Source": "C:\\Users\\YamaR\\Desktop\\AI_Datas\\VxKex_Vista_KxNt\\Win32\\Release\\KxCryp\\KxCryp.dll",
+        "SHA256": "E0321BA9271CFC87838EF90BE109232A8215A8B7402BBC66DDF3A1946A73EF1D",
+        "Version": "2.0.0.2233",
+        "Machine": 332
+      },
+      {
+        "Path": "Kex32\\KxDw.dll",
+        "Source": "C:\\Users\\YamaR\\Desktop\\AI_Datas\\VxKex_Vista_KxNt\\Win32\\Release\\KxDw\\KxDw.dll",
+        "SHA256": "1151AF52FC52930C10DE1CE68EE00BC40EE2DB6C71CCF01DB45E91F2B2D7CAA1",
+        "Version": "2.0.0.2233",
+        "Machine": 332
+      },
+      {
+        "Path": "Kex32\\KxDx.dll",
+        "Source": "C:\\Users\\YamaR\\Desktop\\AI_Datas\\VxKex_Vista_KxNt\\Win32\\Release\\KxDx\\KxDx.dll",
+        "SHA256": "427819532D2257AE59C618D0AD1549D5376EF3A1AB6AEA5E59877BD8BEFE6FA9",
+        "Version": "2.0.0.2233",
+        "Machine": 332
+      },
+      {
+        "Path": "Kex32\\KxMi.dll",
+        "Source": "C:\\Users\\YamaR\\Desktop\\AI_Datas\\VxKex_Vista_KxNt\\Win32\\Release\\KxMi\\KxMi.dll",
+        "SHA256": "16EE2863DA7EECF0F686237662FC7B269C17C20B1E9E23CFBE4E2B565D0DBDBC",
+        "Version": "2.0.0.2233",
+        "Machine": 332
+      },
+      {
+        "Path": "Kex32\\KxNet.dll",
+        "Source": "C:\\Users\\YamaR\\Desktop\\AI_Datas\\VxKex_Vista_KxNt\\Win32\\Release\\KxNet\\KxNet.dll",
+        "SHA256": "51C0CB647A8B411482CEB380A6A85AC36D0147601F5A07C13CDC5DD157576420",
+        "Version": "2.0.0.2233",
+        "Machine": 332
+      },
+      {
+        "Path": "Kex32\\KxSChanl.dll",
+        "Source": "C:\\Users\\YamaR\\Desktop\\AI_Datas\\VxKex_Vista_KxNt\\Win32\\Release\\KxSChanl\\KxSChanl.dll",
+        "SHA256": "6225DF6E2B2512BB9D06E8F33948C0395A6F34AEB9499F576E0CDE41CCF60FD5",
+        "Version": "2.0.0.2233",
+        "Machine": 332
+      },
+      {
+        "Path": "Kex32\\KxUia.dll",
+        "Source": "C:\\Users\\YamaR\\Desktop\\AI_Datas\\VxKex_Vista_KxNt\\Win32\\Release\\KxUia\\KxUia.dll",
+        "SHA256": "020DB1E135B2E6E68EFAFF15E911CEC1D04D7ABDD14D3A661F459970738512A8",
+        "Version": "2.0.0.2233",
+        "Machine": 332
+      },
+      {
+        "Path": "Kex32\\KxUser.dll",
+        "Source": "C:\\Users\\YamaR\\Desktop\\AI_Datas\\VxKex_Vista_KxNt\\Win32\\Release\\KxUser\\KxUser.dll",
+        "SHA256": "4FA9F43C32778D5F234C0104EA09A86C8D18D45B4FF5959842466253471DD65A",
+        "Version": "2.0.0.2233",
+        "Machine": 332
+      },
+      {
+        "Path": "Kex32\\KexCfg.exe",
+        "Source": "C:\\Users\\YamaR\\Desktop\\AI_Datas\\VxKex_Vista_KxNt\\audit\\KxNtRelease-2.0.0.2233-build\\x86\\KexCfg\\KexCfg.exe",
+        "SHA256": "87279EC1D0AF3EAE3C5D740F4C72AF570BE380AA2FEEF7CD5D87220E4ADD789D",
+        "Version": "2.0.0.2233",
+        "Machine": 332
+      },
+      {
+        "Path": "Kex32\\VxlView.exe",
+        "Source": "C:\\Users\\YamaR\\Desktop\\AI_Datas\\VxKex_Vista_KxNt\\audit\\KxNtRelease-2.0.0.2233-build\\x86\\VxlView\\VxlView.exe",
+        "SHA256": "BC1165D259EF14EE2A74BBF1B2C2048A9BC6A59B59E53E33ED3E15210F0BF7B2",
+        "Version": "2.0.0.2233",
+        "Machine": 332
+      },
+      {
+        "Path": "KexShlEx.dll",
+        "Source": "C:\\Users\\YamaR\\Desktop\\AI_Datas\\VxKex_Vista_KxNt\\x64\\Release\\KexShlEx\\KexShlEx.dll",
+        "SHA256": "8210AFBDBB1BF477792826BDE89A54F8C170A0230B7219189C1A5D057BA2C722",
+        "Version": "2.0.0.2233",
+        "Machine": 34404
+      },
+      {
+        "Path": "VistaSetup.exe",
+        "Source": "C:\\Users\\YamaR\\Desktop\\AI_Datas\\VxKex_Vista_KxNt\\audit\\KxNtRelease-2.0.0.2233-build\\x64\\VistaSetup\\VistaSetup.exe",
+        "SHA256": "BF875908113288FE91E6808AB47D5BC9F55D5D0A0DC7CD105EDD938B170BF04E",
+        "Version": "2.0.0.2233",
+        "Machine": 34404
+      },
+      {
+        "Path": "VistaRun.exe",
+        "Source": "C:\\Users\\YamaR\\Desktop\\AI_Datas\\VxKex_Vista_KxNt\\audit\\KxNtRelease-2.0.0.2233-build\\x64\\VistaRun\\VistaRun.exe",
+        "SHA256": "FB8B123268F91D96DA5CEE772560D24114AD58BA6718A830A53CC5E2F70F7422",
+        "Version": null,
+        "Machine": 34404
+      }
+    ],
+    "Files": [
+      {
+        "Path": "Certificates\\ROOT.sst",
+        "Bytes": 134887,
+        "SHA256": "3F39EA1770E162443CDE855B28760FBDC7F7107E3FC9EB7BFAFA61CFD335AFD2"
+      },
+      {
+        "Path": "configure-vscode-vista.cmd",
+        "Bytes": 1131,
+        "SHA256": "230F9B511538ADF626B976AB7D64BDFE869112FF071B585EE95543713553B411"
+      },
+      {
+        "Path": "Enable-Java-Gradle.ps1",
+        "Bytes": 4086,
+        "SHA256": "036CB59A8A9B6FE43BDD5FF2C93BDC2B5AE26853485964EE0EF9141903F8B31F"
+      },
+      {
+        "Path": "Enable-Java-JDK.ps1",
+        "Bytes": 3328,
+        "SHA256": "4C6C4E0FE940799818ABD457CB1C9E523064F66710A3604E3162269265409B50"
+      },
+      {
+        "Path": "install.bat",
+        "Bytes": 3057,
+        "SHA256": "1763E661C9A26E5CC26CBA22233651C8567B510CB1F6C39E74191EF1BFB775D8"
+      },
+      {
+        "Path": "Kex32\\KexCfg.exe",
+        "Bytes": 117760,
+        "SHA256": "87279EC1D0AF3EAE3C5D740F4C72AF570BE380AA2FEEF7CD5D87220E4ADD789D"
+      },
+      {
+        "Path": "Kex32\\KexDll.dll",
+        "Bytes": 260096,
+        "SHA256": "7BC0E614566A5762FF8F3DC3991487A25C382FD57E8BDE0A512DDD880FE4CF37"
+      },
+      {
+        "Path": "Kex32\\KxAdvapi.dll",
+        "Bytes": 56832,
+        "SHA256": "5E0BDF32422B7289B231E5BF9564BDE357C88EC496C5BA2562B006933B4CD852"
+      },
+      {
+        "Path": "Kex32\\KxBase.dll",
+        "Bytes": 144896,
+        "SHA256": "497E7D08CF7491B86800667E164D31A8E151BC24548133D9470A0449BB3DA0D2"
+      },
+      {
+        "Path": "Kex32\\KxCom.dll",
+        "Bytes": 43008,
+        "SHA256": "6B0CC43619EE6C38F3054B0BB571474EE24C7471D6DECAE9AB923A2E8236B938"
+      },
+      {
+        "Path": "Kex32\\KxCrt.dll",
+        "Bytes": 59904,
+        "SHA256": "08C5DF5751C859635360A4D893F8DFCB909F9AC43BE30EA52C382D194DC601E4"
+      },
+      {
+        "Path": "Kex32\\KxCryp.dll",
+        "Bytes": 25600,
+        "SHA256": "E0321BA9271CFC87838EF90BE109232A8215A8B7402BBC66DDF3A1946A73EF1D"
+      },
+      {
+        "Path": "Kex32\\KxDw.dll",
+        "Bytes": 3584,
+        "SHA256": "1151AF52FC52930C10DE1CE68EE00BC40EE2DB6C71CCF01DB45E91F2B2D7CAA1"
+      },
+      {
+        "Path": "Kex32\\KxDx.dll",
+        "Bytes": 29696,
+        "SHA256": "427819532D2257AE59C618D0AD1549D5376EF3A1AB6AEA5E59877BD8BEFE6FA9"
+      },
+      {
+        "Path": "Kex32\\KxMi.dll",
+        "Bytes": 21504,
+        "SHA256": "16EE2863DA7EECF0F686237662FC7B269C17C20B1E9E23CFBE4E2B565D0DBDBC"
+      },
+      {
+        "Path": "Kex32\\KxNet.dll",
+        "Bytes": 35328,
+        "SHA256": "51C0CB647A8B411482CEB380A6A85AC36D0147601F5A07C13CDC5DD157576420"
+      },
+      {
+        "Path": "Kex32\\KxNt.dll",
+        "Bytes": 124928,
+        "SHA256": "26CF5A00E372A52742AB3655FAD797F8832C7CD1E558C770CFFA997FA026A6C9"
+      },
+      {
+        "Path": "Kex32\\KxSChanl.dll",
+        "Bytes": 57856,
+        "SHA256": "6225DF6E2B2512BB9D06E8F33948C0395A6F34AEB9499F576E0CDE41CCF60FD5"
+      },
+      {
+        "Path": "Kex32\\KxUia.dll",
+        "Bytes": 10752,
+        "SHA256": "020DB1E135B2E6E68EFAFF15E911CEC1D04D7ABDD14D3A661F459970738512A8"
+      },
+      {
+        "Path": "Kex32\\KxUser.dll",
+        "Bytes": 113152,
+        "SHA256": "4FA9F43C32778D5F234C0104EA09A86C8D18D45B4FF5959842466253471DD65A"
+      },
+      {
+        "Path": "Kex32\\VxlView.exe",
+        "Bytes": 173568,
+        "SHA256": "BC1165D259EF14EE2A74BBF1B2C2048A9BC6A59B59E53E33ED3E15210F0BF7B2"
+      },
+      {
+        "Path": "Kex64\\dwrw10.dll",
+        "Bytes": 1962856,
+        "SHA256": "FFEC1381D353FCB6107CEB30C7947EA9C6793CA24770193088C4BA8EC7F1B4E6"
+      },
+      {
+        "Path": "KexCfg.exe",
+        "Bytes": 137728,
+        "SHA256": "D01F048449B23F89D3707766EB1E9CBD4CC73A9F8E0F6179A5388465E8C1A96E"
+      },
+      {
+        "Path": "KexDll.dll",
+        "Bytes": 263168,
+        "SHA256": "0D93AC4B2B3E4283BA2702B6705A93B1169FABE6057AA2B41FD1AB3228F074B9"
+      },
+      {
+        "Path": "KexShlEx.dll",
+        "Bytes": 38912,
+        "SHA256": "8210AFBDBB1BF477792826BDE89A54F8C170A0230B7219189C1A5D057BA2C722"
+      },
+      {
+        "Path": "KxAdvapi.dll",
+        "Bytes": 58368,
+        "SHA256": "8EC55EA7068DC3BA9042232F177C3AC7DF7C1B92009A6AE132657DA122644204"
+      },
+      {
+        "Path": "KxBase.dll",
+        "Bytes": 155136,
+        "SHA256": "1AE510BCC2138DE3862C26FD28F19D4469369FFC8CA37B5CB0BCB02EE116CE03"
+      },
+      {
+        "Path": "KxCom.dll",
+        "Bytes": 51712,
+        "SHA256": "0C78CD70553BCE2160EDE24E33218D8443B2E4459D225C04AB17447CA288A4C8"
+      },
+      {
+        "Path": "KxCrt.dll",
+        "Bytes": 55296,
+        "SHA256": "DD9F59A3A85ABC32EA2C4EB555E905F5CF9154F8AFF6C8C18E013CB37F554F70"
+      },
+      {
+        "Path": "KxCryp.dll",
+        "Bytes": 29184,
+        "SHA256": "6CC4174DC7BD5D4A47F466E87DDCE25B63A541933288BC3B6FBE5B82BDA52440"
+      },
+      {
+        "Path": "KxDw.dll",
+        "Bytes": 4096,
+        "SHA256": "854CEDABAE299DFBDE05DEFE4FEB4634C8FA85353B52CE6D0E34D4751B72A7EC"
+      },
+      {
+        "Path": "KxDx.dll",
+        "Bytes": 31744,
+        "SHA256": "58CDAABED58A5B8965E39BEC74E0C5BBD7D99B7363A60919776E33E6972DB955"
+      },
+      {
+        "Path": "KxMi.dll",
+        "Bytes": 22528,
+        "SHA256": "B655426A3F96A1B1D06017C49B9B66955640D21CF73F6784637ECE4FB6ADACAF"
+      },
+      {
+        "Path": "KxNet.dll",
+        "Bytes": 35840,
+        "SHA256": "42B8C6A7E36C081B1BD2252418618E4012FFBB0E43E5F3AE4AD220FD6BD7C9F7"
+      },
+      {
+        "Path": "KxNt.dll",
+        "Bytes": 122880,
+        "SHA256": "E0A5C616CD40A8C1E72A9F52F9C5BECFBB8957F2B13B76F397A704A2DEC6A4EA"
+      },
+      {
+        "Path": "KxSChanl.dll",
+        "Bytes": 71680,
+        "SHA256": "433ADBCD891F6B8495C6942A114B3823726144F88F3BF008926290C5039A5C06"
+      },
+      {
+        "Path": "KxUia.dll",
+        "Bytes": 10752,
+        "SHA256": "BC1B0DE32AE83BB417B920B5358EB0D92E4C3473FDB345636E5F2C705EF4E3C2"
+      },
+      {
+        "Path": "KxUser.dll",
+        "Bytes": 116224,
+        "SHA256": "A053663062A3AB4E31ACEA720AC4C1312965308429BCEFF30D01E3245829C067"
+      },
+      {
+        "Path": "launch-vscode-1.138-vista.cmd",
+        "Bytes": 808,
+        "SHA256": "F45EF0C6C75325757B8C3AB250DD79A8FB5A525E132FBDD85EA2CCD98825079B"
+      },
+      {
+        "Path": "launch-vscode-vista.cmd",
+        "Bytes": 559,
+        "SHA256": "EE32D5CC47E3B17F8E294EE072360B1B8826AEEB7D79A6F023479D2D28CF3E29"
+      },
+      {
+        "Path": "Remove-VxKex-Files.cmd",
+        "Bytes": 1797,
+        "SHA256": "0006F99F0C4210F21E9542BD495CB77ED9C03C5043E6ADEEE069735864541420"
+      },
+      {
+        "Path": "Reset-VxKex-Config.bat",
+        "Bytes": 3111,
+        "SHA256": "343662F01492F66C92AE4291D0153035998FE829EE80FC7E131A696E730F6838"
+      },
+      {
+        "Path": "Reset-VxKex-Config.reg",
+        "Bytes": 4713,
+        "SHA256": "AC5BE68C313EFE0667442EA4883A2B3792FFA6AFD9B96606E2FBD00C1C230917"
+      },
+      {
+        "Path": "Run-VxKexSetup.cmd",
+        "Bytes": 1934,
+        "SHA256": "0BA64FA43E36B1D61A95CF7C741DD0B7FC880DDB90AC6A8A946FDF7FBD95CC02"
+      },
+      {
+        "Path": "VistaPty\\conpty.node",
+        "Bytes": 91136,
+        "SHA256": "ACE86F0F580E2E7D853A13A110FE5D43B050F40143AB283B7B40E28A8FE5A210"
+      },
+      {
+        "Path": "VistaPty\\install.cmd",
+        "Bytes": 230,
+        "SHA256": "699B4459AC7EC229D0BA5E5EB906482D6F301BCD69794FD954237E8E30599704"
+      },
+      {
+        "Path": "VistaPty\\install.ps1",
+        "Bytes": 3027,
+        "SHA256": "109CAE4181546A1FE9A169BC414CD15F08E9739B58CC773D4876A9690375C406"
+      },
+      {
+        "Path": "VistaPty\\NODE-LICENSE",
+        "Bytes": 131885,
+        "SHA256": "1413F0AE4500F1689552909D01CE0D6ACD6A0D8B63869BE9D7CCDC260255EC29"
+      },
+      {
+        "Path": "VistaPty\\README.md",
+        "Bytes": 5922,
+        "SHA256": "15CE14A315D62331FFF22D04568CCBD28991A916407E298B76BB9B757CE0F8F0"
+      },
+      {
+        "Path": "VistaPty\\uninstall.cmd",
+        "Bytes": 234,
+        "SHA256": "C733F7C6523DB251B2095E8ACD0B5BFD9EE6C4EAF4E381B49A3F885CDAB26435"
+      },
+      {
+        "Path": "VistaPty\\uninstall.ps1",
+        "Bytes": 2435,
+        "SHA256": "47D2B8EB06F82528FDF1ED791BAFC006B51688E4B4FB0FAE4A8664944CFB31E3"
+      },
+      {
+        "Path": "VistaPty\\vista-pty-clear.exe",
+        "Bytes": 38400,
+        "SHA256": "240054583E9C57CEAF72F64130BD96F7F2ED49C8903B1ED14B82D618DF60AEEE"
+      },
+      {
+        "Path": "VistaPty\\winpty.dll",
+        "Bytes": 772504,
+        "SHA256": "41095A39C0CB721453AC79FDD83D1509876A10BD5F2FF53ADD9A74764CDCA7F1"
+      },
+      {
+        "Path": "VistaPty\\winpty-agent.exe",
+        "Bytes": 882072,
+        "SHA256": "18C00539B806F469EC3623BAA13F5865CC4044F662B2C201B5A3C4D9F5B8F278"
+      },
+      {
+        "Path": "VistaPty\\WINPTY-LICENSE",
+        "Bytes": 1106,
+        "SHA256": "49C18DB6B32E1EE4F12BE1029DFB88CA6AF973333888CE23103602DCEC96FAE7"
+      },
+      {
+        "Path": "VistaRun.exe",
+        "Bytes": 8192,
+        "SHA256": "FB8B123268F91D96DA5CEE772560D24114AD58BA6718A830A53CC5E2F70F7422"
+      },
+      {
+        "Path": "VistaSetup.exe",
+        "Bytes": 49664,
+        "SHA256": "BF875908113288FE91E6808AB47D5BC9F55D5D0A0DC7CD105EDD938B170BF04E"
+      },
+      {
+        "Path": "VxlView.exe",
+        "Bytes": 182272,
+        "SHA256": "2A3AA9CDAF7470D3C35D2204CAD92EE9DF8BFD596082175CF66A89E54F895B1F"
+      }
+    ],
+    "Sources": [
+      {
+        "Path": "00-Common-Headers/InnoProfile.h",
+        "SHA256": "8CBAD51F9F3EF24DB24BA60948C0C6FD87424F1C9A302553626EB4BC02BED0BC"
+      },
+      {
+        "Path": "00-Common-Headers/KexAssert.h",
+        "SHA256": "D8BF78DE3A3DDF51002F17B332EE10ADF3BD67DEC6351FC31A220D531834F1B3"
+      },
+      {
+        "Path": "00-Common-Headers/KexComm.h",
+        "SHA256": "80E481B0B73C27588D45360F1FF2321A5B053B816CC8D305FB359C4DB186A74E"
+      },
+      {
+        "Path": "00-Common-Headers/KexComp.h",
+        "SHA256": "399F13E9C2A09F1A077E9839B8A8290F4F843BEE8FD6D0A96E295FC964357CEA"
+      },
+      {
+        "Path": "00-Common-Headers/KexCpu.h",
+        "SHA256": "A7E4611D4C312C5EC29F334A0AD4D1356EFDA6A90B642DFF82569B48B9C925E0"
+      },
+      {
+        "Path": "00-Common-Headers/KexDll.h",
+        "SHA256": "A1B5465746620FCD4C2A126CA4B0F1495496F6A231B645BB091B3966F773E9E3"
+      },
+      {
+        "Path": "00-Common-Headers/KexGui.h",
+        "SHA256": "78D7F81B1144A5D8BAD9568D53D8B499279103660822D6759D538A7251FE08BA"
+      },
+      {
+        "Path": "00-Common-Headers/KexLnk.h",
+        "SHA256": "206F6676D31895A6D123AC46E3629246918BC4A55BC956138A87D30FCFC9F101"
+      },
+      {
+        "Path": "00-Common-Headers/KexMls.h",
+        "SHA256": "B3559E8B676B332A811DE9821FE4007C1933C0531A7DEECDF55842A537E4D441"
+      },
+      {
+        "Path": "00-Common-Headers/KexPathCch.h",
+        "SHA256": "17E02A2A8E8E83EC11DCF9BF410AA03EF70276698BDD87E7AB006E22EE6D0516"
+      },
+      {
+        "Path": "00-Common-Headers/KexSmp.h",
+        "SHA256": "3B9BAAA0AF8CBFAE26A8D478B69B03B62268ED005A745CF70A59010F7C8465A1"
+      },
+      {
+        "Path": "00-Common-Headers/KexStatus.h",
+        "SHA256": "36398C22F3E50470B0E913D3E29D5221E734080211B20B8399DC1177D1E1930D"
+      },
+      {
+        "Path": "00-Common-Headers/KexStrSafe.h",
+        "SHA256": "6F320A690003F3B235932A77F3460CF4D60464F0098FA4E649B5D21D3D9FD52F"
+      },
+      {
+        "Path": "00-Common-Headers/KexTypes.h",
+        "SHA256": "2B2DD9F0EE568AD35ADCB94C0A2241CF9DBBD41FCA12B424D9D47382F4D266B5"
+      },
+      {
+        "Path": "00-Common-Headers/KexVer.h",
+        "SHA256": "7C3698D5E403666BB8B26525337F2DD4498D65A0CDD308E275C7A597F576A449"
+      },
+      {
+        "Path": "00-Common-Headers/KexW32ML.h",
+        "SHA256": "5866E1FC4B4942D1825424560E868F67B63889C0612F64B132D0639C351BB615"
+      },
+      {
+        "Path": "00-Common-Headers/KseGuid.h",
+        "SHA256": "25B2B492562AC5FC197870B16E196566269008DF6D5CB78EC8BFE4B84DCFE9ED"
+      },
+      {
+        "Path": "00-Common-Headers/KxBase.h",
+        "SHA256": "63550DC9899D43F733FB859FB5A047924961D4B835873FA103B037E5577CBA65"
+      },
+      {
+        "Path": "00-Common-Headers/KxCfgHlp.h",
+        "SHA256": "67F559E3835695065F5CB9B83C5B3A4B3ED206CDE1102FE7DD182CC4B9FB2C76"
+      },
+      {
+        "Path": "00-Common-Headers/KxCom.h",
+        "SHA256": "608DBDBB677D9558F4384772B1E7164FE458BAD5AE0ABAFC5AFC3D422B5C7546"
+      },
+      {
+        "Path": "00-Common-Headers/KxCryp.h",
+        "SHA256": "F9133529C4EAA414603F4B7FEAC265F7930457BA79CF30E5A1F1801D4E5EDAF7"
+      },
+      {
+        "Path": "00-Common-Headers/KxDx.h",
+        "SHA256": "280B69CC3CA288C008E18EA0ED0AB47E0B622FE61BE40213E2B102BE0AF51690"
+      },
+      {
+        "Path": "00-Common-Headers/KxMi.h",
+        "SHA256": "E6054CCB86FD7018C46BA7E5B1DBF177477D9130BE9430ED78B1B1A33D1B8E98"
+      },
+      {
+        "Path": "00-Common-Headers/KxSChanl.h",
+        "SHA256": "5D367A6A154D4128A8B0C86FE2B28CBA768FEAF46429A3BB1E3A700978AA56F4"
+      },
+      {
+        "Path": "00-Common-Headers/KxUser.h",
+        "SHA256": "5D278302DD0637C096FDFB7E090DA1DA852DC2A3072F2E7DF536762AB47DE7F4"
+      },
+      {
+        "Path": "00-Common-Headers/NtDll.h",
+        "SHA256": "DD9B4E07661D7AB647B6701C3A3A4E7AD69F1A67098E6E5730D2904630B816B2"
+      },
+      {
+        "Path": "00-Common-Headers/NtKrnl.h",
+        "SHA256": "D37E68BB27D28641025FDC8C81FCA87EAA4213058251E7428FCE0AC30E34CC42"
+      },
+      {
+        "Path": "00-Common-Headers/NtStrSafe.h",
+        "SHA256": "72FEFFA09B40A976F2BC91BA17B3F624A1053982E31C12C3D904E8110C167F67"
+      },
+      {
+        "Path": "00-Common-Headers/SafeAlloc.h",
+        "SHA256": "62A41448F796FD519EED00792C56C8228506359194DA4CE73E85701D916D746C"
+      },
+      {
+        "Path": "00-Common-Headers/VistaLaunch.h",
+        "SHA256": "331ED1715989E86D591A1DB85B79873BBECAF3840B94C96675D39FEED0375693"
+      },
+      {
+        "Path": "00-Common-Headers/ZigNtIoProfile.h",
+        "SHA256": "98426DCE73BD6A1F40286C4EEB749645952F6C578B082D343AB3FC52AB26243C"
+      },
+      {
+        "Path": "00-Common-Headers/vautogen.h",
+        "SHA256": "476B2E58F6FAFDB654976B3F73596DA41220F1C0A167482F97EE5D4956FD9B44"
+      },
+      {
+        "Path": "Installer/Enable-Java-Gradle.ps1",
+        "SHA256": "036CB59A8A9B6FE43BDD5FF2C93BDC2B5AE26853485964EE0EF9141903F8B31F"
+      },
+      {
+        "Path": "Installer/Enable-Java-JDK.ps1",
+        "SHA256": "4C6C4E0FE940799818ABD457CB1C9E523064F66710A3604E3162269265409B50"
+      },
+      {
+        "Path": "Installer/VistaPty/install.ps1",
+        "SHA256": "109CAE4181546A1FE9A169BC414CD15F08E9739B58CC773D4876A9690375C406"
+      },
+      {
+        "Path": "Installer/VistaPty/uninstall.ps1",
+        "SHA256": "47D2B8EB06F82528FDF1ED791BAFC006B51688E4B4FB0FAE4A8664944CFB31E3"
+      },
+      {
+        "Path": "KexCfg/KexCfg.manifest",
+        "SHA256": "DA7EAAA9C41BFB4D85F5964D46908C8A3F14F51F573A64551963FD53A0A21CDD"
+      },
+      {
+        "Path": "KexCfg/KexCfg.rc",
+        "SHA256": "F6AEE13FC976AAE94BF7C9B88548103526E9C9A6F7CC04C02DFE5A857A7B6CD4"
+      },
+      {
+        "Path": "KexCfg/buildcfg.h",
+        "SHA256": "766C2B920CC6BF2BC87D62B0105C2BA91F66583925628D0D7BB9F8293785B892"
+      },
+      {
+        "Path": "KexCfg/bulk.c",
+        "SHA256": "16739AC50CBB14E2D37870E51E890C6B34CAC0EA111C40A1B2BB0AD09C33922B"
+      },
+      {
+        "Path": "KexCfg/global.c",
+        "SHA256": "968D0E617E25748B57CFC52D0A64A20F61F4FF7AD7B5C69F7040497758B8FE6D"
+      },
+      {
+        "Path": "KexCfg/gui.c",
+        "SHA256": "E05407BD3C9C82E99DAE581D053A09C609130610CAD93DA1CAFDFE6EC47C7D9C"
+      },
+      {
+        "Path": "KexCfg/kexcfg.h",
+        "SHA256": "B21291C691AC8C8938FABDCEDC575DB20A48EC492525310A1EAB4F7814F3FC03"
+      },
+      {
+        "Path": "KexCfg/main.c",
+        "SHA256": "28830A0342D724A1119E70CBF7B53915203FCBD7A64D7961F9D90C297E07FB7F"
+      },
+      {
+        "Path": "KexCfg/resource.h",
+        "SHA256": "A28605F59863FD2C0A28584EFBC02000679C6FAE505C658711DB5615897042F2"
+      },
+      {
+        "Path": "KexCfg/writer.c",
+        "SHA256": "AA4AA9EB3BB7AD620DBA664423ED1012D305DA7B424631F793AE91448FD44AAB"
+      },
+      {
+        "Path": "KexDll/KexDll.def",
+        "SHA256": "8AB34C45A995277581B521E4C707E29669F8EAC7133D90A7623501E8E17E8AED"
+      },
+      {
+        "Path": "KexDll/KexDll.rc",
+        "SHA256": "939CC8C22991FE08A24244F80480DE047C8950F1CBD1AB94BE136520136A38B1"
+      },
+      {
+        "Path": "KexDll/apiset.c",
+        "SHA256": "350D4C045E8E1DCE67902C7182B8C930BCDDEEB4E97B0B269DBBB354E6AD7015"
+      },
+      {
+        "Path": "KexDll/ash.c",
+        "SHA256": "C3F2D6AE55DCE5F546884BF2A2B1A3B02A062AD73158F4D0572194C9E98F355F"
+      },
+      {
+        "Path": "KexDll/ashcrsup.c",
+        "SHA256": "D2A64AB6A8C2C65937C32EF297FA133527047B09CB470A6C642BFEFEDB739C37"
+      },
+      {
+        "Path": "KexDll/ashselec.c",
+        "SHA256": "F71480D74021FE1E88F6EF75D5FC9C55E8AD0ADD42BA8BFC8D2EB481A7D46838"
+      },
+      {
+        "Path": "KexDll/avrf.c",
+        "SHA256": "75FFFE04F56C083DDC81E947998D679DFC9E90B3079A860A042FA563EC634FFE"
+      },
+      {
+        "Path": "KexDll/buildcfg.h",
+        "SHA256": "CCF00BCDE6BE0466A163E876AB70D60C844BC5C62F8A06B24EA1B1F52B81AFB4"
+      },
+      {
+        "Path": "KexDll/cpiwbypa.c",
+        "SHA256": "7BB814E67DCAC9E13E85F21DA47601B70480DBA4675DBCA81CB855F65E841547"
+      },
+      {
+        "Path": "KexDll/critsect.c",
+        "SHA256": "E70923F7A3A92E3579DD9BE67264246CEF5A4BCAE46BEA340D7B72F492D4D165"
+      },
+      {
+        "Path": "KexDll/dllmain.c",
+        "SHA256": "398154336E897829FF20C80B80959DC64316B55ABC0D94182F0FA717E4011AC9"
+      },
+      {
+        "Path": "KexDll/dllnotif.c",
+        "SHA256": "718EC50A5961D40F97DCCE3567F07DA05E9D0B053C012BE7523849A2061F8B7C"
+      },
+      {
+        "Path": "KexDll/dllpath.c",
+        "SHA256": "711B9C85F378C3467B216B987E5F30312A34F750188E35A545C09465BCC69676"
+      },
+      {
+        "Path": "KexDll/dllrewrt.c",
+        "SHA256": "ED8237F0FB0ACBE0694CAC941A7AC72E3E47D4BBD72B0B328F51CA62863EE5A7"
+      },
+      {
+        "Path": "KexDll/dload.c",
+        "SHA256": "92A4ACAFC2DC9D2117912BA0820D65003C9CFCE9E42984EBFC9C6B5E700641E7"
+      },
+      {
+        "Path": "KexDll/etw.c",
+        "SHA256": "DFA90AC5AEFFB3C3A4550220FBABBE7E073F066770FB7F35765259EFBBD19599"
+      },
+      {
+        "Path": "KexDll/except.c",
+        "SHA256": "243958D6044520E24AD4C2BB239D6BBD6781E1E6C82FB9382BC4795ACEA8D828"
+      },
+      {
+        "Path": "KexDll/kexdata.c",
+        "SHA256": "B861E926416F583602A7449605086CF046082F21372CA66BBCE8F2E17B5D766C"
+      },
+      {
+        "Path": "KexDll/kexdllp.h",
+        "SHA256": "BC2B9743231A3074012D7E77F685DAB96204C2A9DEB2BA9F93435E6F2220859C"
+      },
+      {
+        "Path": "KexDll/kexhe.c",
+        "SHA256": "AFE3A6968E97DE5D2DBA7F5F8BA93A32760CF1506487736E8385CD0A1B60CF38"
+      },
+      {
+        "Path": "KexDll/kexhk.c",
+        "SHA256": "ED61D6F04791AF58CB1662853826C1B263B6847D60AE7E42C702A86250D25074"
+      },
+      {
+        "Path": "KexDll/kexldr.c",
+        "SHA256": "8C095AAAC6496801FD6A1085D87CACD5FA1D12091A361795B9DC49BBDA0CFF88"
+      },
+      {
+        "Path": "KexDll/kexrtl.c",
+        "SHA256": "51B2A31989D82C34B036F2A7E276BFE8C471D82102107741BFCE5D00A0C0CBED"
+      },
+      {
+        "Path": "KexDll/logging.c",
+        "SHA256": "4728EC09AB52AEECD553E075BF9AD3C069167E8E2963737B7F222107DA34D17E"
+      },
+      {
+        "Path": "KexDll/ntalrtid.c",
+        "SHA256": "D243A9BC7B6F9795140AC9256F660029983625C07237A9A50CA42F297C8803DC"
+      },
+      {
+        "Path": "KexDll/ntcondrv.c",
+        "SHA256": "175D6D50FD82DE4501C33C964FD7BFBB6FF044D901798C0A88E604837FD38C8A"
+      },
+      {
+        "Path": "KexDll/ntfile.c",
+        "SHA256": "15186E991DC071B347D6709D66A91F4FE2588550687CEA7587B33A40CD4BE6B3"
+      },
+      {
+        "Path": "KexDll/ntjob.c",
+        "SHA256": "71A9ACE4A03CCD55F4400B1C581212C4987D5512C39D1FDD084A37B03A069A79"
+      },
+      {
+        "Path": "KexDll/ntobj.c",
+        "SHA256": "AB65E579601B60F6158D2049DFB66C259E345291288744ED2B5F95AD27C026ED"
+      },
+      {
+        "Path": "KexDll/ntpriv.c",
+        "SHA256": "2A3111EE4AB71E1253EE9E119D18CCA3B4A59CABBD598C8FE18ED35394BD31E1"
+      },
+      {
+        "Path": "KexDll/ntps.c",
+        "SHA256": "EFDD12D7D1773400CB6BEE4DB645DC410012FE06B97C2A82C192815CEB0DC616"
+      },
+      {
+        "Path": "KexDll/ntreg.c",
+        "SHA256": "6CAAEC98EECA7B024B8C18E83C6CDE2E76AF3365F7A77DF25726E7AE9362E68F"
+      },
+      {
+        "Path": "KexDll/ntsect.c",
+        "SHA256": "81929C95113B86CE8E881ADC25FA28036542445C329C0779C85B0A730B067E4F"
+      },
+      {
+        "Path": "KexDll/ntthread.c",
+        "SHA256": "C10E05F17C3A7288DDCAC99124B4CBDDA57DF3AB9089FC52F5F819D02CB377F8"
+      },
+      {
+        "Path": "KexDll/ntwnf.c",
+        "SHA256": "149244F0D78DE2656A428165C9A673192DDE217391AF10A1A24FFFE32F9388CA"
+      },
+      {
+        "Path": "KexDll/openkeyex.c",
+        "SHA256": "E8F8B1A5002805AA527691F26A0AEADD1EA6EB332CDEEFDD7BBC42D652CDC826"
+      },
+      {
+        "Path": "KexDll/propagte.c",
+        "SHA256": "C8155D1538766DE6E7C852A398C656B6793E747A00F5D72DCE1C4CB20A0B64CC"
+      },
+      {
+        "Path": "KexDll/redirects.h",
+        "SHA256": "1D915D7240CF6F0E94A52B1E24B90DA44F881F3EFBABC5EFD4B87A3F77072652"
+      },
+      {
+        "Path": "KexDll/rtldomain.c",
+        "SHA256": "75693D8D9D49CD6E440F4B974290DC36E1016ADA8BEBDBFCEC587DEFAC48C0B4"
+      },
+      {
+        "Path": "KexDll/rtlsec.c",
+        "SHA256": "E28C2C8E6AB80C29F8F08226C5E85D5C1F3DAFD3C25A61402E92C5EC621374DA"
+      },
+      {
+        "Path": "KexDll/rtlwoa.c",
+        "SHA256": "1677DDB6428EC1E57D1BC69B302FE8C4271F0D82525081ED863A9DA576D2DCC1"
+      },
+      {
+        "Path": "KexDll/rtlwow64.c",
+        "SHA256": "4E780B54B03CFEBAB51CA8E13E4923A49A3D08C504F43753CCA2E0B19977C79C"
+      },
+      {
+        "Path": "KexDll/srwtry.c",
+        "SHA256": "260188385D977E01352908E44747E5EADCF3CF8AE6DDA37591D53A9B4601CD94"
+      },
+      {
+        "Path": "KexDll/status.c",
+        "SHA256": "63F2C38DD93F68A61C9F06E30434CB1820490A1236A62683E3B8E637E5D0ADFD"
+      },
+      {
+        "Path": "KexDll/syscal.c",
+        "SHA256": "F0892848FF8EC697E880DEB9107D6D0366E8AA78842AFC10958B78B0DBE63F70"
+      },
+      {
+        "Path": "KexDll/syscal64.asm",
+        "SHA256": "83D599C2AE1B52A13D458408980DA44C3D8C6E5F006AEC0AA731D67979FF74E2"
+      },
+      {
+        "Path": "KexDll/utf8.c",
+        "SHA256": "6C8ADF97E185A4BBEDAD65C475E441E0B745AFF7CD372F9FB15E5318307A3978"
+      },
+      {
+        "Path": "KexDll/verspoof.c",
+        "SHA256": "EAF87D16D839071C50888C1B478E8B02C2BC7491B8C3B1D141EE48CCF822EEC6"
+      },
+      {
+        "Path": "KexDll/vxlopcl.c",
+        "SHA256": "744A0DB9230A439C8BFE6DF9C949B9931D736F3DDFDE851F543244ED8A60AAFE"
+      },
+      {
+        "Path": "KexDll/vxlpriv.c",
+        "SHA256": "AC3CA4BD751C9A575EFD5C4AE8971FEFFF0F7109B059663464829136C6F1C9A4"
+      },
+      {
+        "Path": "KexDll/vxlquery.c",
+        "SHA256": "B72AB22C7972CDED07E0C10D6455425D404DE834C558BB16AEF1E009827503E1"
+      },
+      {
+        "Path": "KexDll/vxlread.c",
+        "SHA256": "162B7BA89D97E5DFE98BE5D0E5519C315AF34588F01D0C9137A00AC6B5D2DA11"
+      },
+      {
+        "Path": "KexDll/vxlsever.c",
+        "SHA256": "12B2A1372AE2184009DDEF3DE519F21DBD2AAE4888150C327E464EBE02699737"
+      },
+      {
+        "Path": "KexDll/vxlwrite.c",
+        "SHA256": "C497A65020CF68EB23AA8A159FC8B3A5110C030BF53DCF4B34E1ECED4BED2D32"
+      },
+      {
+        "Path": "KexGui/buildcfg.h",
+        "SHA256": "CD848133B10C6DF623F526BD9023EAA7DACDF82934C0D89C20503FE39FD0836F"
+      },
+      {
+        "Path": "KexGui/ctlsx.c",
+        "SHA256": "F951E8CAD5CC52FD0A1035D394FB3434974F8814AE9C3AD72AA05E78A754C7B3"
+      },
+      {
+        "Path": "KexGui/dpi.c",
+        "SHA256": "039AC51C5D65E5DD10E89DFBDBA22D499EEE6FEF59482388A995B8BB5E477DA3"
+      },
+      {
+        "Path": "KexGui/fldrpkr.c",
+        "SHA256": "1E8E27FFABBAB54FCA94D10049EBBE229E228C7672EEDF711ECB9D95FCA363C4"
+      },
+      {
+        "Path": "KexGui/kexgui.c",
+        "SHA256": "3A0F91EFB5C35933478214E7C512ED1357FC734154CFD807BA2F34BEB66C4E71"
+      },
+      {
+        "Path": "KexGui/locale.c",
+        "SHA256": "392382778BD05B1BD1EA1EAA5DCFCA336C58753AD4AD525A5C81555590FD44FA"
+      },
+      {
+        "Path": "KexGui/mls.c",
+        "SHA256": "669C3FA1CBE7AEDB4ECDA1C95083B79184D10405A55C9A8C15A3FC86DFBB3390"
+      },
+      {
+        "Path": "KexGui/msgbox.c",
+        "SHA256": "F64B2DB51ED4856B05DD4854A5B063A629550F099150FE431B6C8201F798CF23"
+      },
+      {
+        "Path": "KexGui/shprops.c",
+        "SHA256": "E877557A8FE9E13E7379F74F70EA4AE45BD7C730F7F307880B86A1B569881225"
+      },
+      {
+        "Path": "KexGui/window.c",
+        "SHA256": "344957152ABCEBBF62DB9337573BFAA5274DC514733CE0B9BF203E68901BD2D1"
+      },
+      {
+        "Path": "KexGui/wndx.c",
+        "SHA256": "EF9B7E9AEF32DA8D83FE497911881B347941D7E5740C65EDA671BFF6EAC1F792"
+      },
+      {
+        "Path": "KexMLS/buildcfg.h",
+        "SHA256": "C0CFB4D59514A85C0878801643C52B68A63DC0BA918E8A116743C17005B43A12"
+      },
+      {
+        "Path": "KexMLS/mls.c",
+        "SHA256": "A3582B828181CAFCBC7E1BBFA293493F13449FECF543F1EBC214ACA4318716DA"
+      },
+      {
+        "Path": "KexPathCch/buildcfg.h",
+        "SHA256": "8866AEBA84538F5173B058F24A49F0AE16094BED7CDC7C83F95CB43105BFBF3E"
+      },
+      {
+        "Path": "KexPathCch/pathcch.c",
+        "SHA256": "B3E48BAB5C3B5D548C2709F16F5F16F2027E7DB0A331D9A0CDC82CAC1A351FF2"
+      },
+      {
+        "Path": "KexShlEx/KexShlEx.def",
+        "SHA256": "0064B0BBF72E04817651BC8283F029AD4C6768921DF93B0AC02779E8B5E5EFC4"
+      },
+      {
+        "Path": "KexShlEx/KexShlEx.h",
+        "SHA256": "CDD49C28CEF36A2ABD697E13CD67BBC7CE6CCB2C3CE0F69B13477D157CBAAFC0"
+      },
+      {
+        "Path": "KexShlEx/KexShlEx.rc",
+        "SHA256": "575993F1FE6B17A46BBB54D60CA65126BBB8A32B0A81759A43701FC2D2F4F7BB"
+      },
+      {
+        "Path": "KexShlEx/buildcfg.h",
+        "SHA256": "212D1445BB1196A43E24A9799B5E274490D994602C219918FCF6DAA1B09D44D2"
+      },
+      {
+        "Path": "KexShlEx/ckxshlex.c",
+        "SHA256": "291E46077C8F891FD29D862D64C3545FF9BF1AF6B27B1B321CB7B31D7E7A2D0B"
+      },
+      {
+        "Path": "KexShlEx/clsfctry.c",
+        "SHA256": "4DBB42AF5E28C2D5F34ED0B477EBF81BCC9CC3065B6AF5B264FCA964A8196E65"
+      },
+      {
+        "Path": "KexShlEx/dllmain.c",
+        "SHA256": "AA807BA2E01D144CD0AAEDF33DA73D249DBB2E8840169BDCB3A665573CE1B53A"
+      },
+      {
+        "Path": "KexShlEx/gui.c",
+        "SHA256": "C32F76D289DCA615E7695F5F8598B96733619FDB2676531F4FD580DF4DC50DC8"
+      },
+      {
+        "Path": "KexShlEx/lnkfile.c",
+        "SHA256": "933ED1772F46E9FA20DEC14764F6B58BC59A27993D0D296CD16F802AB1FB58A9"
+      },
+      {
+        "Path": "KexShlEx/resource.h",
+        "SHA256": "81EA00C09FD1449C34B10DB8F80735B1B7A305BA2751A87A86E769F37AAE8AAD"
+      },
+      {
+        "Path": "KexSmp/buildcfg.h",
+        "SHA256": "9F1C456918873A6E615A454B4FBBBC6881DC3EE26E0885D8588399BCC7011EBB"
+      },
+      {
+        "Path": "KexSmp/strmap.c",
+        "SHA256": "71C6AB6556B4FDF0B031F04F528A81B5630DEEA87733CE2619DD96B14696F518"
+      },
+      {
+        "Path": "KexW32ML/buildcfg.h",
+        "SHA256": "F4CFE06488ACA369E2601DA73BA038BB2733E5DC9FAEE9C2D8D25DF612B3EAAC"
+      },
+      {
+        "Path": "KexW32ML/file.c",
+        "SHA256": "03C709E734B7C6B5E6C2A1A811FFD7E1983F5880C3076A26E666219F08EA6AB5"
+      },
+      {
+        "Path": "KexW32ML/kexw32ml.c",
+        "SHA256": "D90DDE5005D535BF5B706D381981E71E623FBA8E64BA0BC874C0272F0FDBD9F7"
+      },
+      {
+        "Path": "KexW32ML/registry.c",
+        "SHA256": "3D23BBF5CD77B9EB67EC3E6E69FB9F41F31E5E0F2C614401BB063F080628F131"
+      },
+      {
+        "Path": "KexW32ML/txapi.c",
+        "SHA256": "7F605B82B4A8073D219BE03B86E2ACBC02479126A9C7F7E72DD04B074F2D60CB"
+      },
+      {
+        "Path": "KxAdvapi/buildcfg.h",
+        "SHA256": "02155F7A99D78524D70E87D3CBEC4A14396E6F9965D3EC1F748E45DAA7A8E00E"
+      },
+      {
+        "Path": "KxAdvapi/dllmain.c",
+        "SHA256": "85D1379534FC37A17EC334A2FA7D613F6F739F6838A9FFC869350FE2F0918CC8"
+      },
+      {
+        "Path": "KxAdvapi/forwards.c",
+        "SHA256": "28F544CF1F86B75C4BC3104E2868DE48C15DAF8A941A9567700252E8AA5B1329"
+      },
+      {
+        "Path": "KxAdvapi/kxadvapi.def",
+        "SHA256": "CACABCD1DBD50BBE3B778447D5D2F4B22E4DCA2EF43B884F9E692B01C1B5FBA7"
+      },
+      {
+        "Path": "KxAdvapi/kxadvapi.rc",
+        "SHA256": "86AAC273451453497B0E3EEA3F1EFCBF42364E8BCC6A206F9E72B426AF547564"
+      },
+      {
+        "Path": "KxAdvapi/time.c",
+        "SHA256": "A1E0CB5D000D746F0491CF8350F060D7B1C4A6E6CB579A02A13460A5BA39EC9E"
+      },
+      {
+        "Path": "KxAdvapi/verspoof.c",
+        "SHA256": "0FEF20AEAE4D8F60AF00E4AF70FD48F66B5D64D65411C5729FA44D51E94E2417"
+      },
+      {
+        "Path": "KxBase/KxBase.h",
+        "SHA256": "9B952A501D31072F6AD60B09EBFE59FB805A6B658C022F10A0BB1C1DBF670DEB"
+      },
+      {
+        "Path": "KxBase/KxBase.rc",
+        "SHA256": "BF7C49A9611A4E0241BA92381FA78ABD3B22FD7F899DFE83E30033DE9776426C"
+      },
+      {
+        "Path": "KxBase/appmodel.c",
+        "SHA256": "661AD321D853C10CC23EA336C85D448A22C09F078797ED96E7B768AB6ABBB24B"
+      },
+      {
+        "Path": "KxBase/appstate.c",
+        "SHA256": "9FA28335DD714F2C7141145D7B92B6ADD23C1DFEE946B6A1BC99AFCE63B98DED"
+      },
+      {
+        "Path": "KxBase/buildcfg.h",
+        "SHA256": "FEFF71E2E51A5EEAD104FA6C6B4789C340C1A1F437BD291EB624E84C3DD84A0D"
+      },
+      {
+        "Path": "KxBase/cfgmgr.c",
+        "SHA256": "84515D0C52257C94A9D4883E92DD025B04B78B00EAA90DEA0CED62227931152A"
+      },
+      {
+        "Path": "KxBase/conansi.c",
+        "SHA256": "31D4D13780D22E3F164B00D8A480D5EE05E56EA9FBDE46A360827AE48442903A"
+      },
+      {
+        "Path": "KxBase/console.c",
+        "SHA256": "B2B4D50874098E95230FAD6370A247F796BD009F0152502595F22C776A6D7CD0"
+      },
+      {
+        "Path": "KxBase/consup.c",
+        "SHA256": "22A5642ECE95A38FD041638AF596AD24B984E72AF7E277830ACF39B3F8465F03"
+      },
+      {
+        "Path": "KxBase/critsect.c",
+        "SHA256": "CA42E26AC1C7B5C48E8E981F4684447F6AD090A08951286E0C2B7D8790A81A25"
+      },
+      {
+        "Path": "KxBase/dllmain.c",
+        "SHA256": "6C71D7717434CB96C918A5B5F9260E88B59E3A0D0D146EB375E4C9C57EB0153D"
+      },
+      {
+        "Path": "KxBase/file.c",
+        "SHA256": "B4307FF3CFFBD5410114A3EEA559F0DABFFA2492510866FDE1F7669E576D31FA"
+      },
+      {
+        "Path": "KxBase/forwards.c",
+        "SHA256": "34DCAF78082AF3177758DA8547B837A3FB73E0EE3C06DA34CFCE4DF5978D2601"
+      },
+      {
+        "Path": "KxBase/geoname.c",
+        "SHA256": "B83AB0E9C9F71CA68D181333D703F28072FB76494449F3628611DC4D9090976C"
+      },
+      {
+        "Path": "KxBase/handle.c",
+        "SHA256": "DDE0585D5DD575BA7ECAB090FEE633F08F48B228FC937F1F5EBAA2BB11BFB4DC"
+      },
+      {
+        "Path": "KxBase/heap.c",
+        "SHA256": "9F646E60E07D735B00A119C2A29085DC04C0AC4B1DD208DEE11D2F7033474449"
+      },
+      {
+        "Path": "KxBase/kxbase.def",
+        "SHA256": "61B2B5F88F74EDC22F975C756D0113000C792E98BD4920BF49CAC70427B80361"
+      },
+      {
+        "Path": "KxBase/kxbasep.h",
+        "SHA256": "026D281002FA9ACBB083B26A25027C4473053BBF54514AC831F30D75A31C8793"
+      },
+      {
+        "Path": "KxBase/misc.c",
+        "SHA256": "3976CBDCCDAE398F1B82CF7EEEE3B3FB1DF3FF04521006DA4EA3EFBAF42891BF"
+      },
+      {
+        "Path": "KxBase/module.c",
+        "SHA256": "D24A4D5594B917DB310D18473BCFD021F78B94FF529570947E9AC20DA9A1CABB"
+      },
+      {
+        "Path": "KxBase/process.c",
+        "SHA256": "10C227356922459BFBEB50CBAD2BA55439B3B80B4241AD452FA080A501A33A2C"
+      },
+      {
+        "Path": "KxBase/pssapi.c",
+        "SHA256": "5D77E97CC2BDC78FBEE79625D088486FC3D46F4E3A327E9ED31680C5E3A65BEE"
+      },
+      {
+        "Path": "KxBase/redirects.h",
+        "SHA256": "DFD7AF3746A659FAD40B8574A4108C6ADA003D19238624FF5CD9B59D2DD7EEE7"
+      },
+      {
+        "Path": "KxBase/security.c",
+        "SHA256": "4783B235BE94C3192242ADF5FECE0CFD0739C764CAE86B5FA2E082FF4E9D1590"
+      },
+      {
+        "Path": "KxBase/stubs.c",
+        "SHA256": "42F1780AD280AA64674EBD95A6AD661052844CE9A7465E41DE4F0EF1C12E0648"
+      },
+      {
+        "Path": "KxBase/support.c",
+        "SHA256": "56EEAE36AF66D6C2EC6C1476EF57DB3ACB81C95D33B6FB236A849CF9D8DEAEA5"
+      },
+      {
+        "Path": "KxBase/synch.c",
+        "SHA256": "669198CE1BB0293D3BE34B26B99F4047B31682A0271D2849CF70E2E0ADA975DC"
+      },
+      {
+        "Path": "KxBase/system.c",
+        "SHA256": "9672F9A502540311606F7A7DD8EEABB2785463230CE16D920D55187CD55BA0AB"
+      },
+      {
+        "Path": "KxBase/thread.c",
+        "SHA256": "8973D4531D3678C7BF0139F6833DBC10BB5C3054236E603B39B34D8CA26D0238"
+      },
+      {
+        "Path": "KxBase/time.c",
+        "SHA256": "CA0AA846F4ED248F1EA7DB2DE077BDCA9C498786E20AAED899E3786A6049FD11"
+      },
+      {
+        "Path": "KxBase/token.c",
+        "SHA256": "94BFC49DE98F6F3BCDA151BAC8622C0C05638817DE7F357FDE3EB6D653B1A04C"
+      },
+      {
+        "Path": "KxBase/verspoof.c",
+        "SHA256": "4B40BA9D0EEB79D2A566EF3125925FE4A0539F61605E8D9E77ADC776B77EFEA4"
+      },
+      {
+        "Path": "KxBase/vmem.c",
+        "SHA256": "D75F35B253F62E2C9835A6503D5D0EC2E38799D1146F31176597299570F87ACA"
+      },
+      {
+        "Path": "KxBase/wow64.c",
+        "SHA256": "C08D5545E8026E1AC595B90FDAB9FFECACBA979CDD2A06EF82293BA5222B7DE1"
+      },
+      {
+        "Path": "KxCfgHlp/buildcfg.h",
+        "SHA256": "AB42BC1E8D502EB191E44B62F21DD0293E098E70C9F6035E5261571BED179C80"
+      },
+      {
+        "Path": "KxCfgHlp/cpiwbypa.c",
+        "SHA256": "65B4154A2A5B1891CCF9B4C06D539911B7D5A6F72B89ABAAB8D0D89B5FB045AD"
+      },
+      {
+        "Path": "KxCfgHlp/ctxmenu.c",
+        "SHA256": "1F9ECAC3947BB218FDD7DEDDC809FE7AC3D936A222CA8F2D47279B2459A02F67"
+      },
+      {
+        "Path": "KxCfgHlp/delcfg.c",
+        "SHA256": "A53D5F80ED0AF55D372B30EB14DFC9C9E3B21A2D1930B37CFA1767DB921D130B"
+      },
+      {
+        "Path": "KxCfgHlp/dskclnup.c",
+        "SHA256": "FA6ED67D8543DEDAEC38256947EC1BD3979921A905BB8C5458F7B7473415CE5B"
+      },
+      {
+        "Path": "KxCfgHlp/elevate.c",
+        "SHA256": "FC0C7A6E147573019D5146E15A91E7A3EBEEF3847382EC89C55A506907040325"
+      },
+      {
+        "Path": "KxCfgHlp/getcfg.c",
+        "SHA256": "E01E0C5C9F33613F7D5111F2183A85BA64FE445A00CA0BC280577EB09E534107"
+      },
+      {
+        "Path": "KxCfgHlp/kexdir.c",
+        "SHA256": "C1EB5B73BDDF31A0CC57E71B95BDCCB990EDBF82D4BEDCC5500F74CB642FD646"
+      },
+      {
+        "Path": "KxCfgHlp/kxcfgp.c",
+        "SHA256": "62005FE90BB5113E1A691818972E3100C36600E3B0162C03ABBA90D8587F8B0C"
+      },
+      {
+        "Path": "KxCfgHlp/kxschanl.c",
+        "SHA256": "1128F561A2A6040685C2600AA03CB9BDB6D347E4CC250803778D98856A56BBB6"
+      },
+      {
+        "Path": "KxCfgHlp/logassoc.c",
+        "SHA256": "88B3E59728CAD2887FAFACB70AE11CC7D52A9F231EC1B625711A64BACD683A40"
+      },
+      {
+        "Path": "KxCfgHlp/logging.c",
+        "SHA256": "4755A9911440A187D407F8AEC62B428954C103621E8A08FBB188A6449ADD2A02"
+      },
+      {
+        "Path": "KxCfgHlp/msisup.c",
+        "SHA256": "5D9CCDE4929F4500D495184F8FDDBCA193EB433BA9D918E73DD8AE2A99C7D51D"
+      },
+      {
+        "Path": "KxCfgHlp/openkey.c",
+        "SHA256": "FA6363D9ACD5BBDF44D01990FE8C7751D636143230FD01D37DD3A3D7050CD9F5"
+      },
+      {
+        "Path": "KxCfgHlp/preserve.c",
+        "SHA256": "45BC64E0FC1A205220B3C3C00A7C9C0C47BD8DBF33EE2F36CC0F5BAFB5C11749"
+      },
+      {
+        "Path": "KxCfgHlp/setcfg.c",
+        "SHA256": "EF6E448944B6D8B06894940A3BF5AF69F4E631E901B6E032A9D9F7775EB2196A"
+      },
+      {
+        "Path": "KxCfgHlp/setup.c",
+        "SHA256": "429B753A6FA63AD37B7C707535C2C05D7B2881B713A0A937FC684F05D7D9834A"
+      },
+      {
+        "Path": "KxCfgHlp/setupfile.c",
+        "SHA256": "F21DE05560B6FD3E96DC35D2020D6B98E4CB339DCE7F274B38314848A54B5D6F"
+      },
+      {
+        "Path": "KxCfgHlp/setupreg.c",
+        "SHA256": "CDE7C0112A68CF160451BDA5A0BC5E07EEC8103A5FB956692FF852B34F8A1C2C"
+      },
+      {
+        "Path": "KxCfgHlp/shlsetup.c",
+        "SHA256": "12D0D28AFE5A80463D4CC7102170D0DDC5FB3248B8666CC7834B67C5284009E7"
+      },
+      {
+        "Path": "KxCom/KxCom.rc",
+        "SHA256": "901928703A075D231DA1BB124B85EC6299E906D5E2659649C6612E9F8B02EBD6"
+      },
+      {
+        "Path": "KxCom/actfact.c",
+        "SHA256": "630BA1FA0191AF302AD33DE137F622C492A19E2B409CB2EA5DDDA4CE930C3BA0"
+      },
+      {
+        "Path": "KxCom/buildcfg.h",
+        "SHA256": "C4D2C87237ACFDA00D98A56CA79003A0127936174F15084DC6A3B0DCF155FC3F"
+      },
+      {
+        "Path": "KxCom/dllmain.c",
+        "SHA256": "23B218EEA655FA44219A7474F65CA4E4611774D4E30D3CE0FD7C410E408F094B"
+      },
+      {
+        "Path": "KxCom/firefoxpatch.c",
+        "SHA256": "EE9D32C619B59FA38B0C2F833CE6E1641D7EF1B25F7FAD20D02124B81F05E2A2"
+      },
+      {
+        "Path": "KxCom/forwards.c",
+        "SHA256": "1FD51B6C7C8A2F333FA7BC63E73B7EA1F7B4A00C1768F12D50E7777CE7B01E1C"
+      },
+      {
+        "Path": "KxCom/glprstat.c",
+        "SHA256": "CA20320753A9CD70327AB349BADE1B52409C573F5D14C4BD15C972D4DB4D46DE"
+      },
+      {
+        "Path": "KxCom/kxcom.def",
+        "SHA256": "61FC915A0C026771CF298ED5C85CCF055DFF32BA4FA060B87AC4B278218EFD64"
+      },
+      {
+        "Path": "KxCom/kxcomp.h",
+        "SHA256": "320FC8B47A73EF81E3FCB954C6ACBA5985E4EFC9597FCAC72BB1E8A8BCECA859"
+      },
+      {
+        "Path": "KxCom/launcher.c",
+        "SHA256": "4782FD155C68F7D280BF9C5C49F22FDE1914C6D69BB41C51AD58BC7389E0A7EC"
+      },
+      {
+        "Path": "KxCom/mta.c",
+        "SHA256": "3A93FB52B9307DC5F0B0A84703EA5CB3BF353420B2AE807E3373722F5057D22B"
+      },
+      {
+        "Path": "KxCom/roapi.c",
+        "SHA256": "9F69CA9EDA27F7C9736A1B008D56BDCFA9E5CAFC9F3D178114FE6A110D54287B"
+      },
+      {
+        "Path": "KxCom/robuffer.c",
+        "SHA256": "3B49163E732252C2F06C3AE8A202391307595B91B0FB03C955AFCDCFEEFC6C9D"
+      },
+      {
+        "Path": "KxCom/roerror.c",
+        "SHA256": "AE856460F5A7B9EBE8A7D3702553843FB0CFBA93164F8DF0C218594567259D56"
+      },
+      {
+        "Path": "KxCom/rofactry.c",
+        "SHA256": "F2F9F7AA708B8D2DB1FF0EC708B5EDED8EAFF32CAE531901B14FD116D290CCB6"
+      },
+      {
+        "Path": "KxCom/roinit.c",
+        "SHA256": "C7083B17D0239A0EBDC17CA5597B1B8E9DA2B80AAE41AC11F832E8CA05D361E8"
+      },
+      {
+        "Path": "KxCom/shelllink.c",
+        "SHA256": "32680188EC7D07959BDE27A071A5BD96762D6447476BED958C843597C39ED61A"
+      },
+      {
+        "Path": "KxCom/uisettings.c",
+        "SHA256": "07D1C3ED780C375A1AB3A8C4DD26D4FCCBFE49E511F2C627E112CBD2BE932E65"
+      },
+      {
+        "Path": "KxCom/uiview.c",
+        "SHA256": "77F1F2E6FBACB5F81B8F8DC72BB91CE5E7BBDC8CBDDBC2C55F4500F0C20B5A8A"
+      },
+      {
+        "Path": "KxCom/uri.c",
+        "SHA256": "42826E35099658A828F5C96E355C09F0767D994827186A5CDAC8C80D535F3742"
+      },
+      {
+        "Path": "KxCom/winrt.c",
+        "SHA256": "DDA4FB46AA5A9A096FB050E0D2346B0E9E4B49C8FE208B44CEA2558120D4D476"
+      },
+      {
+        "Path": "KxCrt/KxCrt.rc",
+        "SHA256": "BE09B270CF6F46B1A78BA3EB231177162B223C6966A0E283AE9D30B67E67A0CB"
+      },
+      {
+        "Path": "KxCrt/buildcfg.h",
+        "SHA256": "124FE07D07BB85015FC11A59E90F0666C8589F11A3E10D80B86DD9CCC41A0FCE"
+      },
+      {
+        "Path": "KxCrt/dllmain.c",
+        "SHA256": "85D1379534FC37A17EC334A2FA7D613F6F739F6838A9FFC869350FE2F0918CC8"
+      },
+      {
+        "Path": "KxCrt/forwards.c",
+        "SHA256": "B8B851B7CC9BB9DFA359993761D9EB713BCFF9C5DE8DD7BED6CEAD8BB94BC3E1"
+      },
+      {
+        "Path": "KxCrt/kxcrt.def",
+        "SHA256": "1A378EABD6D312B107C225C0EC05F3D185D790D66868226D37C3AEBA02468FA3"
+      },
+      {
+        "Path": "KxCrt/wcsftime.c",
+        "SHA256": "857EDE03C8519B09B38576AF0680DBA37E3195697F5D40A35B015C96D2ED032D"
+      },
+      {
+        "Path": "KxCryp/bcrypt.c",
+        "SHA256": "E258018A6DD1EAFB29050A4EA85AC3DACE726A6801E586EEF44E24E80DDECCED"
+      },
+      {
+        "Path": "KxCryp/buildcfg.h",
+        "SHA256": "E6A2443FE353061D2B5AB76E0C0557D5164F7C0FCFB091BA0449D02AD164D592"
+      },
+      {
+        "Path": "KxCryp/credhndl.c",
+        "SHA256": "1D0C062D6CECE163AC774ACCD74E94B5666A983713E56CDEF9FD8BDD67900ABD"
+      },
+      {
+        "Path": "KxCryp/dllmain.c",
+        "SHA256": "DC9DA638E5F37E5C41E4A3BC1C09C74FA7D8E85283431C74AF34F59598FA7F91"
+      },
+      {
+        "Path": "KxCryp/forwards.c",
+        "SHA256": "E526674578DBBE438AD734048EBE75F33555C5DC6D96CC1AF72E38B33373FF82"
+      },
+      {
+        "Path": "KxCryp/isi.c",
+        "SHA256": "D622657DBF2CB3BD5CA608990B10AC697AC4E70B0696EC2F1BDF3AB4D47456CE"
+      },
+      {
+        "Path": "KxCryp/kxcryp.def",
+        "SHA256": "08EEFDB516BA442C38074218A2000146C4189CE41D582D4D57DA6ED69261CE09"
+      },
+      {
+        "Path": "KxCryp/kxcryp.rc",
+        "SHA256": "58121C5B5AF603581CC50113EEEEED66508EA1A711211E9163F953B9A32FB878"
+      },
+      {
+        "Path": "KxCryp/kxcrypp.h",
+        "SHA256": "F0EA7F8F19F3A2683266DDE2AB680CF2F6FDBB4EDDB67F66FB7F8DEB0C613639"
+      },
+      {
+        "Path": "KxCryp/rng.c",
+        "SHA256": "2A4045301F918775A772F51F8197DE3A4D2879E0AC0E51AFA78A98EC21EEE619"
+      },
+      {
+        "Path": "KxDw/buildcfg.h",
+        "SHA256": "815F6BAC53EF9F1C4C46FDA1E34623AA64C1611DBCD8D7F3158703401D4D95B3"
+      },
+      {
+        "Path": "KxDw/dllmain.c",
+        "SHA256": "65757E67A02F93679A5E902B3091BB02033E125A42D30733EB8B6658452F610B"
+      },
+      {
+        "Path": "KxDw/factory.c",
+        "SHA256": "6261B7D2AA869CC84B9C956AF8BED937E329F8BE07C6DE9C9FB1C3E6E36801A1"
+      },
+      {
+        "Path": "KxDw/forwards.c",
+        "SHA256": "06430B68021A2CFB0E38D01449F344429E886B78D0AAF998A415B430401500E9"
+      },
+      {
+        "Path": "KxDw/kxdw.def",
+        "SHA256": "3DFF3F50F777ED890EDDBF8A3BCA3BDABA161D80969D17D9248C0F870D15E36D"
+      },
+      {
+        "Path": "KxDw/kxdw.rc",
+        "SHA256": "C82B6E37B5490ACF3E86A30252C09F6F89AA1DB510B7C5EF137D79F935AB5CEB"
+      },
+      {
+        "Path": "KxDw/kxdwp.h",
+        "SHA256": "A93969E64F8EF8D98634B35B65E14C3171DBD989A901280AA85BDCBB848E1778"
+      },
+      {
+        "Path": "KxDx/KxDx.rc",
+        "SHA256": "7F1868921888443B54611220BBC24423E90C8630E2F067D668E236ACB46A3B65"
+      },
+      {
+        "Path": "KxDx/buildcfg.h",
+        "SHA256": "4C0A479F5C922EA78087DF06AF6395B3C7FA724CCC44F99070880F6E12D1573C"
+      },
+      {
+        "Path": "KxDx/dcmpstub.c",
+        "SHA256": "725815EE7167156DDBB2B543D3D78C38620C7FE633A3AD5F571C14FBA4DF43B4"
+      },
+      {
+        "Path": "KxDx/debug.c",
+        "SHA256": "FB6078D3B99C4C6D64E13D9DADB154B1DEBCC4C5B04285075E5375E8FD40E5C2"
+      },
+      {
+        "Path": "KxDx/direct2d.c",
+        "SHA256": "575FDF938A9AB69B88157D65113A514293F521F3A1A80ACF4B09EC8A3E65014A"
+      },
+      {
+        "Path": "KxDx/dllmain.c",
+        "SHA256": "4466F79462A7570D28A34079A9EDCB3D3986F57CF232496E50F015A1C2D94AE3"
+      },
+      {
+        "Path": "KxDx/dx11.c",
+        "SHA256": "E26624F1359EF990DFE813829EFE6705FB5C683EBE626843ACA742003A8EB65C"
+      },
+      {
+        "Path": "KxDx/dx12stub.c",
+        "SHA256": "DA0A110B0436A0ACE316453CF45C47D821505C75A8B62081BFDCC38F6F065F3A"
+      },
+      {
+        "Path": "KxDx/dxgi.c",
+        "SHA256": "D4A5E3E45412F587FE01D09B6D4A736D8E6DAA33AB46E9EB95A0F4E0290C990B"
+      },
+      {
+        "Path": "KxDx/factory.c",
+        "SHA256": "9A74ECCBA6DEBC0A33E786B9042EBDB63F8CC785DFAAB1FDC882203DDB315F9E"
+      },
+      {
+        "Path": "KxDx/forwards.c",
+        "SHA256": "55CB5DBE116C0FF6CBAF5367FC079C9D05534B8C47720FCF99E33B28DCB8B6C7"
+      },
+      {
+        "Path": "KxDx/iid.c",
+        "SHA256": "A9C12E33108A0F49F6D0F72894B0FAF7ACF6AC94032208289AB76B4BA7DBF6AE"
+      },
+      {
+        "Path": "KxDx/kxdx.def",
+        "SHA256": "738D1EFF2EFE62899AD8F85634C215E4B1CD31B502405BA6AF0F72E1522B76DF"
+      },
+      {
+        "Path": "KxDx/kxdxp.h",
+        "SHA256": "0A16D87517F47A04DC673351226CF279E019C7D26CC4F0723F447F7168F0A2D7"
+      },
+      {
+        "Path": "KxDx/mfplat.c",
+        "SHA256": "BB31ADD58ABE5A3A6E52B1BE6B9DAEAFD5E0EEA46DEF8B4DAE4CBE6EBDBB43EF"
+      },
+      {
+        "Path": "KxDx/rptnoint.c",
+        "SHA256": "F02E684DE9A97B95E60E9302E984623333BB2B6491593F2BD2D4C1D352AE2E5B"
+      },
+      {
+        "Path": "KxMi/buildcfg.h",
+        "SHA256": "7B62BF60FAB4A3F4DFFDCC2A0B8E67E073968513B4D200747E3C3558C51A74C6"
+      },
+      {
+        "Path": "KxMi/dllmain.c",
+        "SHA256": "2E7C5E2BFF875862402B06E434E480386A5A41A4EA36460BFC22E73E37CC02AD"
+      },
+      {
+        "Path": "KxMi/forwards.c",
+        "SHA256": "458E89E691BC565D8C19E1985684FE62300BF578898BC3B705E23D119F9126AF"
+      },
+      {
+        "Path": "KxMi/kxmi.def",
+        "SHA256": "E0DF85233CAB063BABD46B923A631B01E5AC8C1244AE026D89D27BDB10AFF5A9"
+      },
+      {
+        "Path": "KxMi/kxmi.rc",
+        "SHA256": "088E2ABF00A01761B93A7916CA182B3EA550CBB6F4146A667B366EEDDA3E2DE6"
+      },
+      {
+        "Path": "KxMi/kxmip.h",
+        "SHA256": "19D02F52381035DCC89A5D943CEF082B693EEAFD9E394DA782DA87615D7462A3"
+      },
+      {
+        "Path": "KxMi/powrprof.c",
+        "SHA256": "78FF19DCCA6C5DA9260A3EF45BAA4D3ECDEA41A0AABA1587CC5899A6B2A14286"
+      },
+      {
+        "Path": "KxMi/userenv.c",
+        "SHA256": "1AD61DE1706F918329315D315884D05174C0F54B55B5FC9DF38B9E2E7506303F"
+      },
+      {
+        "Path": "KxMi/verspoof.c",
+        "SHA256": "A70743D4D1416C7E50057AE64D047AD058E823A68ED37B64FC9FD8B8C40113B1"
+      },
+      {
+        "Path": "KxMi/wldp.c",
+        "SHA256": "9B580BE028D4FDD4038209A5CA770912C7A8312C2232ADF6D56038AFD3376D88"
+      },
+      {
+        "Path": "KxMi/wtsapi.c",
+        "SHA256": "BCAB37B272630A3577566B0F043368DF026B82762D8F1CDE512B058F8193881B"
+      },
+      {
+        "Path": "KxNet/buildcfg.h",
+        "SHA256": "57B5D1215B5EA551A15C6043F16C9BD60C4733DE97EF2FF3A317FE6145ACC80B"
+      },
+      {
+        "Path": "KxNet/dllmain.c",
+        "SHA256": "65757E67A02F93679A5E902B3091BB02033E125A42D30733EB8B6658452F610B"
+      },
+      {
+        "Path": "KxNet/dns.c",
+        "SHA256": "B24B4298968A0697F5D2CAEE16719D3ABFFB8737402A785C2B6D1DEFC90BC158"
+      },
+      {
+        "Path": "KxNet/forwards.c",
+        "SHA256": "5471EBDD749D8A649B269F38351430F522E424A0BEB80F91CFE02377CA7A020A"
+      },
+      {
+        "Path": "KxNet/kxnet.def",
+        "SHA256": "52375160208CC3835B4CACAA4788295417974AD922938F7533AA99A9194A008C"
+      },
+      {
+        "Path": "KxNet/kxnet.rc",
+        "SHA256": "B6D8C27F52CAD58DD9AE787A7235F1C88DD0C6887C051B3AB7E8B9E667667294"
+      },
+      {
+        "Path": "KxNet/kxnetp.h",
+        "SHA256": "21BCD2988DD1D670833AB74DAC3E795905065127111E2E2A1573DD5852618C35"
+      },
+      {
+        "Path": "KxNet/lmjoin.c",
+        "SHA256": "154D48285D40D10FC1802DE71680338DBF10DBAAFCC9F8AC24B3D2711CE7BDCC"
+      },
+      {
+        "Path": "KxNet/winhttp.c",
+        "SHA256": "407DF980553516461156ECE9C80E704A8BD7EFF88B6529A0FF01F96FDBA856E6"
+      },
+      {
+        "Path": "KxNet/winsock.c",
+        "SHA256": "B0E906105B7324DCDC203A5D0912B2F374F95C5CF6B4EAD0AC64E29DCACEC07F"
+      },
+      {
+        "Path": "KxNt/KxNt.def",
+        "SHA256": "708FA319517CA1CD703B385D8374B6CC4D048890B4557969FD2A540A2BB9206E"
+      },
+      {
+        "Path": "KxNt/KxNt.rc",
+        "SHA256": "C7623C1CFA528D3217405CFCBAE447D34051648DEDD050B80AD171EF96219627"
+      },
+      {
+        "Path": "KxNt/buildcfg.h",
+        "SHA256": "ABAA19A98D1B9C32AFA6ED6CFE9827EE5A774D7C30EECD0D1A92B14526BFA086"
+      },
+      {
+        "Path": "KxNt/dllmain.c",
+        "SHA256": "44FB9BA716DA9F75DB96743578592026288A02BA6D2034E0BA023AE534D339D9"
+      },
+      {
+        "Path": "KxNt/forwards.c",
+        "SHA256": "0CB23562C628C3D4694C11FAE9699DF62D6D4DB50E18F045CC087CBDD1718AE6"
+      },
+      {
+        "Path": "KxNt/stubs.c",
+        "SHA256": "A9A00CFBD393C02BF437FB838B7DC2E1B365A5A95D7C2B10A9FE279C8EB3B20A"
+      },
+      {
+        "Path": "KxSChanl/KxSChanl.rc",
+        "SHA256": "5833B84BD067C74DDC55ADE4F7EC61D0D8BE048C0FDC248AA5AE84B871790729"
+      },
+      {
+        "Path": "KxSChanl/api.c",
+        "SHA256": "386C2DC4724F8A2E66C10F0B7271A3DF32CE6DC068E539FA6CBAF3A2ED2C9EDB"
+      },
+      {
+        "Path": "KxSChanl/buildcfg.h",
+        "SHA256": "EE6F6684971A8FFB352914DBE53258A1C9540D32A931EAEFB5049D8B718405F2"
+      },
+      {
+        "Path": "KxSChanl/certs.c",
+        "SHA256": "AD760D0A2A69E701A65DA6767E71D03B1D6958D0F832B093C6D063AD53BCE022"
+      },
+      {
+        "Path": "KxSChanl/credhndl.c",
+        "SHA256": "A39A322645F0B14FB8860CF56A0F4BF57E243F4701DD98193A21979B2A497EB9"
+      },
+      {
+        "Path": "KxSChanl/ctltoken.c",
+        "SHA256": "13D619CE1527EEBE6DEA40406B5CD75BE5F4DA725C3C309C3934331FFE6D2313"
+      },
+      {
+        "Path": "KxSChanl/ctxattr.c",
+        "SHA256": "EE408377138CDC3C313D7DA90A56D467B4B30A6F86CC2147DEEAEA5109C5BC02"
+      },
+      {
+        "Path": "KxSChanl/dllmain.c",
+        "SHA256": "BD2CC907953F1F9BE033BE1645AE72DB2EBB9DBAD72D4D349FD07F87BC38BCD5"
+      },
+      {
+        "Path": "KxSChanl/encdec.c",
+        "SHA256": "785E4F41CEAE0BD2AD40E56E710674643E6B3E0291BFD592B2018C098DEF3B5B"
+      },
+      {
+        "Path": "KxSChanl/hkdf.c",
+        "SHA256": "6E8480B00CE4305D67383802F8BAE64C8CCAEB0F7480F7D4B9972ECCCA819435"
+      },
+      {
+        "Path": "KxSChanl/ioinfo.c",
+        "SHA256": "A0D248858E19EEF8BD491ADA80A159DBD42405106870F15FDB981BB1E80759BF"
+      },
+      {
+        "Path": "KxSChanl/kxschanl.def",
+        "SHA256": "C52263AD3D968558739B9A783A5418EF82700A81EA4CCDEE6149F37DA4E717DC"
+      },
+      {
+        "Path": "KxSChanl/kxschanlp.h",
+        "SHA256": "0E5CE86CA5E1C0F6B919998B366F8D10DF3391AFD07115304409E01CF7936C42"
+      },
+      {
+        "Path": "KxSChanl/secctx.c",
+        "SHA256": "CE30D44FB89C803DA32EE276B53120EDB31BA5429B90B742F364497589474A51"
+      },
+      {
+        "Path": "KxSChanl/sslprovider.h",
+        "SHA256": "C1551FC821E78500BBC4D01EAFE2F158FD8AF2A2C2BBA291999851172E6692A7"
+      },
+      {
+        "Path": "KxSChanl/sspihack.c",
+        "SHA256": "252E7E020DA9044AAEE2B84DEB0E74DA9D09417D13DB057D97772329F6FBFF11"
+      },
+      {
+        "Path": "KxSChanl/tlsalert.c",
+        "SHA256": "225E88035A90414127078A90DC1C15B6406DFD2625ACBCC68F30B257D5C8515E"
+      },
+      {
+        "Path": "KxSChanl/tlsdec.c",
+        "SHA256": "F394168E46A567D954A3EBC376EC73429B9B8B4104F82403B113E05E61C69A4E"
+      },
+      {
+        "Path": "KxSChanl/tlsenc.c",
+        "SHA256": "43400D1B05F8D4FAA3D63B880BBCA7A0F59DFB98CB00E99B7C8AFC002D86D0A6"
+      },
+      {
+        "Path": "KxSChanl/tlsext.c",
+        "SHA256": "C8E2C70AD50F4C58E8F45981FD9F9DF9B7B01BA7E0DC4CEE33E948645CA2836B"
+      },
+      {
+        "Path": "KxSChanl/tlshello.c",
+        "SHA256": "0DB66BBBFC43986CBBAB7565AF7487A5568F4E3CD6FE967DF609D9DA1098C3B5"
+      },
+      {
+        "Path": "KxSChanl/tlshs.c",
+        "SHA256": "73396898285D3449DE52E982777C5878A42963A7BD711C6A1BA8B698C38182CD"
+      },
+      {
+        "Path": "KxSChanl/tlshs12.c",
+        "SHA256": "C8504FDE40B37028D00D305088536A0F4223EFF9080278C751B748FD443E6795"
+      },
+      {
+        "Path": "KxSChanl/tlshs13.c",
+        "SHA256": "936C076191EF9EEC34BB89A5ABB403693DC2C0BD2175314446570F92542CB8A3"
+      },
+      {
+        "Path": "KxSChanl/tlsrdwr.c",
+        "SHA256": "61DAD9FB83B9CDCBC8673C730319C0B2AA66E2F2526984FBF9F7EC9D699E2511"
+      },
+      {
+        "Path": "KxSChanl/tlsshut.c",
+        "SHA256": "706889B6BAF407B17B53300D2AF4CBB79F9565F6A5A0D1F1BF4A6E1C7C735E08"
+      },
+      {
+        "Path": "KxSChanl/tlsutil.c",
+        "SHA256": "D6577F3DE5088D7CE7777C8B7C5C0812B29ED3A450674F2F73BA8428B5B417DA"
+      },
+      {
+        "Path": "KxUia/buildcfg.h",
+        "SHA256": "17FC8A70EFEE4CE146EDE0C0FF6E6C0AA917829D167C0DB695529894C091D453"
+      },
+      {
+        "Path": "KxUia/dllmain.c",
+        "SHA256": "65757E67A02F93679A5E902B3091BB02033E125A42D30733EB8B6658452F610B"
+      },
+      {
+        "Path": "KxUia/forwards.c",
+        "SHA256": "CB22B1F0F4ABE126441CC9C68FAABC0839C2E6598B0983E846674963C77450FF"
+      },
+      {
+        "Path": "KxUia/kxuia.def",
+        "SHA256": "D38C236CE351639EF3D5FB4810F1613213F024B6D0611035DCE89D7ABEF41EDB"
+      },
+      {
+        "Path": "KxUia/kxuia.rc",
+        "SHA256": "577332CF0FD8B12593109D143CE1B5BB69BE8E4CA019CC0BFA51E38B1B10DE0F"
+      },
+      {
+        "Path": "KxUia/kxuiap.h",
+        "SHA256": "33D191D8875614ECC9F871E7A529585FBA569E8619AB312360F842016E800384"
+      },
+      {
+        "Path": "KxUia/uiacore.c",
+        "SHA256": "B616CCE2FDE81192CBDC9C6987B776B9A45F6496B5F81B46E066E705C8F3A9CD"
+      },
+      {
+        "Path": "KxUser/KxUser.rc",
+        "SHA256": "013DEA43082B81DD7DFBE2B21CAB93F4E541CB514BDF0933D55F4FC25CFDD908"
+      },
+      {
+        "Path": "KxUser/autorot.c",
+        "SHA256": "E99C05FA1F7D7C30224589DF15D03FB9BA0AB463057DCB2B0B6E464255A00D16"
+      },
+      {
+        "Path": "KxUser/blutooth.c",
+        "SHA256": "B4587CDBA862728AA642172F3372EBC450CB5E1C0BD2D6CA1B9119197294ADD6"
+      },
+      {
+        "Path": "KxUser/buildcfg.h",
+        "SHA256": "BA5383E479DBDB52770FF090F1E4C8D91F4FCBD40464751DEAE0810E78CD27AE"
+      },
+      {
+        "Path": "KxUser/chromiumpatch.c",
+        "SHA256": "7131D8493970F06A83D98C36837DA606F9E83FE2CF5ABECCFAA19A0FF5F22C1B"
+      },
+      {
+        "Path": "KxUser/dllmain.c",
+        "SHA256": "2461E949E6EEDF4CDB83785A97C7B2C4AB94CA9B1AF7A34B61F80C887A659E29"
+      },
+      {
+        "Path": "KxUser/featurestaging.c",
+        "SHA256": "EA3F0498A4E367EA9B174272A3C0F12E03490B15BE9963A9F9D524279022D6F7"
+      },
+      {
+        "Path": "KxUser/forwards.c",
+        "SHA256": "15EC71526583B8B10EC5D8519A8CC093B1A77DD894499F5FF24B955F6CDD10F0"
+      },
+      {
+        "Path": "KxUser/knownfld.c",
+        "SHA256": "999F60F3300269ED417D4B2BD5451DBD90BC7DC61973EF3AC486FF54E11584EE"
+      },
+      {
+        "Path": "KxUser/kxuser.def",
+        "SHA256": "EB436D00D225A90BB2ED1A268E032660B58B4184FDAF37A4BD9B9391879E4C84"
+      },
+      {
+        "Path": "KxUser/kxuserp.h",
+        "SHA256": "7630438CAC5ED34DF8238CEC3D5A2E4EE5EEAE482E072DE157A0626B130DE5A0"
+      },
+      {
+        "Path": "KxUser/loadsyslib.c",
+        "SHA256": "6C183FCC1B9A657DFDC197D6B19AC04378765BC9E6236DDC737B5FC792E30AB8"
+      },
+      {
+        "Path": "KxUser/misc.c",
+        "SHA256": "D08DC0CA8335F138B4BCCD1D0125A33C625EF9DF4CD7F8728B9633672C9A8DA7"
+      },
+      {
+        "Path": "KxUser/pointer.c",
+        "SHA256": "15A82584009F608B043D5A0988FF06D5C8C3B814F0C6CA179E6212AD54607837"
+      },
+      {
+        "Path": "KxUser/processref.c",
+        "SHA256": "F7FDE05791898EBC56BCE9D83CA54E365684BAA922F7B69083129B7CA9FE6106"
+      },
+      {
+        "Path": "KxUser/pwrnotfy.c",
+        "SHA256": "B02BC97BDA149343996412E403D0B63251CC2707BE0FD431CA1E055CF9C4515D"
+      },
+      {
+        "Path": "KxUser/scaling.c",
+        "SHA256": "4F29B78E75EE6FD81DB227647D7B38A9751CA1E712A085BC1D8EC7C99DFA299A"
+      },
+      {
+        "Path": "KxUser/syscal.c",
+        "SHA256": "7696EDD1302E8F288AB0CC1A0770E4138FC0E6297118191E8F4BDA6C6EF60140"
+      },
+      {
+        "Path": "KxUser/syscal64.asm",
+        "SHA256": "101DEA106E4FEB5D40D82D6FB9D68347444E53F4104196B5F7201CB981E6F1EB"
+      },
+      {
+        "Path": "KxUser/sysmetrc.c",
+        "SHA256": "EAFF37446D5659C1A4D2A3DEEF8B8017114DF7324961734733E6CB016ACDD6AC"
+      },
+      {
+        "Path": "KxUser/timer.c",
+        "SHA256": "5E08F0764A6CD02D13F926A74E319751854ADCA3B84C00706672E6DA7E711C3C"
+      },
+      {
+        "Path": "KxUser/window.c",
+        "SHA256": "D7E96689AE5579388D6457C9CE03C2711273934B00BB3B74F694EB5E783AD8C5"
+      },
+      {
+        "Path": "KxUser/winmsg.c",
+        "SHA256": "D9557A6F11B29F4B5EE5A0014AC82E46A61DF36B81BDBCF6DBF6001FFD5C1B4D"
+      },
+      {
+        "Path": "VistaSetup/VistaSetup.manifest",
+        "SHA256": "990260E012B70106F9D91D608FD34F43F4A95DECD808AAFC0CA315701EE2DD57"
+      },
+      {
+        "Path": "VistaSetup/VistaSetup.rc",
+        "SHA256": "16FD9366F6E9DF97E7BFBA535F5493368CF78B74F1AB28F4B6A447CEB1697CC7"
+      },
+      {
+        "Path": "VistaSetup/buildcfg.h",
+        "SHA256": "278B60B8F1E437C26F5FA0DEBDE92E00A2D4D047F666533A151D71F0124D715A"
+      },
+      {
+        "Path": "VistaSetup/main.c",
+        "SHA256": "1B2C813DFE91358B03CE4E195B00E0BFDF2B6CE0E0CCC611B02AA8EAB80C5A22"
+      },
+      {
+        "Path": "VistaSetup/stage.c",
+        "SHA256": "BA52951B21D5A22319D5DE7A7BEA5C59850A3F1C5982D7CEE1893CFF5BA84881"
+      },
+      {
+        "Path": "VxKexLdr/VxKexLdr.rc",
+        "SHA256": "6BB2E1ABA9D9EE734835EEC55BD3E885E41DB954405C7C5348C7F7A7E49B0A36"
+      },
+      {
+        "Path": "VxKexLdr/buildcfg.h",
+        "SHA256": "41716457D45AEBF8A7ED684AAEA0E6D8B6E8BACB24AFB8940EC317D226DEAB9B"
+      },
+      {
+        "Path": "VxKexLdr/creaproc.c",
+        "SHA256": "2C4CF886D58CFB3C9CF199AD55D4E6310C0A597FE58343D173EB778D33E923EB"
+      },
+      {
+        "Path": "VxKexLdr/gui.c",
+        "SHA256": "0D0DDFC271C2581477A31A9471B3A4CA18965580FAF4AFAF00A662D9D175B2F3"
+      },
+      {
+        "Path": "VxKexLdr/main.c",
+        "SHA256": "4C2386A81A64D15E622A759895106AAC828E54A4D2BE4908719FA5E2B7475E21"
+      },
+      {
+        "Path": "VxKexLdr/resource.h",
+        "SHA256": "6E07FAC9AC01541ABD4A56461DB86C425FFCABA4A43E6D38617A9C84BC68E03F"
+      },
+      {
+        "Path": "VxKexLdr/vxkexldr.h",
+        "SHA256": "03EB822012069C0C02D9A84D7596C3AC7DAB1143096C5DE715CEBCEA6B7B215D"
+      },
+      {
+        "Path": "VxlView/VxlView.manifest",
+        "SHA256": "AB1FB590CCFFF20496634A7A766C72F7BAE685DE749B7D7C0FA383E76B1A8F12"
+      },
+      {
+        "Path": "VxlView/VxlView.rc",
+        "SHA256": "3BC272CEFA5046EF0C5CB68AC36F18C76CBA725736F16A4172058AB37183667C"
+      },
+      {
+        "Path": "VxlView/association.c",
+        "SHA256": "94EB6403E7CA906FDE3F436441DA7C83EA8BC7DE8B5951B0F45BE9472BCD72EE"
+      },
+      {
+        "Path": "VxlView/backend.c",
+        "SHA256": "D6412B50E90C30F435CABE570517A8BC2EB5BE57B19090921DA7E11306C4D89D"
+      },
+      {
+        "Path": "VxlView/backendp.c",
+        "SHA256": "5BD70C302DC4FD5FA9BC18F88920D92477EE1A190B9CE2A26EE3D2E2A667C877"
+      },
+      {
+        "Path": "VxlView/backendp.h",
+        "SHA256": "1EE0628793582CCE5DA2AE0099879EDEA28F3FD361FE0A4F960F1C69F230B046"
+      },
+      {
+        "Path": "VxlView/buildcfg.h",
+        "SHA256": "A43928AB1D913175CFE974FE15B0B46D3EC1DCA74311EB314860E75D81378C3C"
+      },
+      {
+        "Path": "VxlView/config.c",
+        "SHA256": "7F7E7C5A2E79B3C174139AFD164B5822E56B5705906109E1A9C274C0FC6468AE"
+      },
+      {
+        "Path": "VxlView/details.c",
+        "SHA256": "84EB77805821B8AA7891B29A7AC54D07F0FFB4425C9276E023B024335FB6ECF8"
+      },
+      {
+        "Path": "VxlView/filters.c",
+        "SHA256": "2CF178B4E6087946A15CBA2E720FFF154319876E1D1E810AD97A2C2912EEC3E2"
+      },
+      {
+        "Path": "VxlView/globals.c",
+        "SHA256": "711367C9193649E263BA184C2E7DCC5EE7D6D555B6CE9049194697222636875F"
+      },
+      {
+        "Path": "VxlView/goto.c",
+        "SHA256": "1379FCCA83B6F187D1F7AE0ADC1A971DC528DFA2D44EDA0721D09DF6C22DFF3B"
+      },
+      {
+        "Path": "VxlView/helpabout.c",
+        "SHA256": "E48A627D67FA0A3AE40F6C17D070971792AC9AEFF2FA10CBB8068D83D5C42DD4"
+      },
+      {
+        "Path": "VxlView/listview.c",
+        "SHA256": "57A56E193748BB5C222BC2A4ACAAC2467978517C2210C6595C975D6BABB90947"
+      },
+      {
+        "Path": "VxlView/resource.h",
+        "SHA256": "E607054D3D20E272DD63720D46B67E746E34B123F7526C4DD0C253FF28F11BA5"
+      },
+      {
+        "Path": "VxlView/statusbar.c",
+        "SHA256": "31C52342D13A7A622722B3F3E30DA1CA2F8F4D83F0ECF63684E87353343160EC"
+      },
+      {
+        "Path": "VxlView/vxlview.c",
+        "SHA256": "410C9E4B2F378A19277C3CBF9955582EDCB506EC5CB8B12A87BDC77A4ABCE76A"
+      },
+      {
+        "Path": "VxlView/vxlview.h",
+        "SHA256": "3DA5B80633A9974F2C1689B8472C8B839E528ECBE9E8EFE6B44B2E5DE06598B8"
+      },
+      {
+        "Path": "build_all.ps1",
+        "SHA256": "78BDCF2A4A03BCE8477A6B3B37EA74DD94C32BBD8B6D274CC277A31460357598"
+      },
+      {
+        "Path": "build_all_x86.ps1",
+        "SHA256": "5D6E557357133545332C88F717E62F5F5BFC25C733C2EAFA4510E8C46E185E2C"
+      },
+      {
+        "Path": "build_extended.ps1",
+        "SHA256": "A9F90CD39054F165933F7668E73B8E7B10EDE1D9F22D97FE616E6BEEB751AE22"
+      },
+      {
+        "Path": "build_extended_x86.ps1",
+        "SHA256": "647CF83303C0AFF4391F9045CD137C91A5BA518BC0CD0E77BCED98CB603D9A04"
+      },
+      {
+        "Path": "build_kexcfg.ps1",
+        "SHA256": "65D0F9F8B814B66D67166359EFCB418483D6C8D51135272535FDDD486F2ECC4F"
+      },
+      {
+        "Path": "build_kexdll.ps1",
+        "SHA256": "F29EDABE966837D581B21C3F2A0222439AA2C37A13F6A2CAC3ECBA36A112D721"
+      },
+      {
+        "Path": "build_kexdll_x86.ps1",
+        "SHA256": "5273FDE4EC951EDE103CBAAFC8353DB244209A8FA20106009B08DA4210990513"
+      },
+      {
+        "Path": "build_kexgui.ps1",
+        "SHA256": "661B32E9B30E13A7FC773B35F2B9AEF8B072DD425434861DD930B6BA228DC55B"
+      },
+      {
+        "Path": "build_kexgui_x86.ps1",
+        "SHA256": "D362B8CAD70C94C440363BC7F13DE0585B7970CC9BA7953857AE8D4307A90759"
+      },
+      {
+        "Path": "build_kexmls.ps1",
+        "SHA256": "6C27B8CD095E141434C1524A70A9C1B9A689B3804DC2F5B7598E905AEFE98389"
+      },
+      {
+        "Path": "build_kexmls_x86.ps1",
+        "SHA256": "57A336AC41CCB3CB4F75AFE96540ECD1DA5996DF9A57FEE94C0F76ACDF34F720"
+      },
+      {
+        "Path": "build_kexpathcch.ps1",
+        "SHA256": "1AC98733597358198DDB7DAA2106206016E7F2E97942108E073E8C08BB82C3BF"
+      },
+      {
+        "Path": "build_kexpathcch_x86.ps1",
+        "SHA256": "32A58CED54A1B2D75B19E33E8A86B84B14B3C6040D85C2B7A691DC2851DBE75E"
+      },
+      {
+        "Path": "build_kexshlex.ps1",
+        "SHA256": "F2F2EFB019D42558F36DA7CC3488954A064CE95ACE452E6B62B6ED3911B64430"
+      },
+      {
+        "Path": "build_kexshlex_x86.ps1",
+        "SHA256": "8D4831F83DBFA6F10012C7BEEE18E1081AD514E596A388EEB6581CA9E01EE08E"
+      },
+      {
+        "Path": "build_kexsmp.ps1",
+        "SHA256": "82F86F11187C757001FFB94D7109BC9C5DBDBFBA4830879280A389E1CBDFF48C"
+      },
+      {
+        "Path": "build_kexsmp_x86.ps1",
+        "SHA256": "1467E46E0F7054AE5FB87E7423BFDF52526B5966A13B5B6D5ACC077A7DF0BEB5"
+      },
+      {
+        "Path": "build_kexw32ml.ps1",
+        "SHA256": "ECCE40353FCA063A810EC855FC313DA70A935DCBDFC4BE22D3A90A8F2D66AE82"
+      },
+      {
+        "Path": "build_kexw32ml_x86.ps1",
+        "SHA256": "3B46F82FE887450AA2F65AFBF57A218B99A005A43306241968B60B0E1704977F"
+      },
+      {
+        "Path": "build_kxadvapi.ps1",
+        "SHA256": "E30133994962436C2128768B42384E10DAB5000491C72A1126397C85F48F870B"
+      },
+      {
+        "Path": "build_kxbase.ps1",
+        "SHA256": "73863539BA9774CFBD3EDD789266AB7083C8F3A433275227AA91145073E74FB7"
+      },
+      {
+        "Path": "build_kxbase_x86.ps1",
+        "SHA256": "104A8D2B8F14FB5C60E08C43BFED107E9A06DD75B051B4898E40D691DA83B67E"
+      },
+      {
+        "Path": "build_kxcfghlp.ps1",
+        "SHA256": "B8CF4DFF40F2379AEDA7811D92C5F94D62723BDF38109C96FC523C6909B3652C"
+      },
+      {
+        "Path": "build_kxcfghlp_x86.ps1",
+        "SHA256": "378DB9A8B154A7321A99D7A541DF1FE57D17485927F3BBBCE6B11E10EF52DAF4"
+      },
+      {
+        "Path": "build_kxnet.ps1",
+        "SHA256": "CE366641A39B8F9DE18D9F45026F9B15A14562ED670155A2A203CF303D3751AB"
+      },
+      {
+        "Path": "build_kxnt.ps1",
+        "SHA256": "BF0315226E5BA98F3AAF35AD6A7EEDD6AD6DBEB5310675B74853B79E015E9EDE"
+      },
+      {
+        "Path": "build_kxnt_x86.ps1",
+        "SHA256": "4DD952ED98A77B000193F7C7E111F5E520FB6FC6CA1BCFE6EF6B23FF9EA3A591"
+      },
+      {
+        "Path": "build_kxuser.ps1",
+        "SHA256": "EFB4B209603A0EC2420A080A1FDE63B4E85957F9A641CC39F08C79BC6F354084"
+      },
+      {
+        "Path": "build_runtime_x86.ps1",
+        "SHA256": "04AD11134560DC0C04161CE3FC61059ABAEFD7C0CDC9E5115B3B55A926B205AE"
+      },
+      {
+        "Path": "build_vistasetup.ps1",
+        "SHA256": "2EFB1055D4A83501668EDF520183C9EC0B8FA2CF086A96C08EDDC7BE8792C220"
+      },
+      {
+        "Path": "build_vxlview.ps1",
+        "SHA256": "8D8602F54224E4047A8E402B9F103EB995B319A7421866EE2A6D7F2902B7B38E"
+      },
+      {
+        "Path": "package_x86.ps1",
+        "SHA256": "2138BF2FF3786C61DD0F54DE96695EE19D4167A882A3D746B1084274EBA4D69C"
+      },
+      {
+        "Path": "tests/analyze_kxnt_ifeo_condrv.ps1",
+        "SHA256": "7130452DA82E69E7117275395D535E00836489403DB81CE25E2864214D0CB574"
+      },
+      {
+        "Path": "tests/analyze_kxnt_ifeo_event.ps1",
+        "SHA256": "0BF569C71E4E12F77D9847F301F983468BEA912CD04AAA623D8DFFE7067D3661"
+      },
+      {
+        "Path": "tests/analyze_kxnt_ifeo_runtime.ps1",
+        "SHA256": "3B9E3A340B31A26D8CD1D5319C03579C44750A547037EFCBFC34D575A8AEE18C"
+      },
+      {
+        "Path": "tests/analyze_kxnt_ifeo_suite.ps1",
+        "SHA256": "6DCCDBDA01A79BD1D0D9AE8710EFCF0452C5293DEFF970786BF518DCC6758002"
+      },
+      {
+        "Path": "tests/analyze_kxnt_ifeo_utf8_event.ps1",
+        "SHA256": "03F478386C2721C99AA8AF9147FB87C560FD512D1DFE4B4405084660A993E9D7"
+      },
+      {
+        "Path": "tests/analyze_kxnt_ifeo_zig_write.ps1",
+        "SHA256": "8EA615B2EC17E2108C97598C8D92707F6BF4FFDF03290E3D35BB5EDEB8F1F2A6"
+      },
+      {
+        "Path": "tests/analyze_kxnt_open_link.ps1",
+        "SHA256": "92B990355C7F59BE8DC321E795E4224EF37392D0C0489807D73CD1A937BE839A"
+      },
+      {
+        "Path": "tests/analyze_kxnt_utf8_external_observer.ps1",
+        "SHA256": "F8FAA11B62CBF1F39F9136E67EB43E50B44931A3E22B88233368998DC0DFD448"
+      },
+      {
+        "Path": "tests/analyze_kxnt_utf8_lifecycle_handles.ps1",
+        "SHA256": "BABB18F6A0EDB6E600FA414442A2BA81E7CFD57E0163880C57FBC59AA594B4B1"
+      },
+      {
+        "Path": "tests/analyze_kxnt_utf8_loader_snapshot.ps1",
+        "SHA256": "A92AFF8CFCA125FBDBEA67AFE927B20183178845E18F30ED24B25E13517C9337"
+      },
+      {
+        "Path": "tests/analyze_kxnt_vista_condrv.ps1",
+        "SHA256": "6CF78B4912D10C08ADDC7DF30EF6B46FE069FF37E627609CC07910A3F7A244CA"
+      },
+      {
+        "Path": "tests/analyze_kxnt_vista_ifeo.ps1",
+        "SHA256": "8DD12A92FCD324623E656BA8787A5A5064F0D298E0376A3D208359418459F18C"
+      },
+      {
+        "Path": "tests/analyze_kxnt_vista_runtime.ps1",
+        "SHA256": "AB38C89E4464B67D1A07857E389186859AF6020D840CF98BF6A7899E6C8244F1"
+      },
+      {
+        "Path": "tests/audit_kxnt_guest_dependencies.ps1",
+        "SHA256": "798801FAA9009BCD6C1487C919B367CB6457E967F223D09E72368A9C843CCC8D"
+      },
+      {
+        "Path": "tests/build_config_missing_image_probe.ps1",
+        "SHA256": "87856E24E4321F483EB86604680EB6F4D76D0FDE23B78CD373A7325157CE97D1"
+      },
+      {
+        "Path": "tests/build_context_menu_probe.ps1",
+        "SHA256": "E52CFBEE0B357D493482362A50326DB6E6ACA4248C4C3B10919F4C9E60183624"
+      },
+      {
+        "Path": "tests/build_global_settings_cli_probe.ps1",
+        "SHA256": "E1A77D572E3AE2B81231B0E6AC0165F204895CAC8AB4D7791CF5FE15876A2754"
+      },
+      {
+        "Path": "tests/build_installed_version_probe.ps1",
+        "SHA256": "5FDF58F65874E3E0CEF14808F1D2FCE3CBE7697CE1571F1410E5628BBFA5A3B9"
+      },
+      {
+        "Path": "tests/build_installer_delete_fixture.ps1",
+        "SHA256": "906B191C6DE55CD1F5CA4ED69D3043148127D8F0EEBE525BD87FFFE2328873F7"
+      },
+      {
+        "Path": "tests/build_installer_registry_fixture.ps1",
+        "SHA256": "2474B4452378C3D0EA7419FE8B4F5314042B78C2AF29155F7EF55DCBA12305BD"
+      },
+      {
+        "Path": "tests/build_installer_stage_fixture.ps1",
+        "SHA256": "4842D598F36DBF03048224A335747EFD0720382F96FE9A7CFC66250CE71EBC89"
+      },
+      {
+        "Path": "tests/build_kxnt_ifeo_probe.ps1",
+        "SHA256": "51287672CC81D10419CD4BB6754A23F51CBF4EAF1718C96257E371C80530FD5D"
+      },
+      {
+        "Path": "tests/build_kxnt_import_audit_fixture.ps1",
+        "SHA256": "F2C29E352D90DE17AF1EA75D04843A8593E2D3EAB1AA98C8D3086B7BE1589379"
+      },
+      {
+        "Path": "tests/build_kxnt_parity.ps1",
+        "SHA256": "2E776B26EDEA30C9EF38D63902329B9BCB0CFFF35FB7106B868E47B17659BC2E"
+      },
+      {
+        "Path": "tests/build_kxnt_probes.ps1",
+        "SHA256": "B14FC784A215299D9A6C0D985E2B8904334655C3122A19463E9982FD7528B1BC"
+      },
+      {
+        "Path": "tests/build_kxschanl_registration_probe.ps1",
+        "SHA256": "3655EF75D932DA5FF60D437BA7471ECC895036E12A61DD0437B30FFD4F80181A"
+      },
+      {
+        "Path": "tests/build_logging_settings_probe.ps1",
+        "SHA256": "45702F280F9419965B1E74616FEB34C92A7CB4E62A90BC919106FDBDD91713F8"
+      },
+      {
+        "Path": "tests/build_preserve_all_probe.ps1",
+        "SHA256": "4EA691080CABFC94C2BFA251083F160FDE88B1F24A45D8FA7761A4152A2FB97D"
+      },
+      {
+        "Path": "tests/build_preserve_configuration_probe.ps1",
+        "SHA256": "720EC5CD49D72D0075364A9040341D46351EFBBEFC1DB88A370B4F9E57B49C72"
+      },
+      {
+        "Path": "tests/build_preserve_view_probe.ps1",
+        "SHA256": "CFA7B68131066002A69120C5448518245A0FAB4740358F1A2E05496B7D24C48F"
+      },
+      {
+        "Path": "tests/build_setup_binary_probe.ps1",
+        "SHA256": "B2FE6634C67FCBD9D1CA4191E6429884FA8294BD5DD0FC98401CC9F605B1989D"
+      },
+      {
+        "Path": "tests/build_setup_cache_probe.ps1",
+        "SHA256": "4BF3FC32E31E8D0243821BB38F878CF3D51E8A9869EE23523FCF5F923319D5B7"
+      },
+      {
+        "Path": "tests/build_setup_package_probe.ps1",
+        "SHA256": "E7B946BAFD4C8A47B5D7247EAC53A59184E183EA51267EC403759101D9083EBE"
+      },
+      {
+        "Path": "tests/build_setup_registry_probe.ps1",
+        "SHA256": "293EF82E47AEA9721DC23B7E4E6D3AFDD90D136E77A38019616E525622980CE5"
+      },
+      {
+        "Path": "tests/build_setup_stage_probe.ps1",
+        "SHA256": "9095AD05D77F5D84FC2F8699AC1E96CFB9B574E345EBEF421462C47308FF666E"
+      },
+      {
+        "Path": "tests/build_setup_system_lifecycle_probe.ps1",
+        "SHA256": "8F8F37A5D8D6B6352CCDA8E497C4EC7FAECDD19DB500648124A7D4DBC8D1D7AD"
+      },
+      {
+        "Path": "tests/build_setup_transaction_probe.ps1",
+        "SHA256": "7650E2B41A75676F743104D86792C9E6E913DEC02BA9A4970937F89AFE3B6E47"
+      },
+      {
+        "Path": "tests/build_setup_user_scope_probe.ps1",
+        "SHA256": "2F6121335A1AF81D7502F31BAB07309B3D9493FC0F81BC049B9C5C80AD58EC07"
+      },
+      {
+        "Path": "tests/build_tls_package_deployment_probe.ps1",
+        "SHA256": "3EC7EAE3055FDD70F4B585FE4FC3FFFE0704830B545A6FE35CF7FD3B67536D0F"
+      },
+      {
+        "Path": "tests/build_verifier_tokens_probe.ps1",
+        "SHA256": "DB35B53E71E2D20226D640E6B49C40774FB8D766CEF053B163807B86A0EF827D"
+      },
+      {
+        "Path": "tests/build_vista_compat_probe.ps1",
+        "SHA256": "649C7980000E1E22DC0159AA82FB40F90B1EB40205B6C9E7080A449B735EB326"
+      },
+      {
+        "Path": "tests/build_vista_shell_config_probe.ps1",
+        "SHA256": "FB71CEFD533193425A204B9B0B7D96A647CB3C980A006D5532C8F971012578FD"
+      },
+      {
+        "Path": "tests/build_vistasetup_rollback_probe.ps1",
+        "SHA256": "B9E48F45D4CD6A0100207F6AD97340380AAB78EC7810EEC360AC201ABAD3CA56"
+      },
+      {
+        "Path": "tests/build_vxl_reader_probe.ps1",
+        "SHA256": "A9060D7818B35308C4AD197BE6F81625BB880B64770B78E628C0F50FFF0C50FE"
+      },
+      {
+        "Path": "tests/build_vxlview_details_probe.ps1",
+        "SHA256": "38288E6E604F3C31EB1F20B2293DCD56B3930520BD6B259C73605E800179B623"
+      },
+      {
+        "Path": "tests/build_vxlview_export_failure_probe.ps1",
+        "SHA256": "884D4113E72C6C70B20E4D92DA0DA89EB47CFDE67656F7DF55B6D174FF90BEDE"
+      },
+      {
+        "Path": "tests/build_vxlview_probes.ps1",
+        "SHA256": "AAA51F88A3924F7CC715899BBBAD6CD0F6863DAE7E5ED47775A59A846AA11502"
+      },
+      {
+        "Path": "tests/build_wow64_version_probe.ps1",
+        "SHA256": "582E2C5468B19ADF532CAB622042E8AD94FFC49D05574656CFF0563D77D655AE"
+      },
+      {
+        "Path": "tests/capture_kxnt_release_build_readiness.ps1",
+        "SHA256": "C424A7ECF3F8FCD65E8AA45DD2EDF5500D6360B758CC0122233340AABF1A97E4"
+      },
+      {
+        "Path": "tests/capture_kxnt_vista_clone_baseline.ps1",
+        "SHA256": "24401CD8F3CBDE4E69CC1F7DA65DE441DA5201932A5BEF346CDF17AF72677026"
+      },
+      {
+        "Path": "tests/cng_object_probe.c",
+        "SHA256": "B1CC825D7F2DB6EFF2630D6466B394E087BCAF2883F43E6899F7C52BED1CD546"
+      },
+      {
+        "Path": "tests/config_missing_image_probe.c",
+        "SHA256": "A87ABF2FE91678B3BA96909F9C17988A908E87B8E0E5008CF3DBD93A0D93ADF1"
+      },
+      {
+        "Path": "tests/context_menu_probe.c",
+        "SHA256": "3428027C58EB8689EA206DF6EABC7AE8E8E5EF6A05BFEA0D3FB7A27EBD0937DB"
+      },
+      {
+        "Path": "tests/create_tls_cross_signed_fixture.ps1",
+        "SHA256": "4080A50A123BB67E852E06B0E4AA06A78498431F9C7DD58622768FE2DEEF2B55"
+      },
+      {
+        "Path": "tests/create_tls_fixture.ps1",
+        "SHA256": "D63E54CAFFA838AE5C258AEAE7AAE5EC8AFD187E3C04EE7255CE2F5CD0285F55"
+      },
+      {
+        "Path": "tests/create_tls_negative_fixtures.ps1",
+        "SHA256": "F4D5B6E128850D95CA400C67BB7BB68586B8320470978AF188B4B6CB4BECDDB5"
+      },
+      {
+        "Path": "tests/global_settings_cli_probe.c",
+        "SHA256": "0075E2237AEAC808A2E95D5BF8409FE63CE63D473C07600B7109C8EAE859D335"
+      },
+      {
+        "Path": "tests/inno_profile_probe.c",
+        "SHA256": "D2B0B5168196583A01B2A9860E2AE4040D4B85F388BA7F30A4FE44A00FF5710E"
+      },
+      {
+        "Path": "tests/installed_version_probe.c",
+        "SHA256": "0FFAA65B9506C8B7662BB90DFB9AB013D379A756F402E62CFB5D63BDDDF231A7"
+      },
+      {
+        "Path": "tests/java_loader_probe.c",
+        "SHA256": "75396094DFA61B4836920B100B25A592BB49500294C22A7FD3C41E0EF5C089C3"
+      },
+      {
+        "Path": "tests/kexcfg_gui_probe.c",
+        "SHA256": "AB977E9715128F9FD780B5CD9E64B08000D0047780CE2CC7563D5C7801C61290"
+      },
+      {
+        "Path": "tests/kxnt_alert_probe.c",
+        "SHA256": "3E951B5ED1F5B0FAA01F10847E2B92D412B52F89A365B7FF7D6B07BD308A43D9"
+      },
+      {
+        "Path": "tests/kxnt_compare_probe.c",
+        "SHA256": "5FE540F1E20DC324E8F59D6D419AA53AAE81049197E996671464E71574C1FC46"
+      },
+      {
+        "Path": "tests/kxnt_condrv_imports.def",
+        "SHA256": "EDD8BBB198AA9FD6E93DD862DDCF506DB92782418CA77AD081F1A4F02EF3C40E"
+      },
+      {
+        "Path": "tests/kxnt_condrv_probe.c",
+        "SHA256": "650A24AAAC1266B747958101A7CE51D964CBA2DB93C705435F54810A9D6C4188"
+      },
+      {
+        "Path": "tests/kxnt_console_classification_probe.c",
+        "SHA256": "6564AD3B864D578B1F503B07ABCEAD3BA14D9D65545A1053A2501036F8F41FDE"
+      },
+      {
+        "Path": "tests/kxnt_device_family_probe.c",
+        "SHA256": "438A4C38E5A2C213E827F4ACBE632EE3999B9E172D3807CF1311B39DAC5F25A5"
+      },
+      {
+        "Path": "tests/kxnt_domain_probe.c",
+        "SHA256": "C8FB5E187834CB138CA7D3E925E6949E577AB2A420C080A13DAF1356FE9B6B46"
+      },
+      {
+        "Path": "tests/kxnt_file_information_probe.c",
+        "SHA256": "ABCD30287A9A0EC942F75F2549F6C901EE512C27D99C341CEB177184F6D2BE67"
+      },
+      {
+        "Path": "tests/kxnt_ifeo_deployment_probe.c",
+        "SHA256": "37FDF3702233BFB719D12F4781E66E01915059DA9CB2D4CCD1ADA582D4862D7E"
+      },
+      {
+        "Path": "tests/kxnt_ifeo_imports.def",
+        "SHA256": "2F39FA69B194FCAC5E5EF184B8E401C465DD650E9FE38B98B75053E7528875D3"
+      },
+      {
+        "Path": "tests/kxnt_ifeo_suite_imports.def",
+        "SHA256": "C1683C4031486B2535D91E2DAE80DA91C61EED49BA4C89AEA3CC23E6DBA53BEF"
+      },
+      {
+        "Path": "tests/kxnt_ifeo_suite_provider.h",
+        "SHA256": "40E102ACF88FFBD7714AA5B3633ED8D40E645C3DC28CDDCF1C58375B65F9A6A9"
+      },
+      {
+        "Path": "tests/kxnt_import_resolution_probe.c",
+        "SHA256": "1027BCE5371C135B0FB4EC74879CDDDC5C9A03BC7326ED81E4AD89836FBEF9D4"
+      },
+      {
+        "Path": "tests/kxnt_membership_probe.c",
+        "SHA256": "FE3BFB7B51B7CC60388454C61DCFD704A9814D746B30965E559DD27F08F10AD2"
+      },
+      {
+        "Path": "tests/kxnt_native_launch_probe.c",
+        "SHA256": "0A2C2C0965FE9F74BC306937EF3426E84BCF4ABFE4B1A2BD4FB7BBAF0375B829"
+      },
+      {
+        "Path": "tests/kxnt_open_key_adapter_probe.c",
+        "SHA256": "16BCAB1D049BDDF8407ED434442849896998B9DE83945B10E553D34BA4A1C656"
+      },
+      {
+        "Path": "tests/kxnt_open_key_options_probe.c",
+        "SHA256": "5C1146741D00BD261F385DA367F11EF5F2808FE13E430EA04DF2068F56664E95"
+      },
+      {
+        "Path": "tests/kxnt_open_key_reference_probe.c",
+        "SHA256": "EC8233F0D6D3F0B043227AA941B2FEBFDDCC9438F28DE8A3BB873BA4CCC32571"
+      },
+      {
+        "Path": "tests/kxnt_performance_probe.c",
+        "SHA256": "106E8DACA157A08B1D575F1040C9556F11CB93E32632C7DAA31C97349EED58EF"
+      },
+      {
+        "Path": "tests/kxnt_persisted_state_probe.c",
+        "SHA256": "893C8A1F6D3BAFE62A074751E376E62B8FD967123DFC2594FCA3BB8CD0BAAD10"
+      },
+      {
+        "Path": "tests/kxnt_processor_feature_probe.c",
+        "SHA256": "08F4CA39E4FE0D1580BF588417768301AE7F838E3960D6F6D9FAAEB582D70AD1"
+      },
+      {
+        "Path": "tests/kxnt_registry_link_native_probe.c",
+        "SHA256": "17E3F80C16028BEB3019D741BA3700FAE864A0583F7B32711A542608FFDC547A"
+      },
+      {
+        "Path": "tests/kxnt_registry_transaction_probe.c",
+        "SHA256": "8B0FD0599F0C6ED758E0BCCE6801CC214BCBDEA8ECC41D114E4D03C4616675E4"
+      },
+      {
+        "Path": "tests/kxnt_sid_class_probe.c",
+        "SHA256": "B70CB041D26132598803B4B916EA3976EE48BA02A3E95F5F914D4A06CBEEA21D"
+      },
+      {
+        "Path": "tests/kxnt_silent_exit_probe.c",
+        "SHA256": "9CE0532BC996C8AB398B6746CFE13C12F4B5FA96897F48D6CF7FAA21EA2BC335"
+      },
+      {
+        "Path": "tests/kxnt_srw_probe.c",
+        "SHA256": "A839355573BBB1C4A6C2BBEF367DDF1E9D61915919671D676AA7155D4B938610"
+      },
+      {
+        "Path": "tests/kxnt_utf8_external_observer.c",
+        "SHA256": "D3378CABE5D7234F2BC17C928462EE6835B506316FEBD47744D9DC36CAF7915E"
+      },
+      {
+        "Path": "tests/kxnt_utf8_probe.c",
+        "SHA256": "9E964FE77782B419EFB717FFE269CBAA85D2AA1923228525A48EA453C69E14DF"
+      },
+      {
+        "Path": "tests/kxnt_utf8_resource_probe.c",
+        "SHA256": "45DC32A226FA86E0BFB2D4C90BBFF4615710E5C56DD9B0891D632839B8651247"
+      },
+      {
+        "Path": "tests/kxnt_utf8_trace.h",
+        "SHA256": "AFEE335EB85E16A1171496C0AEC350FEF71755A844321DD2E8CB49461534811F"
+      },
+      {
+        "Path": "tests/kxschanl_load_probe.c",
+        "SHA256": "BC93EEEFEE1CF83A687364848123F956722D71AAB654FB4CA380FBC82552B58A"
+      },
+      {
+        "Path": "tests/kxschanl_registration_probe.c",
+        "SHA256": "56769006078A96596C6324AE58D0CEC7D7B78AB450EA9D4D8F2EC69D8AB68C72"
+      },
+      {
+        "Path": "tests/kxschanl_tls_client.c",
+        "SHA256": "DDBCB74B6490D81B91F58C76A220B88A9F8E42A752A9AAC3AA4A917604916F19"
+      },
+      {
+        "Path": "tests/logging_settings_probe.c",
+        "SHA256": "85B9E3E61FEB73448A9147B77D2C9366E2B05EB688449AC9E7CAAD5A4F72D09D"
+      },
+      {
+        "Path": "tests/prepare_kxnt_vista_clone.ps1",
+        "SHA256": "880D8ABA28C5C2351D43CC2CB2A1A7B98F695D64D664D40D94816824FDFA4BA8"
+      },
+      {
+        "Path": "tests/prepare_kxnt_vista_current_clone.ps1",
+        "SHA256": "22491A3CF2BD29AC32C90C202EBF2272F2E39F17596D36981582AACBF79633E3"
+      },
+      {
+        "Path": "tests/preserve_all_probe.c",
+        "SHA256": "4B65A0BBE99312DFABB5C1E2BF5C0758FF3A424365FFD54E9D098B5E4049DF3B"
+      },
+      {
+        "Path": "tests/preserve_configuration_probe.c",
+        "SHA256": "39E3584EF38F28E7778EE0526D760DEB713BDCFE2F2C2337EDC0F6CF1D7A4A44"
+      },
+      {
+        "Path": "tests/preserve_view_probe.c",
+        "SHA256": "2508FFA7CBBB0A7F9165611453A66F57F77C1623E86BCFE5FD635E7A3ADD9F4B"
+      },
+      {
+        "Path": "tests/run_kxnt_alert_reference.ps1",
+        "SHA256": "5DBF9291AF8C56A2E32BC8D5D918C158F794CF42DDC39E6FEFDDD903F9104B0F"
+      },
+      {
+        "Path": "tests/run_kxnt_compare_controls_vm.ps1",
+        "SHA256": "92246AEF95C834724B4A4C74606CAD714144BADC84D47FB44034C5C3494A5614"
+      },
+      {
+        "Path": "tests/run_kxnt_condrv_vm.ps1",
+        "SHA256": "CC49A8D6DDE976132B1586A3E8D8F3A0DA37241EABC96FC527CBD66DD0FA7786"
+      },
+      {
+        "Path": "tests/run_kxnt_console_classification_vm.ps1",
+        "SHA256": "E6D05CF5C95B288438793C3EA12DC9C3A099D5BF8B04DE8B5CC315F14F4A1B85"
+      },
+      {
+        "Path": "tests/run_kxnt_core_suite.ps1",
+        "SHA256": "250EE115221AA8DF073A835EF01409B97BDE07374E3BBE96735F05E72B70D50F"
+      },
+      {
+        "Path": "tests/run_kxnt_ifeo_vm.ps1",
+        "SHA256": "F8D88D0A624C4B2E66757D3AF05688C678B7557EE0CDF4084EB581E2CD7A1A65"
+      },
+      {
+        "Path": "tests/run_kxnt_launch_creation_flags.ps1",
+        "SHA256": "55DDAC0B90EC2A9D9A3E11BD8592F0C9DC28BBDD03215B9550559E8AA464B8DA"
+      },
+      {
+        "Path": "tests/run_kxnt_open_key_adapter.ps1",
+        "SHA256": "89D365B3720FE004941CB19A6D6494C898DCFBABCF743DCCC96B2640687B0CB5"
+      },
+      {
+        "Path": "tests/run_kxnt_open_key_options.ps1",
+        "SHA256": "49C57FD514DB53946F5130D03349FDF4B5EBCF0B317D0F5A839DFD78BC66CECB"
+      },
+      {
+        "Path": "tests/run_kxnt_open_key_reference.ps1",
+        "SHA256": "769A998D97F4D6E803E7DC481F549163434DBECEA9A2D321E7AC01CAB413C2E5"
+      },
+      {
+        "Path": "tests/run_kxnt_performance_reference.ps1",
+        "SHA256": "23BFF95DB744EE70013EB59CFE8FFB216D74CB97C58B64FBBBC23E2B5A06EEAA"
+      },
+      {
+        "Path": "tests/run_kxnt_processor_feature_vm.ps1",
+        "SHA256": "7E3D4E6867987EA6C2F9D2873FBEAE3730D70B7A5C85DC38DD0D661FDD589F18"
+      },
+      {
+        "Path": "tests/run_kxnt_registry_link_native.ps1",
+        "SHA256": "A9CEF5A8623E8C7DC1F9D84FB347DD244885EB095A9B9F22BB30E5ED6D803A94"
+      },
+      {
+        "Path": "tests/run_kxnt_registry_transaction_probe.ps1",
+        "SHA256": "C77F6C42B7F19532F3BF4EF22054A65ECB048B51285851144BD769AE78635E96"
+      },
+      {
+        "Path": "tests/run_kxnt_silent_exit_vm.ps1",
+        "SHA256": "05E00E79D0AFF449B4F9C53B52DFAD0B865C2F06A37AD3585DDF755237EEBE1E"
+      },
+      {
+        "Path": "tests/run_kxnt_srw_vm.ps1",
+        "SHA256": "991D4A26D5BDBC31CBC49DC78AC5A4F46972E956ED3357D787EF1D9554E36CAE"
+      },
+      {
+        "Path": "tests/run_kxnt_utf8_reference.ps1",
+        "SHA256": "D99889173F16AA551B53F4206C0E8199FD59D59A342CEC65B19DA0E36833F9F0"
+      },
+      {
+        "Path": "tests/run_kxnt_utf8_resource_probe.ps1",
+        "SHA256": "208CC8EAFEE28CF6B018D5E7FD0F581EDC24669FC8FEC864A975739A550BA754"
+      },
+      {
+        "Path": "tests/run_kxnt_utf8_vm.ps1",
+        "SHA256": "BDF0778BF57A8F7466D867E1A92AE84106E7DCBDE68A4BD6411BD7E2A36A8144"
+      },
+      {
+        "Path": "tests/run_kxnt_utf8_windowless_vm.ps1",
+        "SHA256": "D94DD8D4E8EDC191DB49420A2979F3AE84A14F686C740C4F04779D10361CD98F"
+      },
+      {
+        "Path": "tests/run_kxnt_zig_native_reference.ps1",
+        "SHA256": "6CE532D824181C0D4BD6234FF0D3A26A2A4681C4B706F4F4F89FD266419649E2"
+      },
+      {
+        "Path": "tests/setup_binary_probe.c",
+        "SHA256": "27C16737A4227A274D74128549E2CA6F4AB9B5CA93635073FF790DD836A9A652"
+      },
+      {
+        "Path": "tests/setup_cache_probe.c",
+        "SHA256": "5847BA74C46A8536EFB62CB6E6090BAB0BA26D41DC9E2882E124661F0EF8B5A3"
+      },
+      {
+        "Path": "tests/setup_package_probe.c",
+        "SHA256": "E5DE2D1EAA1D41783B105F4A7D7C0A6EEA72CACDB79D234A4DA322E88D1C6759"
+      },
+      {
+        "Path": "tests/setup_registry_probe.c",
+        "SHA256": "E123909D336FE08622058025F685609AE77C03F597D69AA3D1C58985F63E29FB"
+      },
+      {
+        "Path": "tests/setup_scope_recovery.c",
+        "SHA256": "DE96668C1292A9D766724273E5CDF011E289EA2C23C1B483AE7527FAD4FD09AB"
+      },
+      {
+        "Path": "tests/setup_stage_probe.c",
+        "SHA256": "457EFE7B95962008B72CA98A67F67FE29B589D49999D539B6CF8FDADE8A28AB0"
+      },
+      {
+        "Path": "tests/setup_system_lifecycle_probe.c",
+        "SHA256": "3BEB2B5588B38375795A57451F82AC8D7DB990E80CBD6B19D294C1BDCE703758"
+      },
+      {
+        "Path": "tests/setup_transaction_probe.c",
+        "SHA256": "E88AFE9A18A44DD1B42E1D9189A351CA1C306AE73476737689DCB47AD01406B4"
+      },
+      {
+        "Path": "tests/setup_user_scope_probe.c",
+        "SHA256": "A16AE0BE7D9D7C3B228E311287D8BA4269C501AB71C089715638E716BF8C8E2D"
+      },
+      {
+        "Path": "tests/strong_spoof_tick_probe.c",
+        "SHA256": "8E92170F087932AC546EF8058C178DFF8B17C6FBD5688F69ED7FF0A659D3FA6C"
+      },
+      {
+        "Path": "tests/summarize_kxnt_parity.ps1",
+        "SHA256": "EDBC051C071F122AEA4045B51552B3C8ED08E54CD48F65182F1D9B9E3D6D6F87"
+      },
+      {
+        "Path": "tests/tls_package_deployment_probe.c",
+        "SHA256": "AE5CA998350F73521263298DDB6DA591270CC1E6EAC87C47F5224C8047055F98"
+      },
+      {
+        "Path": "tests/verifier_tokens_probe.c",
+        "SHA256": "A6CA2B2DE9B005367832F4DF7B00F098FD4827AFAC59C8A7BD43D99208DDB891"
+      },
+      {
+        "Path": "tests/vista_compat_probe.c",
+        "SHA256": "96CA69FA834ECD3EACBD48A97AE038441CFD576C2D9282D858AC5175E11A4247"
+      },
+      {
+        "Path": "tests/vista_handle_list_probe.c",
+        "SHA256": "E0E9F0BFB44EB1D7471D06EA72F38DA53B61AB271677AD1FF7E21C262F8C10EA"
+      },
+      {
+        "Path": "tests/vista_property_store_probe.cpp",
+        "SHA256": "92CACD2251F32B5A5958A74630D26DBC4820A1829AFD5240DC7500B75A22DDF1"
+      },
+      {
+        "Path": "tests/vista_shell_config_probe.c",
+        "SHA256": "5B828C99676BFC7B722BDB8DCA0FC5A0059F97935DCCDADA3E30FE6CA29F833B"
+      },
+      {
+        "Path": "tests/vista_shelllink_probe.cpp",
+        "SHA256": "232603D620474E52EE816B14107C17C9999FDA97CDA62AC832DB49E362EB019B"
+      },
+      {
+        "Path": "tests/vista_shelllink_probe.rc",
+        "SHA256": "FB97EDC2D41868C2A946B950E5519E972C1CE10BC8E9AAD702D7CE43E5EB202C"
+      },
+      {
+        "Path": "tests/vista_terminal_backend_probe.cpp",
+        "SHA256": "21483EEAED7D2FC3D64F342B433CB2E183E3F6AC60DB3052E88702CC517839AC"
+      },
+      {
+        "Path": "tests/vistarun_wait_child.c",
+        "SHA256": "1A7940C8332FC3F0CC6ACD859F53319852736177791292805811CD368790E95E"
+      },
+      {
+        "Path": "tests/vistarun_wait_probe.c",
+        "SHA256": "39E2E418FEC24555454E58E9280F2A029F5E538035CC10AF14C40780A4B14A44"
+      },
+      {
+        "Path": "tests/vistasetup_rollback_probe.c",
+        "SHA256": "BE48A845C43053938FE12FB8C92C4D18F2E147F542480C65312DA05569B8CA85"
+      },
+      {
+        "Path": "tests/vxl_association_probe.c",
+        "SHA256": "BB951EE703561A314BD76135FDFF6D73A0B8FF563023EEB26666533C3085D762"
+      },
+      {
+        "Path": "tests/vxl_fixture_probe.c",
+        "SHA256": "2305B895DCA4DAE49D5352D60A4D9A5A96218C144201A7538517451CC6A7CDD2"
+      },
+      {
+        "Path": "tests/vxl_reader_probe.c",
+        "SHA256": "A5C89532BEE1463C0990B760FC906220DF80CE5AEA07A84BA9C324371D0ECF80"
+      },
+      {
+        "Path": "tests/vxlview_details_probe.c",
+        "SHA256": "070A5251AC4E572B2E27871F8222D493C833571D0F7F8F7EA219C5B80D5FBE1F"
+      },
+      {
+        "Path": "tests/vxlview_export_failure_probe.c",
+        "SHA256": "4BCB73F3A3EE877D5B84B66B3F31FBEB64620D124C8DF5DA52856D157973A2BF"
+      },
+      {
+        "Path": "tests/vxlview_export_probe.c",
+        "SHA256": "AF3F7541C9FB58C4B3E7244B7AEF1B3A059F8CF167B1D952AEA76D76EAC534C4"
+      },
+      {
+        "Path": "tests/vxlview_gui_probe.c",
+        "SHA256": "1AB5F54564C246F10EE711F978060E6F65C8FAF7B666810D131C54A4FB620C39"
+      },
+      {
+        "Path": "tests/wow64_child_probe.c",
+        "SHA256": "B9009B01E06B28E440CB2DA086C18B691E53F09DD8E03E46838E5D156CE4B225"
+      },
+      {
+        "Path": "tests/wow64_version_probe.c",
+        "SHA256": "2BDE6AD678E9A324F80AB06254513FF2AA0314326484623A08215BF4E8AC6C07"
+      },
+      {
+        "Path": "tools/Stage-NextParityHigh.ps1",
+        "SHA256": "EAAF6C674EC8381C6636EF9C78528569664871A29F30E7C8FB07EC1460DEB708"
+      },
+      {
+        "Path": "tools/Stage-NextParityTls.ps1",
+        "SHA256": "DB5D3C70C72693AF11AD92B259F65F861C529D34F7F2854691A50AAEAD3D9B0D"
+      },
+      {
+        "Path": "tools/VistaPty/addon.cpp",
+        "SHA256": "790D6967B17273CA3D0599099EBD17101957AA9C9D02B646F2A822E4019FE3DC"
+      },
+      {
+        "Path": "tools/VistaPty/api.h",
+        "SHA256": "553D210A566901242A9C96D1CDEEDB16566B6FEE89AE75C2CF988F53071EB374"
+      },
+      {
+        "Path": "tools/VistaPty/build.ps1",
+        "SHA256": "77BE24C2223C8B1974517C68637DA2DFC582749C882521CDED7D7020413BF03E"
+      },
+      {
+        "Path": "tools/VistaPty/clear.cpp",
+        "SHA256": "7F8572CD882CCDAA42FF2FFB770E2B873BAB6F601EBEA34958C551C2245400FC"
+      },
+      {
+        "Path": "tools/VistaPty/compat/stdbool.h",
+        "SHA256": "32EC1E93A495264B389D8BB29EE7B6088C4B7FBE056D2A4A72B8F66A5AD81FCD"
+      },
+      {
+        "Path": "tools/VistaPty/include/js_native_api.h",
+        "SHA256": "1F2CD7EFABD4D9C4364C7F1598CA6C77462C8BB732A01E84E4FBF8C88320920D"
+      },
+      {
+        "Path": "tools/VistaPty/include/js_native_api_types.h",
+        "SHA256": "4E146842B3C7D9C81F7A703915A767CED6A86B825646A4D4EB8E9A77B6FD529D"
+      },
+      {
+        "Path": "tools/VistaPty/include/node_api.h",
+        "SHA256": "2D807B92D63582A8E15C4AC88CAFB3A64245AC945497E5EB41642BDA02C163C4"
+      },
+      {
+        "Path": "tools/VistaPty/include/node_api_types.h",
+        "SHA256": "E50258CAC3C0B2C6E91B1CE2F00D3CC98B0DDCDA14BF56A2EA68C623CEF3433F"
+      },
+      {
+        "Path": "tools/VistaPty/include/winpty.h",
+        "SHA256": "712C16B74EBE99AD6A897B9D014BC9E4501B1BFD3BB0536F3BD640AF2BE88C32"
+      },
+      {
+        "Path": "tools/VistaPty/include/winpty_constants.h",
+        "SHA256": "7C0924793FE580D5CA886A3C921B8FE6EA8A3844E18916A5059287B26D7DDE4C"
+      },
+      {
+        "Path": "tools/VistaPty/install.ps1",
+        "SHA256": "109CAE4181546A1FE9A169BC414CD15F08E9739B58CC773D4876A9690375C406"
+      },
+      {
+        "Path": "tools/VistaPty/uninstall.ps1",
+        "SHA256": "47D2B8EB06F82528FDF1ED791BAFC006B51688E4B4FB0FAE4A8664944CFB31E3"
+      },
+      {
+        "Path": "tools/VistaRun/build.ps1",
+        "SHA256": "238DEE036A923668CB8FDB8C024473130CFDC302F85DFFE09060949D54535F3E"
+      },
+      {
+        "Path": "tools/VistaRun/main.c",
+        "SHA256": "EB4F0ADE4CCBF6B572B97FD9CF027F0C824377356CD9356D2E7894C5B90CECFD"
+      },
+      {
+        "Path": "x64/Release/KexShlEx/KexShlEx.dll.manifest",
+        "SHA256": "83C97F0B8274AB7D651513E9616E8D7C2652359730FDF86F585950CFDD89A03C"
+      },
+      {
+        "Path": "x64/Release/KxAdvapi/KxAdvapi.dll.manifest",
+        "SHA256": "83C97F0B8274AB7D651513E9616E8D7C2652359730FDF86F585950CFDD89A03C"
+      },
+      {
+        "Path": "x64/Release/KxBase/KxBase.dll.manifest",
+        "SHA256": "83C97F0B8274AB7D651513E9616E8D7C2652359730FDF86F585950CFDD89A03C"
+      },
+      {
+        "Path": "x64/Release/KxCom/KxCom.dll.manifest",
+        "SHA256": "83C97F0B8274AB7D651513E9616E8D7C2652359730FDF86F585950CFDD89A03C"
+      },
+      {
+        "Path": "x64/Release/KxCrt/KxCrt.dll.manifest",
+        "SHA256": "83C97F0B8274AB7D651513E9616E8D7C2652359730FDF86F585950CFDD89A03C"
+      },
+      {
+        "Path": "x64/Release/KxCryp/KxCryp.dll.manifest",
+        "SHA256": "83C97F0B8274AB7D651513E9616E8D7C2652359730FDF86F585950CFDD89A03C"
+      },
+      {
+        "Path": "x64/Release/KxDw/KxDw.dll.manifest",
+        "SHA256": "83C97F0B8274AB7D651513E9616E8D7C2652359730FDF86F585950CFDD89A03C"
+      },
+      {
+        "Path": "x64/Release/KxDx/KxDx.dll.manifest",
+        "SHA256": "83C97F0B8274AB7D651513E9616E8D7C2652359730FDF86F585950CFDD89A03C"
+      },
+      {
+        "Path": "x64/Release/KxMi/KxMi.dll.manifest",
+        "SHA256": "83C97F0B8274AB7D651513E9616E8D7C2652359730FDF86F585950CFDD89A03C"
+      },
+      {
+        "Path": "x64/Release/KxNet/KxNet.dll.manifest",
+        "SHA256": "83C97F0B8274AB7D651513E9616E8D7C2652359730FDF86F585950CFDD89A03C"
+      },
+      {
+        "Path": "x64/Release/KxUia/KxUia.dll.manifest",
+        "SHA256": "83C97F0B8274AB7D651513E9616E8D7C2652359730FDF86F585950CFDD89A03C"
+      },
+      {
+        "Path": "x64/Release/KxUser/KxUser.dll.manifest",
+        "SHA256": "83C97F0B8274AB7D651513E9616E8D7C2652359730FDF86F585950CFDD89A03C"
+      }
+    ],
+    "Limits": "Third-party dwrw10 / winpty and unchanged VistaPty assets retained byte-for-byte. VistaRun has no version resource; primary setup/configuration/core/extension DLL versions checked. No runtime success or publication is implied."
+  },
+  "ManifestSHA256": "03305ED28C5E3F7B8D4DA1112E612976E778C885E0545D5AC76F5DC7906ABDFA",
+  "StageScriptSHA256": "A564124B2661C6A69B5A9EB1458643F7A8B5571424D24C0EDCE886CC21090CEF",
+  "ExportComparison": {
+    "State": "NamedExportsPreserved",
+    "Pairs": [
+      {
+        "Path": "KexDll.dll",
+        "ExportCount": 122,
+        "IdenticalNamedExportsAndForwarders": true
+      },
+      {
+        "Path": "KxNt.dll",
+        "ExportCount": 2027,
+        "IdenticalNamedExportsAndForwarders": true
+      },
+      {
+        "Path": "KxBase.dll",
+        "ExportCount": 1924,
+        "IdenticalNamedExportsAndForwarders": true
+      },
+      {
+        "Path": "KxAdvapi.dll",
+        "ExportCount": 822,
+        "IdenticalNamedExportsAndForwarders": true
+      },
+      {
+        "Path": "KxCom.dll",
+        "ExportCount": 496,
+        "IdenticalNamedExportsAndForwarders": true
+      },
+      {
+        "Path": "KxCrt.dll",
+        "ExportCount": 1303,
+        "IdenticalNamedExportsAndForwarders": true
+      },
+      {
+        "Path": "KxCryp.dll",
+        "ExportCount": 225,
+        "IdenticalNamedExportsAndForwarders": true
+      },
+      {
+        "Path": "KxDw.dll",
+        "ExportCount": 1,
+        "IdenticalNamedExportsAndForwarders": true
+      },
+      {
+        "Path": "KxDx.dll",
+        "ExportCount": 249,
+        "IdenticalNamedExportsAndForwarders": true
+      },
+      {
+        "Path": "KxMi.dll",
+        "ExportCount": 228,
+        "IdenticalNamedExportsAndForwarders": true
+      },
+      {
+        "Path": "KxNet.dll",
+        "ExportCount": 444,
+        "IdenticalNamedExportsAndForwarders": true
+      },
+      {
+        "Path": "KxSChanl.dll",
+        "ExportCount": 2,
+        "IdenticalNamedExportsAndForwarders": true
+      },
+      {
+        "Path": "KxUia.dll",
+        "ExportCount": 90,
+        "IdenticalNamedExportsAndForwarders": true
+      },
+      {
+        "Path": "KxUser.dll",
+        "ExportCount": 1581,
+        "IdenticalNamedExportsAndForwarders": true
+      },
+      {
+        "Path": "Kex32/KexDll.dll",
+        "ExportCount": 122,
+        "IdenticalNamedExportsAndForwarders": true
+      },
+      {
+        "Path": "Kex32/KxNt.dll",
+        "ExportCount": 2067,
+        "IdenticalNamedExportsAndForwarders": true
+      },
+      {
+        "Path": "Kex32/KxBase.dll",
+        "ExportCount": 1897,
+        "IdenticalNamedExportsAndForwarders": true
+      },
+      {
+        "Path": "Kex32/KxAdvapi.dll",
+        "ExportCount": 822,
+        "IdenticalNamedExportsAndForwarders": true
+      },
+      {
+        "Path": "Kex32/KxCom.dll",
+        "ExportCount": 432,
+        "IdenticalNamedExportsAndForwarders": true
+      },
+      {
+        "Path": "Kex32/KxCrt.dll",
+        "ExportCount": 1412,
+        "IdenticalNamedExportsAndForwarders": true
+      },
+      {
+        "Path": "Kex32/KxCryp.dll",
+        "ExportCount": 225,
+        "IdenticalNamedExportsAndForwarders": true
+      },
+      {
+        "Path": "Kex32/KxDw.dll",
+        "ExportCount": 1,
+        "IdenticalNamedExportsAndForwarders": true
+      },
+      {
+        "Path": "Kex32/KxDx.dll",
+        "ExportCount": 249,
+        "IdenticalNamedExportsAndForwarders": true
+      },
+      {
+        "Path": "Kex32/KxMi.dll",
+        "ExportCount": 228,
+        "IdenticalNamedExportsAndForwarders": true
+      },
+      {
+        "Path": "Kex32/KxNet.dll",
+        "ExportCount": 444,
+        "IdenticalNamedExportsAndForwarders": true
+      },
+      {
+        "Path": "Kex32/KxSChanl.dll",
+        "ExportCount": 2,
+        "IdenticalNamedExportsAndForwarders": true
+      },
+      {
+        "Path": "Kex32/KxUia.dll",
+        "ExportCount": 90,
+        "IdenticalNamedExportsAndForwarders": true
+      },
+      {
+        "Path": "Kex32/KxUser.dll",
+        "ExportCount": 1573,
+        "IdenticalNamedExportsAndForwarders": true
+      },
+      {
+        "Path": "KexShlEx.dll",
+        "ExportCount": 5,
+        "IdenticalNamedExportsAndForwarders": true
+      }
+    ]
+  },
+  "Logs": [
+    {
+      "Path": "all-x64.stderr",
+      "Bytes": 65849,
+      "SHA256": "374A75ED1928B50F11225BC71593BAAD492FB6F1A25A0C8542D1858D31E97F49"
+    },
+    {
+      "Path": "all-x64.txt",
+      "Bytes": 73017,
+      "SHA256": "928B1C19958206856311F8E555341D2E6D5B805293BA480141BEA5F10E634E17"
+    },
+    {
+      "Path": "all-x86.stderr",
+      "Bytes": 53811,
+      "SHA256": "1836E2EB95641BD2693B3AFE4CEE3C6E7BBD28DB23D190DF66F0FB8E4502F3E4"
+    },
+    {
+      "Path": "all-x86.txt",
+      "Bytes": 58244,
+      "SHA256": "C44B413812AA94EA00734965AD3FA0967FFF1BF4349A3DF8B1AFE34E8B34CF71"
+    },
+    {
+      "Path": "DisposableVM.txt",
+      "Bytes": 44,
+      "SHA256": "545EF31DF5A91CC4BD3ACD8E283FE97B8213E41DFAB6D603646A3199A3EB2DEC"
+    },
+    {
+      "Path": "fixtures-core-x64.txt",
+      "Bytes": 128497,
+      "SHA256": "D23DBEFFD5F7ACA31CD31CFD694785986CE03D90BF34914367A6D41B2A856346"
+    },
+    {
+      "Path": "fixtures-core-x86.txt",
+      "Bytes": 146498,
+      "SHA256": "56B5187DF9C426FBFDB2B95A9B4C4CD28062AE2BD9995D5B50EDB496F28C140B"
+    },
+    {
+      "Path": "fixtures-runtime-x64.txt",
+      "Bytes": 128497,
+      "SHA256": "D23DBEFFD5F7ACA31CD31CFD694785986CE03D90BF34914367A6D41B2A856346"
+    },
+    {
+      "Path": "fixtures-runtime-x86.txt",
+      "Bytes": 146498,
+      "SHA256": "56B5187DF9C426FBFDB2B95A9B4C4CD28062AE2BD9995D5B50EDB496F28C140B"
+    },
+    {
+      "Path": "import-priority.txt",
+      "Bytes": 677,
+      "SHA256": "6EF4D44D6E63C31A882CDA3121934C3CB0E712AA1C299AB2AA469B10B2574EEA"
+    },
+    {
+      "Path": "KexCfg-x64.stderr",
+      "Bytes": 408,
+      "SHA256": "06882404F7B90A948EC6DD734059D392AE2E94D4DED9F1435DB80B85C82C0391"
+    },
+    {
+      "Path": "KexCfg-x64.txt",
+      "Bytes": 86,
+      "SHA256": "49E5F8EA045D0D085F81779F0773FA673D639429DA5146D9F6370EEDC4B71458"
+    },
+    {
+      "Path": "KexCfg-x86.stderr",
+      "Bytes": 408,
+      "SHA256": "06882404F7B90A948EC6DD734059D392AE2E94D4DED9F1435DB80B85C82C0391"
+    },
+    {
+      "Path": "KexCfg-x86.txt",
+      "Bytes": 95,
+      "SHA256": "5C767FC359A87A940F24C0737BA6E66D341CE430A0E71DFEFD000621BF003B01"
+    },
+    {
+      "Path": "VistaRun.stderr",
+      "Bytes": 408,
+      "SHA256": "06882404F7B90A948EC6DD734059D392AE2E94D4DED9F1435DB80B85C82C0391"
+    },
+    {
+      "Path": "VistaRun.txt",
+      "Bytes": 8,
+      "SHA256": "E6433E45388CA56590059AB3E9C95B7717C123C55F9F291DF7C1AF51AD6FEA12"
+    },
+    {
+      "Path": "VistaSetup.stderr",
+      "Bytes": 408,
+      "SHA256": "06882404F7B90A948EC6DD734059D392AE2E94D4DED9F1435DB80B85C82C0391"
+    },
+    {
+      "Path": "VistaSetup.txt",
+      "Bytes": 60,
+      "SHA256": "06F294C1222C327A8B9BD1D5753035B791172597C23E0B780EDE8FC53D83D48F"
+    },
+    {
+      "Path": "VxlView-x64.stderr",
+      "Bytes": 408,
+      "SHA256": "06882404F7B90A948EC6DD734059D392AE2E94D4DED9F1435DB80B85C82C0391"
+    },
+    {
+      "Path": "VxlView-x64.txt",
+      "Bytes": 181,
+      "SHA256": "651BB006CC3FA1E4F253FD6B8FA41ECF158183E01B3C61FCF9E1012D3D5D133F"
+    },
+    {
+      "Path": "VxlView-x86.stderr",
+      "Bytes": 408,
+      "SHA256": "06882404F7B90A948EC6DD734059D392AE2E94D4DED9F1435DB80B85C82C0391"
+    },
+    {
+      "Path": "VxlView-x86.txt",
+      "Bytes": 190,
+      "SHA256": "C6CF3FC6A762AD7C98868F855E8AD558E86508B620E41ACD7DDDCF32B31EC8C5"
+    }
+  ],
+  "VistaRecloneBaseline": {
+    "State": "Captured",
+    "VMX": "C:\\Users\\YamaR\\Documents\\Virtual Machines\\VxKex-Vista-Reclone-20261004\\Vista-Reclone.vmx",
+    "GuestDirectory": "C:\\VxKexProbe\\CurrentBaseline-release-2233-reclone",
+    "NativeLaunchSHA256": "C71F73DCB6EEDA8854311D7B3CBC6AD97427D6082392A1E8A8B54FA21CBD3DA0",
+    "RegistryFiles": [
+      "machine.reg",
+      "ifeo.reg"
+    ],
+    "UserRegistryExported": false,
+    "SystemFiles": [
+      {
+        "GuestPath": "C:\\Windows\\System32\\KexDll.dll",
+        "SHA256": "C1D6B165EF1BDE799F47F9884535D24087E2474F6F728CCFB6BBD6932CC8EC0E",
+        "Bytes": 247296
+      },
+      {
+        "GuestPath": "C:\\Windows\\System32\\KxNt.dll",
+        "SHA256": "48E1528DF40C5A81A3E8CCDD2F54865C541D1685A6DE217A823E7F0B66BB8C02",
+        "Bytes": 120320
+      },
+      {
+        "GuestPath": "C:\\Windows\\SysWOW64\\KexDll.dll",
+        "SHA256": "0730B574F027BA9E916E96309F4960D13C3293F08F774BAE25D608F91F6E7D64",
+        "Bytes": 246784
+      },
+      {
+        "GuestPath": "C:\\Windows\\SysWOW64\\KxNt.dll",
+        "SHA256": "4BAE1DE3858FB4BD488F5336A4D9D6AFB53F5C6B54220F6A30934A55792FFC06",
+        "Bytes": 122368
+      }
+    ],
+    "Scope": "Read-only installed baseline capture on the independent current-state Vista clone; unavailable HKCU export is recorded, not proof of absence; no uninstall or API success is implied"
+  },
+  "Limits": "Source-built candidate and completed core/runtime Vista regression. Limited ConDrv regression and publication are still pending. Versionless VistaRun and preserved third-party/VistaPty components are explicitly identified by staging manifest."
+}

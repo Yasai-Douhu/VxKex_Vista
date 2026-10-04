@@ -31,6 +31,13 @@ foreach ($name in $names) {
   if ($LASTEXITCODE) { throw "Compilation failed: $source" }
   $objects += $obj
  }
+ $resourceSource = Join-Path $root "$name\$name.rc"
+ if (Test-Path -LiteralPath $resourceSource) {
+  $resource = Join-Path $out "$name.res"
+  & rc.exe /nologo /i "$root\00-Common-Headers" /fo $resource $resourceSource
+  if ($LASTEXITCODE) { throw "Resource compilation failed: $name" }
+  $objects += $resource
+ }
  # syscal64.asm belongs only to x64; x86 uses its C/inline-assembly path.
  $def = Get-ChildItem "$root\$name\*.def" | Select-Object -First 1
  & link.exe /nologo /DLL /LTCG /MACHINE:X86 /ENTRY:DllMain /SUBSYSTEM:WINDOWS,6.0 /OPT:REF /OPT:ICF "/OUT:$out\$name.dll" "/IMPLIB:$out\$name.lib" "/DEF:$($def.FullName)" @objects "$root\Win32\Release\KexDll\KexDll.lib" "$root\Win32\Release\KexPathCch\KexPathCch.lib" "$root\Win32\Release\KexSmp\KexSmp.lib" "$root\Win32\Release\KexMls\KexMls.lib" "$root\Win32\Release\KexW32ML\KexW32ML.lib" "$root\Win32\Release\KexGui\KexGui.lib" ntdll_x86.lib msvcrt_x86.lib kernel32.lib user32.lib advapi32.lib shlwapi.lib gdi32.lib ole32.lib version.lib

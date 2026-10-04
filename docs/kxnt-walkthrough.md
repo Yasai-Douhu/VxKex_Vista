@@ -1128,3 +1128,25 @@ tests/capture_kxnt_release_build_readiness.ps1で30 DLL + 12 static librariesの
 Installerは置換していない。現Installer4 DLLと以前のVista通常IFEO主要30pair、actual exports12追加/7保持の一致をsummarize_kxnt_parityで再確認し、current-major-status.jsonをarchive保存。buildによるtracked生成noiseは今回の開始時clean状態へ戻し、新生成bytesはarchiveに保持。元worktreeにはwalkthroughと新validation JSONのみmirrorし、code / Installer / unrelated changesを変更しない。
 
 次はrelease version/tag整合、全配布frontendを含むcandidate stagingとversion resources確認、candidateの主要VM回帰、ZIP/checksum/release notesの作成・公開確認。今回のbuild readinessだけでReleases公開やgoal完了とは判定しない。既知のbounded diagnostic resource差分/WNF等の保留は前項のpolicyと優先度を維持する。
+## 2026-10-04: 2.0.0.2233 配布候補の全35バイナリ更新と Vista 通常IFEO主要回帰完了
+
+版番号を2.0.0.2233、InstalledVersionを既存2.0.0形式の次build 0x800008B9に更新。UTF-16のvautogen.h形式を維持。KxNt / KxBase両形式とextended DLLsで既存.rcをcompile/linkする処理を追加し、public APIの転送表を変更せず版情報を配布DLLへ含めた。
+
+tools/Stage-KxNtRelease.ps1を追加。fresh package/build archive、Windows PowerShell 5の独立子process、compiler fatal/nonzeroの拒否、生成時刻・MZ/PE境界とarchitecture・版番号・copy hashを確認する。全build、両bitのKexCfg/VxlView、native VistaSetup/VistaRunを作成し、Installerの58fileを継承した候補へ35binaryを置換。34binaryのFileVersionが2.0.0.2233、VistaRunは従来どおりversion resourceなし。third-party dwrw10 / winpty、VistaPty等は現Installer bytesを保持し、別製品の版をVxKexの版へ書換えない。29DLLのnamed exports / forwarder destinationsは検証済みInstallerと完全一致。版/ビルド変更後のruntime証拠は下記で取り直した。
+
+再クローンしたVista-Reclone.vmxに対し、baseline captureとrunnerに固定path専用VistaReclone switchを追加。任意VM pathの許可には緩和しない。HKLM product / IFEO export、operator SID、native command終了0、System32/SysWOW64のKexDll/KxNt計4hashを保存。HKCU export取得不可は不在証明としない。candidate VistaSetupの実uninstall-remove / actual SIDがnatural exit0となった後、独立cloneにexact disposable markerを配置した。元ユーザーVista / Server VMの製品状態・設定は変更していない。
+
+feature Installerの置換前をaudit/KxNtRelease-2.0.0.2233-installer-beforeへ保存し、候補35binaryを反映、全58file hash一致を確認した。両bitの通常static ntdll import fixturesを再buildし、core / runtime / ConDrvを各1回実施。
+
+- core: 実native Vista6.0.6002 / product1 / AMD64 / uninjected elevated driver、real install / KexCfg / AVRF経路。12機能×2形式の24pair全PASS。NtOpenKeyEx option0/8各280比較も一致、negative controls、実8配置byte検査、static26bindings、主要resource/unsupported/cleanup gatesをanalyze_kxnt_vista_ifeoで再確認。
+- runtime: UTFとSilentExitの4pair全PASS。UTF functional4893行native比較、malformed/guard/boundaries/scalars等と常設worker反復を確認。実WER reportingを実装したとは扱わない。analyze_kxnt_vista_runtimeが成功。
+- ConDrv: 2pair全PASS。実Zig、legacyconsole/file/pipe/VT/codepage/partial/ambiguous拒否とmain26binding、native処理保持。analyze_kxnt_vista_condrvが成功。
+- 3driver全てexit0 / Failures0 / 実uninstall後fresh state restored。既存guest directoriesはcore/runtimeごとにrenameして保持。timing/lazy resource深掘りは再開していない。
+
+summarize_kxnt_parityは証跡のbasenameを指定できるようにし、historical JSONを上書きせずnew candidateの主要30pair / current4DLL hash / actual追加12exportsとVista7保持 / import priorityを照合する。判定条件は弱めていない。current KxNtでcached actual Java25 java/jvmとCode3fileを再scanし、direct/delay missing intersection0、native未解決数182/166のままを確認。cached sampleはfresh guest inventoryやdynamic未使用証明とは区別する。
+
+docs/validation/kxnt-release2233-{candidate,vista-core,vista-runtime,vista-condrv,import-priority,major-status}.jsonにbuild/provenance/全詳細結果を保存。candidate資料のpending-ConDrv表記は生成時点の記録として保持し、後続condrv/major-statusで完了を証明する。再build生成noiseは開始時HEADへ戻し、Installerの35production変更と版/ビルド/検証scriptを残した。原worktreeはwalkthroughと新JSONのみmirror、unrelated Gemini branchや原Installerは変更しない。
+
+主要完了判定は元portability audit全項目と更新user基準に照合。RTL/SID/membership/compare/拡張file/alert/limitedConDrvを主要完了、既存native転送のUTF/performance/SRW/openも主要完了。WNF2名はNEXT自身に実働基盤がないためP3保留、AppContainer/fullConDrv/UMS/追加registry/WERは独立subsystem/unsupported制限、残りnative forwardersは実callが出た場合の条件付き優先度とする。bounded native Event/observer差を全資源不存在の証明とせずTODOへ維持。native32bit OSは未検証。新候補の回帰はVista x64/WOW64、Server差と競合/境界の詳細は以前の機能別source/major証跡を参照し、今回new candidateでServer全試験を再実施したとは主張しない。
+
+release-notes-v2.0.0.2233.mdを作成。次の公開工程はcurrent candidate全58fileのZIP round-tripとchecksum、branch push、同じ版tag/commitへのReleases upload、GitHub asset digest一致確認。公開の成功とgoal completionは外部状態の確認後に判定する。

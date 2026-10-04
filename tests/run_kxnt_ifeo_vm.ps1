@@ -12,9 +12,11 @@ param(
  [switch]$ConDrvSuite,
  [switch]$ConDrvTrace,
  [switch]$ClientVista,
+ [switch]$VistaReclone,
  [string]$VMRun='C:\Program Files\VMware\VMware Workstation\vmrun.exe'
 )
 $ErrorActionPreference='Stop'
+if($VistaReclone){$ClientVista=$true}
 if($Utf8Observer){if($Utf8ResourceSnapshot -or $EventTrace -or $Utf8Trace -or $ConDrvSuite -or $ConDrvTrace -or $ClientVista){throw 'External UTF observation requires normal Server fixtures only'};$RuntimeSuite=$true}
 if($Utf8ResourceSnapshot){if($EventTrace -or $Utf8Trace -or $ConDrvSuite -or $ConDrvTrace -or $ClientVista){throw 'Private PEB snapshot diagnosis is guarded for the Server clone without CDB only'};$RuntimeSuite=$true}
 if($Utf8Trace){$RuntimeSuite=$true;$EventTrace=$true}
@@ -26,6 +28,7 @@ $root=Split-Path $PSScriptRoot
 $allowed='C:\Users\YamaR\Documents\Virtual Machines\VxKex-Next-Parity-Test\Server2008-SetupParity.vmx'
 if($ClientVista){
  $allowed='C:\Users\YamaR\Documents\Virtual Machines\VxKex-Vista-Current-Parity-Test\Vista-CurrentParity.vmx'
+ if($VistaReclone){$allowed='C:\Users\YamaR\Documents\Virtual Machines\VxKex-Vista-Reclone-20261004\Vista-Reclone.vmx'}
  if($EventTrace){throw 'CDB private-image diagnostics are guarded for the Server clone only'}
 }
 if([IO.Path]::GetFullPath($VMX) -ine $allowed){throw 'This installer-changing runner only accepts the disposable clone, never the user VM'}

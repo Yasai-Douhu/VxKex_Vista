@@ -167,6 +167,13 @@ foreach ($dllName in $ExtendedDLLs) {
     $linkArgs += $ntdllLib, $msvcrtLib
     $linkArgs += "kernel32.lib", "user32.lib", "gdi32.lib", "advapi32.lib", "shlwapi.lib"
     
+    $resourceSource = Join-Path $dllDir "$dllName.rc"
+    if (Test-Path -LiteralPath $resourceSource) {
+        $resource = Join-Path $dllOutDir "$dllName.res"
+        & rc.exe /nologo /i $HDR_DIR /fo $resource $resourceSource
+        if ($LASTEXITCODE) { throw "Resource compilation failed: $dllName" }
+        $linkArgs += $resource
+    }
     Write-Host "  Linking $dllName.dll..." -NoNewline
     & link.exe @linkArgs
     if ($LASTEXITCODE -ne 0) { throw "Link failed: $dllName" }

@@ -1,0 +1,288 @@
+{
+  "State": "MajorVerificationInventory",
+  "Policy": "User completion criteria updated 2026-10-04: bounded timing/environment differences may be TODO, not blockers, after major semantics/safety/runtime verification",
+  "ProductionCandidatesMatchEvidence": true,
+  "NewPublicNamesImplemented": [
+    "NtAlertThreadByThreadId",
+    "NtWaitForAlertByThreadId",
+    "ZwAlertThreadByThreadId",
+    "ZwWaitForAlertByThreadId",
+    "ZwCompareObjects",
+    "RtlCheckTokenMembershipEx",
+    "RtlIsPackageSid",
+    "RtlIsCapabilitySid",
+    "RtlGetPersistedStateLocation",
+    "RtlGetDeviceFamilyInfoEnum",
+    "RtlCanonicalizeDomainName",
+    "RtlIsProcessorFeaturePresent"
+  ],
+  "BinaryExports": {
+    "x86": {
+      "RetainedVistaOnly": {
+        "LdrpResGetRCConfig": "ntdll.LdrpResGetRCConfig",
+        "NtCancelDeviceWakeupRequest": "ntdll.NtCancelDeviceWakeupRequest",
+        "NtFlushBuffersFileEx": null,
+        "NtRequestDeviceWakeup": "ntdll.NtRequestDeviceWakeup",
+        "NtRequestWakeupLatency": "ntdll.NtRequestWakeupLatency",
+        "WerCheckEventEscalation": "ntdll.WerCheckEventEscalation",
+        "WerReportWatsonEvent": "ntdll.WerReportWatsonEvent"
+      },
+      "Added": {
+        "NtAlertThreadByThreadId": "KexDll.NtAlertThreadByThreadId",
+        "NtWaitForAlertByThreadId": "KexDll.NtWaitForAlertByThreadId",
+        "ZwAlertThreadByThreadId": "KexDll.NtAlertThreadByThreadId",
+        "ZwWaitForAlertByThreadId": "KexDll.NtWaitForAlertByThreadId",
+        "ZwCompareObjects": "KexDll.NtCompareObjects",
+        "RtlCheckTokenMembershipEx": "KexDll.KexRtlCheckTokenMembershipEx",
+        "RtlIsPackageSid": "KexDll.KexRtlIsPackageSid",
+        "RtlIsCapabilitySid": "KexDll.KexRtlIsCapabilitySid",
+        "RtlGetPersistedStateLocation": "KexDll.KexRtlGetPersistedStateLocation",
+        "RtlGetDeviceFamilyInfoEnum": "KexDll.KexRtlGetDeviceFamilyInfoEnum",
+        "RtlCanonicalizeDomainName": "KexDll.KexRtlCanonicalizeDomainName",
+        "RtlIsProcessorFeaturePresent": "KexDll.KexRtlIsProcessorFeaturePresent"
+      }
+    },
+    "x64": {
+      "RetainedVistaOnly": {
+        "LdrpResGetRCConfig": "ntdll.LdrpResGetRCConfig",
+        "NtCancelDeviceWakeupRequest": "ntdll.NtCancelDeviceWakeupRequest",
+        "NtFlushBuffersFileEx": null,
+        "NtRequestDeviceWakeup": "ntdll.NtRequestDeviceWakeup",
+        "NtRequestWakeupLatency": "ntdll.NtRequestWakeupLatency",
+        "WerCheckEventEscalation": "ntdll.WerCheckEventEscalation",
+        "WerReportWatsonEvent": "ntdll.WerReportWatsonEvent"
+      },
+      "Added": {
+        "NtAlertThreadByThreadId": "KexDll.NtAlertThreadByThreadId",
+        "NtWaitForAlertByThreadId": "KexDll.NtWaitForAlertByThreadId",
+        "ZwAlertThreadByThreadId": "KexDll.NtAlertThreadByThreadId",
+        "ZwWaitForAlertByThreadId": "KexDll.NtWaitForAlertByThreadId",
+        "ZwCompareObjects": "KexDll.NtCompareObjects",
+        "RtlCheckTokenMembershipEx": "KexDll.KexRtlCheckTokenMembershipEx",
+        "RtlIsPackageSid": "KexDll.KexRtlIsPackageSid",
+        "RtlIsCapabilitySid": "KexDll.KexRtlIsCapabilitySid",
+        "RtlGetPersistedStateLocation": "KexDll.KexRtlGetPersistedStateLocation",
+        "RtlGetDeviceFamilyInfoEnum": "KexDll.KexRtlGetDeviceFamilyInfoEnum",
+        "RtlCanonicalizeDomainName": "KexDll.KexRtlCanonicalizeDomainName",
+        "RtlIsProcessorFeaturePresent": "KexDll.KexRtlIsProcessorFeaturePresent"
+      }
+    }
+  },
+  "NormalIfeoPairs": [
+    {
+      "Architecture": "x86",
+      "Probe": "processor-feature",
+      "MajorVerification": "Passed",
+      "Evidence": "kxnt-release2233-vista-core.json"
+    },
+    {
+      "Architecture": "x86",
+      "Probe": "domain",
+      "MajorVerification": "Passed",
+      "Evidence": "kxnt-release2233-vista-core.json"
+    },
+    {
+      "Architecture": "x86",
+      "Probe": "device-family",
+      "MajorVerification": "Passed",
+      "Evidence": "kxnt-release2233-vista-core.json"
+    },
+    {
+      "Architecture": "x86",
+      "Probe": "persisted-state",
+      "MajorVerification": "Passed",
+      "Evidence": "kxnt-release2233-vista-core.json"
+    },
+    {
+      "Architecture": "x86",
+      "Probe": "sid-package",
+      "MajorVerification": "Passed",
+      "Evidence": "kxnt-release2233-vista-core.json"
+    },
+    {
+      "Architecture": "x86",
+      "Probe": "sid-capability",
+      "MajorVerification": "Passed",
+      "Evidence": "kxnt-release2233-vista-core.json"
+    },
+    {
+      "Architecture": "x86",
+      "Probe": "membership",
+      "MajorVerification": "Passed",
+      "Evidence": "kxnt-release2233-vista-core.json"
+    },
+    {
+      "Architecture": "x86",
+      "Probe": "compare",
+      "MajorVerification": "Passed",
+      "Evidence": "kxnt-release2233-vista-core.json"
+    },
+    {
+      "Architecture": "x86",
+      "Probe": "file-information",
+      "MajorVerification": "Passed",
+      "Evidence": "kxnt-release2233-vista-core.json"
+    },
+    {
+      "Architecture": "x86",
+      "Probe": "alert",
+      "MajorVerification": "Passed",
+      "Evidence": "kxnt-release2233-vista-core.json"
+    },
+    {
+      "Architecture": "x86",
+      "Probe": "performance",
+      "MajorVerification": "Passed",
+      "Evidence": "kxnt-release2233-vista-core.json"
+    },
+    {
+      "Architecture": "x86",
+      "Probe": "srw",
+      "MajorVerification": "Passed",
+      "Evidence": "kxnt-release2233-vista-core.json"
+    },
+    {
+      "Architecture": "x64",
+      "Probe": "processor-feature",
+      "MajorVerification": "Passed",
+      "Evidence": "kxnt-release2233-vista-core.json"
+    },
+    {
+      "Architecture": "x64",
+      "Probe": "domain",
+      "MajorVerification": "Passed",
+      "Evidence": "kxnt-release2233-vista-core.json"
+    },
+    {
+      "Architecture": "x64",
+      "Probe": "device-family",
+      "MajorVerification": "Passed",
+      "Evidence": "kxnt-release2233-vista-core.json"
+    },
+    {
+      "Architecture": "x64",
+      "Probe": "persisted-state",
+      "MajorVerification": "Passed",
+      "Evidence": "kxnt-release2233-vista-core.json"
+    },
+    {
+      "Architecture": "x64",
+      "Probe": "sid-package",
+      "MajorVerification": "Passed",
+      "Evidence": "kxnt-release2233-vista-core.json"
+    },
+    {
+      "Architecture": "x64",
+      "Probe": "sid-capability",
+      "MajorVerification": "Passed",
+      "Evidence": "kxnt-release2233-vista-core.json"
+    },
+    {
+      "Architecture": "x64",
+      "Probe": "membership",
+      "MajorVerification": "Passed",
+      "Evidence": "kxnt-release2233-vista-core.json"
+    },
+    {
+      "Architecture": "x64",
+      "Probe": "compare",
+      "MajorVerification": "Passed",
+      "Evidence": "kxnt-release2233-vista-core.json"
+    },
+    {
+      "Architecture": "x64",
+      "Probe": "file-information",
+      "MajorVerification": "Passed",
+      "Evidence": "kxnt-release2233-vista-core.json"
+    },
+    {
+      "Architecture": "x64",
+      "Probe": "alert",
+      "MajorVerification": "Passed",
+      "Evidence": "kxnt-release2233-vista-core.json"
+    },
+    {
+      "Architecture": "x64",
+      "Probe": "performance",
+      "MajorVerification": "Passed",
+      "Evidence": "kxnt-release2233-vista-core.json"
+    },
+    {
+      "Architecture": "x64",
+      "Probe": "srw",
+      "MajorVerification": "Passed",
+      "Evidence": "kxnt-release2233-vista-core.json"
+    },
+    {
+      "Architecture": "x86",
+      "Probe": "condrv",
+      "MajorVerification": "Passed",
+      "Evidence": "kxnt-release2233-vista-condrv.json"
+    },
+    {
+      "Architecture": "x64",
+      "Probe": "condrv",
+      "MajorVerification": "Passed",
+      "Evidence": "kxnt-release2233-vista-condrv.json"
+    },
+    {
+      "Architecture": "x86",
+      "Probe": "utf8",
+      "MajorVerification": "Passed",
+      "Evidence": "kxnt-release2233-vista-runtime.json"
+    },
+    {
+      "Architecture": "x86",
+      "Probe": "silent-exit",
+      "MajorVerification": "Passed",
+      "Evidence": "kxnt-release2233-vista-runtime.json"
+    },
+    {
+      "Architecture": "x64",
+      "Probe": "utf8",
+      "MajorVerification": "Passed",
+      "Evidence": "kxnt-release2233-vista-runtime.json"
+    },
+    {
+      "Architecture": "x64",
+      "Probe": "silent-exit",
+      "MajorVerification": "Passed",
+      "Evidence": "kxnt-release2233-vista-runtime.json"
+    }
+  ],
+  "Evidence": {
+    "core": {
+      "SHA256": "E5A0F847B5A063C183F36656BA6DC854431F0A155AF0CEDBC071F864D72E8485",
+      "State": "Passed",
+      "DriverExit": 0,
+      "Pairs": 24
+    },
+    "condrv": {
+      "SHA256": "2252EEFF446CE5F005D5F2FE39E24B1D1540BA002F253917130958718EAF4BDC",
+      "State": "Passed",
+      "DriverExit": 0,
+      "Pairs": 2
+    },
+    "runtime": {
+      "SHA256": "CC5F34698281EB91719BD9B0D60B7FA03EF674D674B74BC40DE6F102CC59A876",
+      "State": "Passed",
+      "DriverExit": 0,
+      "Pairs": 4
+    }
+  },
+  "NativeImportPriority": [
+    {
+      "Architecture": "x86",
+      "UnresolvedNativeNames": 166,
+      "ApplicationsInspected": 0,
+      "ActualApplicationsWithMissingImports": 0
+    },
+    {
+      "Architecture": "x64",
+      "UnresolvedNativeNames": 182,
+      "ApplicationsInspected": 3,
+      "ActualApplicationsWithMissingImports": 0
+    }
+  ],
+  "Limits": "Inventory of major evidence for current binaries, not proof of arbitrary apps/flags/all resources. WNF remains deferred/unimplemented; AppContainer/full ConDrv/unsupported registry flags remain explicit limits. Prior Failed diagnostic receipts are not changed."
+}

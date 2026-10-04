@@ -1,9 +1,13 @@
-param([Parameter(Mandatory=$true)][string]$Output)
+param([Parameter(Mandatory=$true)][string]$Output,
+ [string]$CoreEvidence='kxnt-core-ifeo-vista',
+ [string]$ConDrvEvidence='kxnt-condrv-ifeo-vista',
+ [string]$RuntimeEvidence='kxnt-runtime-ifeo-vista',
+ [string]$ImportEvidence='kxnt-native-import-priority')
 $ErrorActionPreference='Stop'
 $root=Split-Path $PSScriptRoot
 if(Test-Path $Output){throw 'Preserve previous status snapshot'}
 $checks=@();$evidence=@{}
-foreach($item in @(@('core','kxnt-core-ifeo-vista',24),@('condrv','kxnt-condrv-ifeo-vista',2),@('runtime','kxnt-runtime-ifeo-vista',4))){
+foreach($item in @(@('core',$CoreEvidence,24),@('condrv',$ConDrvEvidence,2),@('runtime',$RuntimeEvidence,4))){
  $path="$root\docs\validation\$($item[1]).json";$document=Get-Content $path -Raw|ConvertFrom-Json;$r=$document.Receipt
  if($r.State -ne 'Passed' -or $r.DriverExit -ne 0 -or !$r.ClientVista -or $r.EventTrace -or $r.SuiteResults.Count -ne $item[2] -or @($r.SuiteResults|Where-Object {!$_.Passed}).Count){throw "Incomplete ordinary Vista IFEO evidence: $($item[0])"}
  if($r.DriverOutput -notmatch 'OSVersion=6\.0\.6002 ProductType=1 NativeArchitecture=9 DriverKexDllLoaded=0' -or $r.DriverOutput -notmatch 'PASS fresh deployment state restored' -or $r.DriverOutput -match '(?m)^FAIL '){throw 'Native product or teardown not verified'}
@@ -20,7 +24,7 @@ foreach($item in @(@('core','kxnt-core-ifeo-vista',24),@('condrv','kxnt-condrv-i
 $def=[IO.File]::ReadAllText("$root\KxNt\KxNt.def")
 $ported=@('NtAlertThreadByThreadId','NtWaitForAlertByThreadId','ZwAlertThreadByThreadId','ZwWaitForAlertByThreadId','ZwCompareObjects','RtlCheckTokenMembershipEx','RtlIsPackageSid','RtlIsCapabilitySid','RtlGetPersistedStateLocation','RtlGetDeviceFamilyInfoEnum','RtlCanonicalizeDomainName','RtlIsProcessorFeaturePresent')
 foreach($name in $ported){if($def -notmatch ('(?m)^\s*'+[regex]::Escape($name)+'\s*=\s*KexDll\.')){throw "Missing implemented KexDll export: $name"}}
-$importsPath="$root\docs\validation\kxnt-native-import-priority.json";$imports=Get-Content $importsPath -Raw|ConvertFrom-Json
+$importsPath="$root\docs\validation\$ImportEvidence.json";$imports=Get-Content $importsPath -Raw|ConvertFrom-Json
 $exportCheck=@'
 import importlib.util,json,sys
 from pathlib import Path

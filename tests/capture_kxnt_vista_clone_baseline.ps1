@@ -1,8 +1,10 @@
-param([Parameter(Mandatory=$true)][ValidatePattern('^[a-z0-9-]+$')][string]$RunName)
+param([Parameter(Mandatory=$true)][ValidatePattern('^[a-z0-9-]+$')][string]$RunName,
+      [switch]$VistaReclone)
 $ErrorActionPreference='Stop'
 $root=Split-Path $PSScriptRoot
 $vmrun='C:\Program Files\VMware\VMware Workstation\vmrun.exe'
 $vmx='C:\Users\YamaR\Documents\Virtual Machines\VxKex-Vista-Current-Parity-Test\Vista-CurrentParity.vmx'
+if($VistaReclone){$vmx='C:\Users\YamaR\Documents\Virtual Machines\VxKex-Vista-Reclone-20261004\Vista-Reclone.vmx'}
 $guest="C:\VxKexProbe\CurrentBaseline-$RunName"
 $archive="$root\audit\KxNtParity\vista-current-baseline-$RunName"
 if(Test-Path $archive){throw 'Preserve earlier baseline evidence'}
