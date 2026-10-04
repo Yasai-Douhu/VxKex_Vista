@@ -4,14 +4,42 @@
 #include <tlhelp32.h>
 #include <stdio.h>
 #include <stdlib.h>
-/* Same-bitness NT6 Server test observer. Never injects code or closes a target
-   handle. Private PEB layout is diagnostic only, unrelated to production. */
+#include <stddef.h>
+/* Same-bitness NT6 Server test observer. No explicit code injection or target
+   handle closure. Module snapshots may affect target behavior/timing.
+   Private PEB layout is diagnostic only, unrelated to production. */
 typedef LONG (WINAPI *QUERY)(HANDLE,ULONG,PVOID,ULONG,PULONG);
 typedef LONG (WINAPI *SYSTEM_QUERY)(ULONG,PVOID,ULONG,PULONG);
 typedef struct {USHORT length,maximum;PWSTR buffer;} NAME;
 typedef struct {PVOID object;ULONG_PTR pid,handle;ULONG access;USHORT trace,type;ULONG flags,reserved;} ENTRY;
 typedef struct {ULONG_PTR count,reserved;ENTRY entries[1];} TABLE;
 static FILE *out;
+static BOOL remote_read(HANDLE process,LPCVOID address,PVOID buffer,SIZE_T bytes){SIZE_T read=0;return ReadProcessMemory(process,address,buffer,bytes,&read) && read==bytes;}
+static void critical_sections(HANDLE process,DWORD pid,PRTL_CRITICAL_SECTION_DEBUG first,TABLE *table,HMODULE nativeBase,DWORD nativeSize,PVOID loaderLock){
+    PVOID start,cursor;unsigned visited=0,matches=0;BOOL complete=FALSE;
+    if(!first || first==(PRTL_CRITICAL_SECTION_DEBUG)(ULONG_PTR)-1){fprintf(out,"ExternalCriticalSections Visited=0 Matches=0 Complete=0\n");return;}
+    start=(BYTE*)first+offsetof(RTL_CRITICAL_SECTION_DEBUG,ProcessLocksList);cursor=start;
+    do{
+        LIST_ENTRY links;RTL_CRITICAL_SECTION_DEBUG debug;RTL_CRITICAL_SECTION lock;ULONG_PTR i;
+        PVOID debugAddress=(BYTE*)cursor - offsetof(RTL_CRITICAL_SECTION_DEBUG,ProcessLocksList);
+        if(!remote_read(process,cursor,&links,sizeof(links)))break;
+        ++visited;
+        if(remote_read(process,debugAddress,&debug,sizeof(debug)) && debug.CriticalSection &&
+           remote_read(process,debug.CriticalSection,&lock,sizeof(lock)) && lock.DebugInfo==debugAddress && lock.LockSemaphore){
+            for(i=0;i<table->count;++i){
+                ENTRY *entry=&table->entries[i];
+                if(entry->pid==pid && entry->handle==(ULONG_PTR)lock.LockSemaphore){
+                    BOOL nativeOwner=(ULONG_PTR)debug.CriticalSection>=(ULONG_PTR)nativeBase && (ULONG_PTR)debug.CriticalSection-(ULONG_PTR)nativeBase<nativeSize;
+                    fprintf(out,"ExternalCriticalSection Handle=%Ix Lock=%p Debug=%p NativeNtdllOwner=%d LoaderLock=%d LockCount=%ld Recursion=%ld Contention=%lu\n",entry->handle,debug.CriticalSection,debugAddress,nativeOwner,debug.CriticalSection==loaderLock,lock.LockCount,lock.RecursionCount,debug.ContentionCount);
+                    ++matches;break;
+                }
+            }
+        }
+        cursor=links.Flink;
+        if(cursor==start){complete=TRUE;break;}
+    }while(cursor && visited<1024);
+    fprintf(out,"ExternalCriticalSections Visited=%u Matches=%u Complete=%d\n",visited,matches,complete);
+}
 static BOOL ready(PCWSTR path,DWORD pid,unsigned stage){
     FILE *file=_wfopen(path,L"r");char line[512];BOOL found=FALSE;DWORD value,phase;
     if(!file)return FALSE;
@@ -84,7 +112,9 @@ static BOOL observe(HANDLE process,DWORD pid,unsigned stage){
             CloseHandle(duplicate);
         }
     }
-    fprintf(out,"ExternalTable Entries=%Iu\n",entries);fflush(out);
+    fprintf(out,"ExternalTable Entries=%Iu\n",entries);
+    if(status>=0 && table && table->count<=(capacity-2*sizeof(ULONG_PTR))/sizeof(ENTRY))critical_sections(process,pid,cs.DebugInfo,table,(HMODULE)module.modBaseAddr,module.modBaseSize,lock);
+    fflush(out);
     free(table);return owner && typed && identity;
 }
 int wmain(int argc,WCHAR **argv){

@@ -1,4 +1,4 @@
-param([Parameter(Mandatory=$true)][string]$Receipt,[Parameter(Mandatory=$true)][string]$PhaseAnalysis,[Parameter(Mandatory=$true)][string]$Output)
+param([Parameter(Mandatory=$true)][string]$Receipt,[Parameter(Mandatory=$true)][string]$PhaseAnalysis,[Parameter(Mandatory=$true)][string]$Output,[switch]$RequireCriticalSectionOwners)
 $ErrorActionPreference='Stop'
 if(Test-Path $Output){throw 'Preserve earlier lifecycle analysis'}
 $r=Get-Content $Receipt -Raw|ConvertFrom-Json
@@ -19,6 +19,29 @@ function Snapshot([string]$text,[int]$stage,[uint32]$targetPid){
  }
  $count=[regex]::Match($block,'ExternalTargetHandleCount=(\d+)');$table=[regex]::Match($block,'ExternalTable Entries=(\d+)')
  if(!$count.Success -or !$table.Success -or [int]$count.Groups[1].Value -ne $map.Count -or [int]$table.Groups[1].Value -ne $map.Count){throw 'Remote table does not match measured process handle count'}
+ if($RequireCriticalSectionOwners){
+  $walk=[regex]::Match($block,'ExternalCriticalSections Visited=(\d+) Matches=(\d+) Complete=1')
+  $native=[regex]::Match($block,'ExternalNativeModule Base=([0-9A-Fa-f]+) Size=(\d+)')
+  $loader=[regex]::Match($block,'ExternalLoaderLock PEB=[0-9A-Fa-f]+ Lock=([0-9A-Fa-f]+) Semaphore=([0-9A-Fa-f]+)')
+  if(!$walk.Success -or !$native.Success -or !$loader.Success -or [int]$walk.Groups[1].Value -lt 1 -or [int]$walk.Groups[1].Value -gt 1024){throw 'Incomplete bounded critical-section debug-list observation'}
+  $base=[Convert]::ToUInt64($native.Groups[1].Value,16);$size=[uint64]$native.Groups[2].Value
+  $matches=@([regex]::Matches($block,'ExternalCriticalSection Handle=([0-9a-f]+) Lock=([0-9A-Fa-f]+) Debug=([0-9A-Fa-f]+) NativeNtdllOwner=([01]) LoaderLock=([01]) LockCount=(-?\d+) Recursion=(\d+) Contention=(\d+)'))
+  if($matches.Count -ne [int]$walk.Groups[2].Value){throw 'Critical-section match count mismatch'}
+  $loaderVerified=[Convert]::ToUInt64($loader.Groups[2].Value,16) -eq 0
+  foreach($m in $matches){
+   $key=[Convert]::ToUInt64($m.Groups[1].Value,16).ToString();$lock=[Convert]::ToUInt64($m.Groups[2].Value,16)
+   $nativeOwner=$lock -ge $base -and $lock-$base -lt $size
+   if(!$map.ContainsKey($key) -or $map[$key].Type -ne 'Event' -or $nativeOwner -ne ($m.Groups[4].Value -eq '1')){throw 'Native critical-section ownership/type inconsistent'}
+   if($m.Groups[5].Value -eq '1'){
+    if(!$map[$key].LoaderSemaphore -or $lock -ne [Convert]::ToUInt64($loader.Groups[1].Value,16)){throw 'Loader critical-section positive layout check failed'}
+    $loaderVerified=$true
+   }
+   $owner=[pscustomobject]@{Lock=$m.Groups[2].Value;Debug=$m.Groups[3].Value;NativeNtdllOwner=$nativeOwner;LoaderLock=($m.Groups[5].Value -eq '1');LockCount=[int]$m.Groups[6].Value;Recursion=[int]$m.Groups[7].Value;Contention=[uint32]$m.Groups[8].Value}
+   if($map[$key].PSObject.Properties.Name -notcontains 'CriticalSectionOwners'){$map[$key]|Add-Member -NotePropertyName CriticalSectionOwners -NotePropertyValue @()}
+   $map[$key].CriticalSectionOwners+=@($owner)
+  }
+  if(!$loaderVerified){throw 'Known LoaderLock not found in the observed debug list'}
+ }
  return [pscustomobject]@{Count=$map.Count;Handles=$map}
 }
 $results=@()
@@ -37,4 +60,4 @@ foreach($item in $a.Results){
  if(@($added|Where-Object {!$_.Type}).Count){throw 'New handle type not verified'}
  $results+=[pscustomobject]@{Architecture=$item.Architecture;Mode=$item.Mode;TargetPID=$item.TargetPID;BeforeCount=$before.Count;AfterCount=$after.Count;Delta=$after.Count-$before.Count;Added=$added;Removed=$removed;Measured=$true}
 }
-[pscustomobject]@{State='Measured';ReceiptSHA256=(Get-FileHash $Receipt).Hash;PhaseAnalysisSHA256=(Get-FileHash $PhaseAnalysis).Hash;Results=$results;Scope='Same PID before/after surviving-worker lifecycle; exact handle/object identity changes, new object types and count agreement. Toolhelp module snapshots and duplicate/type queries are observations that can affect timing. No attribution of earlier two-handle growth or allocation call stacks; no assumption that an Event is a native cache without separate ownership evidence.'}|ConvertTo-Json -Depth 8|Set-Content $Output -Encoding UTF8
+[pscustomobject]@{State='Measured';CriticalSectionOwnersRequired=[bool]$RequireCriticalSectionOwners;ReceiptSHA256=(Get-FileHash $Receipt).Hash;PhaseAnalysisSHA256=(Get-FileHash $PhaseAnalysis).Hash;Results=$results;Scope='Same PID before/after surviving-worker lifecycle; exact handle/object identity changes, new object types and count agreement. Optional read-only critical-section debug-list matches with self-pointer validation and known LoaderLock layout control identify matching native lock storage. Not a complete inventory of all locks, allocator stack or cache semantics. Toolhelp snapshots/queries may affect timing; no attribution of earlier two-handle growth.'}|ConvertTo-Json -Depth 9|Set-Content $Output -Encoding UTF8

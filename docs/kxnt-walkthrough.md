@@ -1057,3 +1057,50 @@ clone exit0、source VMX hash変化なし、clone diskのbounded sparse descript
 - 両runでmainのstatic26binding / early KexDll、UTFの4893行native一致、SilentExit両形式PASS、profile4解除、実uninstall / fresh復帰を確認。owned Server cloneをsoft停止。原VM・新Vista再clone・原Installer / Releasesは変更なし。
 
 証跡: docs/validation/kxnt-utf8-lifecycle-handles-server.jsonに第一回Failed / 第二回Measured原receipt、2回のphase解析と全handle差分解析、負対照拒否、source hashesと初回build failureを保存。raw archivesはaudit/KxNtParity/ifeo-server-utf8-two-stage-20261004-first / second、修正後build logsはutf8-two-stage-build-fixed-x86 / x64.txt。Toolhelpのmodule観測がtarget timingに影響しないとは保証していない。lookup controlにもKexDll早期注入・thread lifecycleがあるため、controlのEvent増加をKexDll thread処理不具合の不存在証明にはしない。追加のEventのcritical-section所有者や割当てstack、前回adapter delta2、一般UTF資源・cold初期化を次に調べる必要がある。元監査のWNF / 拡張registry / native32bit OS / 必要な未解決forwarders等も未完了。
+## 2026-10-04: 更新された完了基準を適用し、主要移植の状態と残件の優先度を整理
+
+ユーザーが完了基準を更新した。代表正常系、主要異常系・境界、安全性、必要な両形式・OS差、通常IFEO / 実アプリを確認し、実害につながる継続増加・race・破壊・wrong semanticが確認されなければ主要検証完了とする。非致命的・タイミング依存・環境依存で実アプリの成立を妨げない差分をTODOへ分離する。原因を完全説明するまで同じnative lazy allocationや診断影響を追跡する運用は打ち切る。過去のFailed記録をPassedへ変更する意味ではない。
+
+### 完了済みの主要検証と対応範囲
+
+下表の「主要完了」は記載した対応範囲の実装・主要検証を意味し、Windowsの全subsystemや全入力への無制限対応を意味しない。core12種は通常Vista IFEOのx86/WOW64・x64計24組で、Server側の既存詳細証跡とも照合済み。通常runtime4組と限定ConDrv2組もVistaで実install・KexCfg・static binding・actual behavior・解除を確認している。
+
+| 機能 | 状態・実装方法 | 主な検証 / 制限 |
+|---|---|---|
+| RtlIsProcessorFeaturePresent | 主要完了。共有データを範囲付きで読む | valid64 / invalid5。実CPUとOSの能力のみ返す |
+| RtlCanonicalizeDomainName | 主要完了。native IDN / IP変換を利用 | IDN / IPv4 / IPv6 / malformed / buffer / 解放2000cycle。Unicode表のOS差は制限 |
+| RtlGetDeviceFamilyInfoEnum | 主要完了。native productと偽装設定を反映 | optional8 / spoofed3。Vistaを最新OSの実情報とは扱わない |
+| RtlGetPersistedStateLocation | 主要完了。既定pathへのfallback | 16case / byte size / NULL / short buffer。状態保存先redirect機構全体は実装しない |
+| RtlIsPackageSid / RtlIsCapabilitySid | 主要完了。SID形式を検証・分類 | 各660分類 / malformed / guard。AppContainer本体ではない |
+| RtlCheckTokenMembershipEx | 通常tokenの主要完了。native membershipへ適切なABIで委譲 | 114case / restricted / deny-only / impersonation / flags。AppContainer / LPAC未対応flagは成功扱いしない |
+| Nt / ZwCompareObjects | 主要完了。実native object identityで比較 | 16case / invalid / pinned handle / alias / TLS。既存弱い比較を修正済み |
+| Ext_NtSetInformationFile / Zw | 通常rename/deleteの主要完了。旧classへ安全に変換、その他native委譲 | 96case / length / relative root / guard / 1000rename delta0。POSIX等の未対応flagsは明示拒否 |
+| Nt / ZwAlertThreadByThreadId、Nt / ZwWaitForAlertByThreadId | 主要完了。process内thread状態とkeyed event | 待機前通知 / timeout race / foreign ID / termination / ID churn4096 / forced waiter exit。TEB未検証領域へ書かない |
+| RtlQueryPerformanceCounter / Frequency | 主要完了。native計測との整合・unaligned対応 | unaligned16 / 4000calls / 4threads / invalid output10 |
+| RtlTryAcquireSRWLockExclusive / Shared | 主要完了。Vista同期基盤に対応 | native blocking / condition / mixed4000 / writers2000。診断資源差分は下記TODO |
+| RtlUTF8ToUnicodeN / RtlUnicodeToUTF8N | 主要完了。native存在時に委譲、Vistaではchecked conversion | native4893行完全一致 / malformed / pointer / overlap / guard / 全scalar1112064。追加4存続worker ×8phase各128000callの内容・TLS・handle不変。thread lifecycleの有限差分はTODO |
+| NtOpenKeyEx / Zw | option0 / OPEN_LINK8の主要完了。native属性を変更せずopenへ委譲 | 通常IFEO各280境界比較 / link matrix / output untouched / 1000delta0。backup / restore等7optionsは明示NOT_SUPPORTED |
+| Ext_NtWriteFile / Zw、限定ConDrv | 監査で提案した限定互換の主要完了。内容profileでZig legacy console writeに適応 | 実Zigのconsole39units / file・pipe40bytes / VT / partial6 / codepages / ambiguous6拒否。full ConDrv namespaceではない |
+| RtlReportSilentProcessExit | 既存fallback方針の主要検証完了 | 9case / 1000delta0。実WER reportingは未実装、self相当はNOT_SUPPORTED。実機能完了とは区別 |
+
+tests/summarize_kxnt_parity.ps1を追加した。current InstallerのKexDll / KxNt両形式4hashがcore / ConDrv / runtime成功receiptのcandidateと一致すること、実native Vista product / no injected driver / teardown / 26staticbindings / 各詳細PASSを確認する。actual PE exportsも読み、NEXT差分の追加公開12名がKexDllへ転送され、Vistaのみの既存7名が両形式で保持されていることを確認した。Source宣言の有無だけでruntime実装完了とは判断しない。
+
+### 非ブロックTODOと再調査の条件
+
+- UTF / SRW等のnative lazy Event、diagnostic observer影響、thread lifecycleの単発1～2handle差は、変換反復で増加せず主要動作を妨げる証拠がないため主要完了をブロックしない。全資源の不存在を証明したとは主張しない。過去Failed receiptsを保持し、再調査は継続増加、実アプリ障害、共有component変更後の回帰、または新しいallocation stackなど有用な情報が得られる場合だけ行う。
+- 実行中だったcritical-section診断を今回1回で終了した。LoaderLock.DebugInfoからSDKのProcessLocksList / CriticalSection fieldsをremote readし、back-pointer一致、1024件の上限、list closure、実handle表とEvent型・native module rangeを照合。両形式2stageで既知LoaderLockの対応を確認（x64 list85、x86 list88）。追加lifecycleは全4組delta0・identity不変だった。x86前段warm1でrunnerFailedを保持。以前の別Eventやadapter delta2の所有者は未確定のままTODO。
+- 診断observerは明示的code injectionやtarget handle closeをしないが、Toolhelp API内部やqueryの観測影響は否定しない。全critical sectionがこのdebug listに登録される保証やallocation stackの証明はない。Incomplete listを負対照で拒否した。初回SDKでPCVOIDが未宣言のためcompile失敗し、LPCVOIDへ修正して別logで両形式build成功を確認。原failure logを保持。owned Server cloneはsoft停止。
+- native32bit OSは未試験。今回主要検証はx64 nativeとWOW64を含み、32bit native OSの保証は追加対応が必要になった場合に行う。
+
+### 未実装項目の優先順位
+
+| 優先度 | 残件 | 次の実施条件 / 判断 |
+|---|---|---|
+| P1（実利用が確認された場合） | native不在の転送API、特にNtQuerySystemInformationEx | 実call siteと要求class / group / ABIを取得して安全な範囲を実装。入力を無視した旧APIへの一律転送はしない |
+| P2（具体的アプリ要求次第） | registry backup/restore等、WER reporting、ConDrvの追加操作 | 未対応の明示拒否が実運用を妨げる例を先に再現し、要求意味を確定して実装する |
+| P3 / 移植元未実装のため保留 | WNF、RtlUnsubscribeWnfNotificationWaitForCompletion、ZwQueryWnfStateData | NEXTにも実働の停止/完了待機・状態基盤がない。state / subscription / ACL / IPC / completionの独立設計が必要。成功stubで対応済みにしない |
+| P3 / OS subsystem拡張 | AppContainer / LPAC、full ConDrv / UMS等 | API分類や明示unsupportedをsubsystem実装と混同しない。実アプリ要求・Vistaでの費用に応じて判断 |
+
+既存import監査では未解決native名がx64 182 / x86 166。実読取り3file（x64のjava.exe / jvm.dll / Code.exe）の直接ntdll / kxnt importとのintersectionは0。x86実アプリはこの3file監査に含まれていない。未使用証明ではなく、依存DLL / dynamic lookup / 別アプリは別途必要に応じて調べる。次の実用調査は、既に長時間追跡した有限Eventではなく、依存DLLや実call情報から未解決APIの優先度を絞ることとする。
+
+証跡: docs/validation/kxnt-major-verification-status.jsonにcurrent candidate hash付き主要検証一覧、actual exports、既存30IFEO詳細pairとの照合、今回最後の診断Failed receipt / critical-section解析 / 負対照拒否を収録。主要移植の完了と低優先度TODOを分離し、元監査の全scopeを保持した。これまでの原Installer / Releases更新やmain mergeはこのphaseには含まない。
