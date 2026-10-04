@@ -26,6 +26,7 @@ __declspec(dllimport) LONG WINAPI RtlReportSilentProcessExit(HANDLE,LONG);
 __declspec(allocate(".buildid")) const char ProfileSection[]="Owned NT-I/O profile diagnostic";
 static FILE *out;
 static unsigned failures;
+static BOOL debugZig;static unsigned debugInstance;
 static WRITE_NT adapted[2],native;
 static QUERY_OBJECT query;
 static GET_STATUS getstatus;
@@ -288,7 +289,7 @@ static void partial_cases(HMODULE kex,HANDLE screen) {
     fprintf(out,"PartialCompletion Injection=owned-KexDll-IAT Calls=%lu UTF8Units=2 Bytes=4 DBCSUnits=2 Bytes=3 SplitSurrogate=explicit-error NativeUtf8PartialRendering=unreliable\n",partialCalls);
 }
 static void child(HANDLE screen,const char *exe,const char *directory,BOOL pipeOutput) {
-    STARTUPINFOA si; PROCESS_INFORMATION pi; char command[MAX_PATH+4],path[MAX_PATH];
+    STARTUPINFOA si; PROCESS_INFORMATION pi; char command[1024],path[MAX_PATH];
     HANDLE file=NULL,r=NULL,w=NULL; SECURITY_ATTRIBUTES sa={sizeof(sa),NULL,TRUE};
     COORD origin={0,0}; DWORD exitcode=0,wait,read,fill; WCHAR wide[40]; char bytes[80]; BOOL ok;
     sprintf(command,"\"%s\"",exe); sprintf(path,"%s\\zig-output.txt",directory);
@@ -315,12 +316,15 @@ static void child(HANDLE screen,const char *exe,const char *directory,BOOL pipeO
     if(r)CloseHandle(r);if(w)CloseHandle(w);if(file && file!=INVALID_HANDLE_VALUE)CloseHandle(file);DeleteFileA(path);
     FillConsoleOutputCharacterW(screen,L' ',40,origin,&fill);SetConsoleCursorPosition(screen,origin);
     si.hStdOutput=screen;si.hStdError=screen;ZeroMemory(&pi,sizeof(pi));
-    ok=CreateProcessA(exe,command,NULL,NULL,TRUE,0,NULL,NULL,&si,&pi);check("zig-console-create",ok);
+    if(debugZig){sprintf(command,"\"C:\\VxKexProbe\\Wow64\\cdb.exe\" -G -logo C:\\VxKexProbe\\KxNtIfeo\\zig-write-%u.log -cf C:\\VxKexProbe\\KxNtIfeo\\zig-write.cdb \"%s\"",++debugInstance,exe);}
+    fprintf(out,"ZigConsoleLaunch Debugger=%d ExpectedHandle=%p\n",debugZig,screen);fflush(out);
+    ok=CreateProcessA(debugZig?"C:\\VxKexProbe\\Wow64\\cdb.exe":exe,command,NULL,NULL,TRUE,0,NULL,NULL,&si,&pi);check("zig-console-create",ok);
     if(ok) {
         wait=WaitForSingleObject(pi.hProcess,10000);
         if(wait==WAIT_TIMEOUT){TerminateProcess(pi.hProcess,0xdead);WaitForSingleObject(pi.hProcess,5000);}
         GetExitCodeProcess(pi.hProcess,&exitcode);
         check("zig-console-exit",wait==WAIT_OBJECT_0 && exitcode==0);
+        fprintf(out,"ZigConsoleWait Wait=%08lx Exit=%08lx Debugger=%d\n",wait,exitcode,debugZig);
         ZeroMemory(wide,sizeof(wide));
         check("zig-console-content",ReadConsoleOutputCharacterW(screen,wide,39,origin,&read) && read==39 && !memcmp(wide,L"KxNt Zig standard-library console smoke",39*2));
         fprintf(out,"ZigConsole Exit=%08lx ReadUnits=%lu\n",exitcode,read);
@@ -336,6 +340,7 @@ int main(int argc,char **argv) {
     const WCHAR expected[]={L'A',0x65e5,0xd83d,0xde00}; const BYTE sjis[]={0x41,0x93,0xfa};
     if(argc==99){NtWaitForAlertByThreadId(NULL,NULL);RtlReportSilentProcessExit(NULL,0);NtWriteFile(NULL,NULL,NULL,NULL,NULL,NULL,0,NULL,NULL);}
     if(argc!=4 && argc!=5)return 2;out=fopen(argv[1],"w");if(!out)return 3;
+    debugZig=argc==5 && !strcmp(argv[4],"debug-zig");
     profile_bounds();
     kx=LoadLibraryA(argv[2]);kex=GetModuleHandleW(L"KexDll.dll");
     if(!kx || !kex)return 4;
@@ -356,7 +361,7 @@ int main(int argc,char **argv) {
     seedstatus=(SEED_STATUS)GetProcAddress(GetModuleHandleW(L"ntdll.dll"),"RtlSetLastWin32ErrorAndNtStatusFromNtStatus");
     if(!adapted[0]||!adapted[1]||!native||!query||!getstatus||!seedstatus)return 5;
     s=((INIT_DATA)GetProcAddress(kex,"KexDataInitialize"))(&data);if(s<0||!data)return 6;prefix=(ULONG*)data;
-    if(argc==5){
+    if(argc==5 && !debugZig){
         BYTE *image=(BYTE*)GetModuleHandleW(NULL);IMAGE_NT_HEADERS *nt=(IMAGE_NT_HEADERS*)(image+((IMAGE_DOS_HEADER*)image)->e_lfanew);
         IMAGE_SECTION_HEADER *section=IMAGE_FIRST_SECTION(nt);
         for(i=0;i<nt->FileHeader.NumberOfSections;++i)if(!memcmp(section[i].Name,".buildid",8)){VirtualProtect(section[i].Name,8,PAGE_READWRITE,&oldprotect);section[i].Name[0]='X';VirtualProtect(section[i].Name,8,oldprotect,&oldprotect);break;}
@@ -366,7 +371,7 @@ int main(int argc,char **argv) {
     for(i=0;i<128;++i){HANDLE h=CreateConsoleScreenBuffer(GENERIC_READ|GENERIC_WRITE,FILE_SHARE_READ|FILE_SHARE_WRITE,&sa,CONSOLE_TEXTMODE_BUFFER,NULL);if(h==INVALID_HANDLE_VALUE)break;if(!filetype(h)){screen=h;break;}extras[n++]=h;}
     if(screen==INVALID_HANDLE_VALUE)return 7;
     fprintf(out,"ProcessBits=%u Console=%p\n",(unsigned)(sizeof(void*)*8),screen);
-    if(argc==5){for(alias=0;alias<2;++alias){memset(&ios,0xa5,sizeof(ios));ref=ios;s=adapted[alias](screen,NULL,NULL,NULL,&ios,"X",1,NULL,NULL);t=native(screen,NULL,NULL,NULL,&ref,"X",1,NULL,NULL);check("unprofiled-native",s==t && sameios(&ios,&ref));}stressNative=TRUE;stress(screen);CloseHandle(screen);for(i=0;i<n;++i)CloseHandle(extras[i]);fprintf(out,"Failures=%u Result=%s\n",failures,failures?"FAIL":"PASS");fclose(out);return failures?1:0;}
+    if(argc==5 && !debugZig){for(alias=0;alias<2;++alias){memset(&ios,0xa5,sizeof(ios));ref=ios;s=adapted[alias](screen,NULL,NULL,NULL,&ios,"X",1,NULL,NULL);t=native(screen,NULL,NULL,NULL,&ref,"X",1,NULL,NULL);check("unprofiled-native",s==t && sameios(&ios,&ref));}stressNative=TRUE;stress(screen);CloseHandle(screen);for(i=0;i<n;++i)CloseHandle(extras[i]);fprintf(out,"Failures=%u Result=%s\n",failures,failures?"FAIL":"PASS");fclose(out);return failures?1:0;}
     {CONSOLE_FONT_INFOEX font;ZeroMemory(&font,sizeof(font));font.cbSize=sizeof(font);if(GetCurrentConsoleFontEx(screen,FALSE,&font))fprintf(out,"OwnedBufferFont=%ls Family=%u\n",font.FaceName,font.FontFamily);}
     display(screen,437,(const BYTE*)"ASCII",5,L"ASCII",5);
     display(screen,932,sjis,sizeof(sjis),expected,2);

@@ -1,0 +1,32 @@
+.echo KXNT_ZIG_WRITE_TRACE_BEGIN
+.printf "KXNT_TARGET_PID=%x\n", @$tpid
+sxd av
+bu kexdll!Ext_NtWriteFile ".if ((@rcx & 3)==3) { .echo KXNT_CONSOLE_WRITE_ENTRY } .else { g }"
+g
+r rcx
+r rdx
+r r8
+r r9
+r @$t2 = @rcx
+r @$t1 = poi(@rsp)
+dq @rsp+28 L5
+db poi(@rsp+30) L28
+kb 8
+bc *
+bu ntdll!NtQueryObject ".if (@rcx==@$t2) { .if (@rdx==2) { .echo KXNT_OBJECT_TYPE_QUERY_ENTRY } .else { g } } .else { g }"
+g
+r rcx
+r rdx
+r r9
+r @$t0 = @r8
+gu
+.echo KXNT_OBJECT_TYPE_QUERY_RETURN
+r rax
+.if (@rax==0) { dq @$t0 L2; du poi(@$t0+8) }
+bc *
+bp @$t1
+g
+.echo KXNT_CONSOLE_WRITE_RETURN
+r rax
+bc *
+g

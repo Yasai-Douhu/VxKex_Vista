@@ -868,3 +868,18 @@ tests/kxnt_open_key_adapter_probe.c に KXNT_IFEO_IMPORT 時だけ有効な静�
 証跡: docs/validation/kxnt-ifeo-condrv-server.json（4試行の原receipt、Failed build logs、native Zig import表 / hashと解析）、kxnt-condrv-basename-ordinals.json。tests/analyze_kxnt_ifeo_condrv.ps1は初回 / 最終receiptを比較し、判定修正・両PEの境界・部分注入・資源gateを検査し、x64 childの4失敗を明示する。再現はbuild_kexdll.ps1 / build_kexdll_x86.ps1をWindows PowerShellで実行して成功を確認し、Installer2DLLを更新、build_kxnt_ifeo_probe.ps1の両形式-Suite、runner -ConDrvSuiteへ使い捨てVMX / credentials / 未使用RunNameを指定。childは保存されたZig0.16 smokeのNTDLL importを保持したPE6.0版で、private KxNt import差替え版を使用していない。
 
 この工程で修正・検証できたのは通常書換え名への内容判定とWOW64通常IFEOの詳細動作。x64実Zig console childの失敗は未解決。handle数値のFile / console衝突、子のprofile状態、import経路等は実際のchildで次に測定する必要があり、原因としてまだ断定しない。Vista IFEO / native32bit OS、UTF資源gate、拡張registry flags、WNFなど元監査の残りは未完了。
+
+## 2026-10-04: x64 Zig 通常 IFEO 子プロセスの File / console 数値衝突を実測
+
+通常IFEOのx64 Zig console childだけが失敗する問題を、実際の子プロセスで追跡した。productionコード、元作業ツリーInstaller、ユーザーVMのsystem DLLは変更していない。tests/kxnt_condrv_probe.cにdebug-zigを追加し、console試験だけ既存CDB6.12経由で同じZig imageを起動する。file / pipe試験は通常起動のまま。tests/kxnt_ifeo_deployment_probe.c / run_kxnt_ifeo_vm.ps1のConDrvTraceはx64親だけを実行し、両形式のowned Zig profileを登録・解除する。以前の通常試験の合否条件は緩和しない。
+
+- 初回write traceでKexDll!Ext_NtWriteFileにhandle13、Event / APC routine / context NULL、Length40、Key NULLで入ることを確認。実payloadはKxNt Zig standard-library console smokeと改行で、返却はc00000bb。KexDll / KxNt / KxBaseのSystem32コピーが実childでロードされていた。初回receiptはMeasuredだがtrace内容のrunner gateが弱くZigWriteTracesが空だったため、後続runでraw / hashと自然終了を要求した。初回を後から書き換えていない。
+- 次のhandle traceではabsolute load後の!ntsdexts.handleがextension読込みに失敗し、native型の証明にはならなかった。両write entry / returnとchild自然終了は採取できた。全rawを保存し、拡張コマンドの失敗を隠さない。
+- extensionに依存しない診断へ変更。製品が実際に呼ぶ公開ntdll!NtQueryObjectで、元writeのhandleとObjectTypeInformation(class2)を条件に停止する。bufferをdebugger pseudo-registerへ保存し、guで実callのreturnを観測、その後元Ext_NtWriteFile callerのreturn addressへ停止する。private RVAや製品名・固定addressは使用しない。MicrosoftのNtQueryObject資料にあるTypeName先頭のUNICODE_STRINGを読み取る。
+- 最初のobject traceは旧CDBのMASM条件式で&&が構文エラーとなった。実引数・return・File文字列は採取できたが、ENTRY markerを欠くため完全な診断成功として使わない。原Measured receiptを保持し、後続gateを強化した。nested .ifへ直して新規archiveで再実行した。
+- 最終2childで、親が渡すconsole handle13とwrite引数13が一致。native queryもhandle13 / class2 / buffer512bytes、status0を返し、TypeName Length8 / MaximumLength10 / Fileを観測した。queryからのreturn先はKexDll内。続いて元write callerへ戻りc00000bbを確認、両child自然終了1。KexConsoleWriteKindの成功queryがFileならKind2を返すコードと一致し、実childでのFile / console数値衝突が拒否に至る経路を確認できた。native Fileのidentity・名前・用途・作成元は未採取。nearest export名をprivate関数名として断定しない。
+- 最終runnerはmain IAT26一致、2child自然終了とentry / type-query / return marker、構文エラー不在、実driver cleanupを要求してMeasured。親の詳細結果はFailures4 / FAIL / Passed=Falseをそのまま保持した。CDB出力自体がconsoleを変更するため、content比較を製品成功の証拠にしない。driver exit0は観測とteardownの成功であり、ConDrv実装のPASSではない。owned IFEO3keyの不在と実uninstall後fresh状態を確認した。
+
+証跡: docs/validation/kxnt-ifeo-zig-write-server.jsonに4runの原receiptと最終解析を保存。tests/analyze_kxnt_ifeo_zig_write.ps1はArchive / 未使用Outputを受け取り、receiptと実logのhash / byte一致、parent consoleとwrite/query handle一致、引数、成功File型query、順序、実write拒否、child終了1とcleanupを検査する。PowerShellのread-only PID変数名を避けた診断parser修正も行った。再現は両形式build_kxnt_ifeo_probe.ps1 -Suiteでfixturesをbuildし、x64 driverをbuild、run_kxnt_ifeo_vm.ps1 -ConDrvTraceへ使い捨てVMX / credentials / 未使用RunNameを渡す。既存guest fixtureはcleanup成功を確認して保存後に実行する。
+
+次は同じ実childのnative Fileの用途と割当て元を確認し、安全なhandle変換を設計する。単にFile / console衝突の拒否を削除したり、標準出力の値を無条件にconsole優先にするとnative Fileの書込みを誤配送するため、既存の衝突拒否試験を維持する。x64通常Zig consoleの修正・uninstrumented成功、Vista IFEO、native32bit OS、UTF一般資源gate、拡張registry flags、WNFと元監査の残りは未完了。

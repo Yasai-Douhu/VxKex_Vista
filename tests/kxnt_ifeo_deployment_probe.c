@@ -8,8 +8,8 @@
 #include <stdlib.h>
 #define BASE L"C:\\VxKexProbe\\KxNtIfeo"
 static FILE *out;static unsigned failures;
-static DWORD lastChild,lastWait;static BOOL utfTrace,consoleSuite;
-static BOOL selected(unsigned test,BOOL trace,BOOL runtime){return consoleSuite?test>=30:(utfTrace?test==27:(runtime?test>=26:(!trace || test==17 || test==25)));}
+static DWORD lastChild,lastWait;static BOOL utfTrace,consoleSuite,consoleTrace;
+static BOOL selected(unsigned test,BOOL trace,BOOL runtime){return consoleTrace?test==30:(consoleSuite?test>=30:(utfTrace?test==27:(runtime?test>=26:(!trace || test==17 || test==25))));}
 static DWORD tracePid(PCWSTR path){FILE *file=_wfopen(path,L"r");char line[1024],*marker;DWORD pid=0;if(!file)return 0;while(fgets(line,sizeof(line),file))if(!strncmp(line,"KXNT_TARGET_PID=",16) && (marker=line)!=NULL){pid=strtoul(marker+16,NULL,16);break;}fclose(file);return pid;}
 static const WCHAR *kinds[]={L"processor-feature",L"domain",L"device-family",L"persisted-state",L"sid-package",L"sid-capability",L"membership",L"compare",L"file-information",L"alert",L"performance",L"srw",L"utf8",L"silent-exit",L"condrv"};
 static void fixture(unsigned test,PWSTR image,PWSTR name){const WCHAR *arch=test%2?L"x86":L"x64";if(test<2)_snwprintf(name,MAX_PATH,L"KxNtIfeoOpen-%s.exe",arch);else _snwprintf(name,MAX_PATH,L"KxNtIfeo-%s-%s.exe",kinds[(test-2)/2],arch);_snwprintf(image,MAX_PATH,BASE L"\\%s",name);}
@@ -20,10 +20,10 @@ static DWORD run(PCWSTR file,PCWSTR args){WCHAR command[4096];STARTUPINFOW si;PR
 int main(int argc,char **argv){
  const char marker[]="VxKex setup lifecycle disposable VM 20261001";char data[sizeof(marker)];HANDLE f,token=NULL;DWORD bytes,count;PTOKEN_USER user=NULL;PWSTR sid=NULL;
  WCHAR args[2048],image[MAX_PATH],name[MAX_PATH],profile[MAX_PATH],source[MAX_PATH],dest[MAX_PATH];BOOL attempted=FALSE,profileAttempted[32]={FALSE},zigAttempted[2]={FALSE};unsigned arch,index,test,countTests;
- BOOL runtime=argc==2 && (!strcmp(argv[1],"--runtime-suite") || !strcmp(argv[1],"--utf8-trace"));BOOL trace=argc==2 && (!strcmp(argv[1],"--event-trace") || !strcmp(argv[1],"--utf8-trace"));BOOL suite=runtime || trace || (argc==2 && (!strcmp(argv[1],"--suite") || !strcmp(argv[1],"--condrv-suite")));
+ BOOL runtime=argc==2 && (!strcmp(argv[1],"--runtime-suite") || !strcmp(argv[1],"--utf8-trace"));BOOL trace=argc==2 && (!strcmp(argv[1],"--event-trace") || !strcmp(argv[1],"--utf8-trace"));BOOL suite=runtime || trace || (argc==2 && (!strcmp(argv[1],"--suite") || !strcmp(argv[1],"--condrv-suite") || !strcmp(argv[1],"--condrv-trace")));
  OSVERSIONINFOEXW version;SYSTEM_INFO system;
  const WCHAR *arches[]={L"x64",L"x86"};const WCHAR *names[]={L"KexDll.dll",L"KxNt.dll"};
- if(argc!=1 && !suite)return 87;utfTrace=argc==2 && !strcmp(argv[1],"--utf8-trace");consoleSuite=argc==2 && !strcmp(argv[1],"--condrv-suite");countTests=consoleSuite?32:(runtime?30:(suite?26:2));
+ if(argc!=1 && !suite)return 87;utfTrace=argc==2 && !strcmp(argv[1],"--utf8-trace");consoleTrace=argc==2 && !strcmp(argv[1],"--condrv-trace");consoleSuite=consoleTrace || (argc==2 && !strcmp(argv[1],"--condrv-suite"));countTests=consoleSuite?32:(runtime?30:(suite?26:2));
  SetErrorMode(SEM_FAILCRITICALERRORS|SEM_NOGPFAULTERRORBOX|SEM_NOOPENFILEERRORBOX);
  out=fopen("C:\\VxKexProbe\\KxNtIfeo\\deployment.txt","w");if(!out)return 2;
  ZeroMemory(&version,sizeof(version));version.dwOSVersionInfoSize=sizeof(version);check(GetVersionExW((OSVERSIONINFOW*)&version),"read actual clone OS version");GetNativeSystemInfo(&system);
@@ -58,6 +58,7 @@ int main(int argc,char **argv){
    _snwprintf(args,2048,BASE L"\\control-condrv-%s.txt \"%s\" " BASE L"\\KxNtIfeo-Zig-%s.exe native-only",arches[arch],arch?L"C:\\VxKex\\Kex32\\KxNt.dll":L"C:\\Windows\\System32\\KxNt.dll",arches[arch]);
    check(!run(image,args),"unprofiled console native-route control completed");
    _snwprintf(args,2048,BASE L"\\applied-condrv-%s.txt \"%s\" " BASE L"\\KxNtIfeo-Zig-%s.exe",arches[arch],arch?L"C:\\VxKex\\Kex32\\KxNt.dll":L"C:\\Windows\\System32\\KxNt.dll",arches[arch]);
+   if(consoleTrace)wcscat(args,L" debug-zig");
   }
   if(runtime && (test-2)/2==12){
    WCHAR controlArgs[2048];_snwprintf(controlArgs,2048,L"\"%s\" " BASE L"\\control-utf8-%s.txt lookup-control",arch?L"C:\\VxKex\\Kex32\\KxNt.dll":L"C:\\Windows\\System32\\KxNt.dll",arches[arch]);
@@ -68,7 +69,8 @@ int main(int argc,char **argv){
    _snwprintf(debugArgs,4096,L"-G -logo \"%s\" -cf \"" BASE L"\\event-trace.cdb\" \"%s\" %s",dest,image,args);
    debugExit=run(L"C:\\VxKexProbe\\Wow64\\cdb.exe",debugArgs);check(lastWait==WAIT_OBJECT_0 && debugExit<=1,"owned debugger exited naturally; probe exit0/1 recorded separately");
    lastChild=tracePid(dest);check(lastChild!=0,"read actual debuggee PID from CDB");
-  }else check(!run(image,args),"registered static imports and detailed comparisons");
+  }else if(consoleTrace){DWORD exit=run(image,args);check(lastWait==WAIT_OBJECT_0 && exit<=1,"diagnostic parent exited naturally; detail failures retained");}
+  else check(!run(image,args),"registered static imports and detailed comparisons");
   if(test>=2){_snwprintf(source,MAX_PATH,BASE L"\\bindings-%lu.txt",lastChild);_snwprintf(dest,MAX_PATH,BASE L"\\bindings-%s-%s.txt",kinds[(test-2)/2],arches[arch]);check(CopyFileW(source,dest,TRUE),"preserve main-process static bindings");}
  }
 cleanup:
