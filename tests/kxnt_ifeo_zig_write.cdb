@@ -1,6 +1,9 @@
 .echo KXNT_ZIG_WRITE_TRACE_BEGIN
 .printf "KXNT_TARGET_PID=%x\n", @$tpid
 sxd av
+.extpath C:\VxKexProbe\KxNtIfeo
+.load C:\VxKexProbe\KxNtIfeo\ntsdexts.dll
+.chain
 bu kexdll!Ext_NtWriteFile ".if ((@rcx & 3)==3) { .echo KXNT_CONSOLE_WRITE_ENTRY } .else { g }"
 g
 r rcx
@@ -9,6 +12,14 @@ r r8
 r r9
 r @$t2 = @rcx
 r @$t1 = poi(@rsp)
+.printf "KXNT_PROCESS_PARAMETERS=%p STDOUT=%p CURRENT_DIRECTORY_HANDLE=%p\n", poi(@$peb+20), poi(poi(@$peb+20)+28), poi(poi(@$peb+20)+48)
+.echo KXNT_CURRENT_DIRECTORY_PATH
+du poi(poi(@$peb+20)+40)
+.echo KXNT_NATIVE_HANDLE_METADATA
+!handle @$t2 f
+.echo KXNT_ALIGNED_NATIVE_HANDLE_METADATA
+r @$t3 = @$t2 & 0xfffffffffffffffc
+!handle @$t3 f
 dq @rsp+28 L5
 db poi(@rsp+30) L28
 kb 8

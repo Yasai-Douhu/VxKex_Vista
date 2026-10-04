@@ -77,6 +77,9 @@ try {
  # Capture a failing driver too, including cleanup results, before interpreting exit.
  if($ConDrvTrace){
   Guest @('copyFileFromHostToGuest',$VMX,"$PSScriptRoot\kxnt_ifeo_zig_write.cdb","$guest\zig-write.cdb")
+  $extension='C:\Program Files\Debugging Tools for Windows (x64)\winxp\ntsdexts.dll'
+  Guest @('copyFileFromHostToGuest',$VMX,$extension,"$guest\ntsdexts.dll")
+  $debuggerFiles+=[pscustomobject]@{Name='ntsdexts.dll';SHA256=(Get-FileHash $extension).Hash}
   Guest @('copyFileFromGuestToHost',$VMX,'C:\VxKexProbe\Wow64\cdb.exe',"$archive\cdb.exe")
   $debuggerFiles+=[pscustomobject]@{Name='cdb.exe';SHA256=(Get-FileHash "$archive\cdb.exe").Hash}
  }

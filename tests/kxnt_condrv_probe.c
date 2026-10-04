@@ -149,13 +149,19 @@ static void profile_bounds(void) {
     }
 }
 static void collision(HANDLE file) {
-    HANDLE screens[128];unsigned count=0,i,alias;HANDLE target=(HANDLE)((ULONG_PTR)file|3);
+    HANDLE screens[128];unsigned count=0,i,alias,standard;HANDLE target=(HANDLE)((ULONG_PTR)file|3);
+    HANDLE oldOut=GetStdHandle(STD_OUTPUT_HANDLE),oldErr=GetStdHandle(STD_ERROR_HANDLE);
     IOS ios;LONG s;COORD origin={0,0};WCHAR before[8],after[8];DWORD read;
     while(count<128){HANDLE h=CreateConsoleScreenBuffer(GENERIC_READ|GENERIC_WRITE,FILE_SHARE_READ|FILE_SHARE_WRITE,NULL,CONSOLE_TEXTMODE_BUFFER,NULL);if(h==INVALID_HANDLE_VALUE)break;screens[count++]=h;if(h==target)break;}
     check("collision-found",count && screens[count-1]==target);
     if(count && screens[count-1]==target){
         ReadConsoleOutputCharacterW(target,before,8,origin,&read);
-        for(alias=0;alias<2;++alias){memset(&ios,0xa5,sizeof(ios));s=adapted[alias](target,NULL,NULL,NULL,&ios,"C",1,NULL,NULL);check("collision-explicit-error",s==(LONG)0xc00000bb && ios.Status==(LONG)0xa5a5a5a5);}
+        for(standard=0;standard<3;++standard){
+            if(standard==1)check("collision-set-standard-output",SetStdHandle(STD_OUTPUT_HANDLE,target));
+            if(standard==2){check("collision-restore-standard-output",SetStdHandle(STD_OUTPUT_HANDLE,oldOut));check("collision-set-standard-error",SetStdHandle(STD_ERROR_HANDLE,target));}
+            for(alias=0;alias<2;++alias){memset(&ios,0xa5,sizeof(ios));s=adapted[alias](target,NULL,NULL,NULL,&ios,"C",1,NULL,NULL);check("collision-explicit-error",s==(LONG)0xc00000bb && ios.Status==(LONG)0xa5a5a5a5);}
+        }
+        check("collision-restore-standard-error",SetStdHandle(STD_ERROR_HANDLE,oldErr));
         ReadConsoleOutputCharacterW(target,after,8,origin,&read);check("collision-console-unchanged",!memcmp(before,after,sizeof(before)));
         check("collision-file-unchanged",GetFileSize(file,NULL)==2);
     }

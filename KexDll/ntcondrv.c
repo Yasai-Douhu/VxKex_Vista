@@ -34,6 +34,8 @@ static ULONG KexConsoleWriteKind(HANDLE Handle) {
     NTSTATUS Status;
     union { ULONG_PTR Alignment; BYTE Bytes[512]; } Storage;
     UNICODE_STRING FileType;
+    PRTL_USER_PROCESS_PARAMETERS Parameters;
+    OBJECT_BASIC_INFORMATION Basic;
     if (!Handle || ((ULONG_PTR)Handle & 3) != 3 || GetFileType(Handle) != FILE_TYPE_CHAR) return 0;
     Verify = (VERIFY)GetProcAddress(GetModuleHandleW(L"kernel32.dll"), "VerifyConsoleIoHandle");
     if (!Verify || !Verify(Handle)) return 0;
@@ -41,8 +43,22 @@ static ULONG KexConsoleWriteKind(HANDLE Handle) {
     if (Status == STATUS_INVALID_HANDLE) return 1;
     if (!NT_SUCCESS(Status)) return 2; // Never guess after an unexpected query failure.
     RtlInitConstantUnicodeString(&FileType, L"File");
-    return RtlEqualUnicodeString(&((POBJECT_TYPE_INFORMATION)Storage.Bytes)->TypeName,
-        &FileType, FALSE) ? 2 : 1;
+    if (!RtlEqualUnicodeString(&((POBJECT_TYPE_INFORMATION)Storage.Bytes)->TypeName,
+        &FileType, FALSE)) return 1;
+    // Zig obtains its standard handles from ProcessParameters, then uses NT
+    // I/O. NT 6.0 keeps console handles in a separate namespace: stdout 0x13
+    // can alias the loader's directory File at 0x10. Recognize that specific
+    // standard-console intent without treating arbitrary tagged files as
+    // consoles. Never allow a writable native File alias through this path.
+    Parameters=NtCurrentPeb()->ProcessParameters;
+    if (!Parameters || (Handle != Parameters->StandardOutput &&
+        Handle != Parameters->StandardError) ||
+        (((ULONG_PTR)Parameters->CurrentDirectory.Handle & ~(ULONG_PTR)3) !=
+         ((ULONG_PTR)Handle & ~(ULONG_PTR)3))) return 2;
+    Status=NtQueryObject(Handle, ObjectBasicInformation, &Basic, sizeof(Basic), NULL);
+    if (!NT_SUCCESS(Status) ||
+        (Basic.GrantedAccess & (FILE_WRITE_DATA | FILE_APPEND_DATA))) return 2;
+    return 1;
 }
 
 static NTSTATUS KexConsoleWriteError(ULONG Error) {
