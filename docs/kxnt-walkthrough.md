@@ -966,3 +966,14 @@ clone exit0、source VMX hash変化なし、clone diskのbounded sparse descript
 - 親2mainの全詳細PASS、driverFailures0 / exit0、runnerPassed。4owned IFEOを解除・不在確認、実uninstallとfresh復帰を確認。CDBは使っていない。analyze_kxnt_vista_condrv.ps1はVista通常receiptだけを受け付け、実Zig内容・natural exit、6拒否、VT・partial6call、resource対照、static26binding、installbytesとcleanupを要求する。初回解析はZig child cleanupのlabelが誤っていたため拒否し、実driver labelへ合わせた。製品試験結果は変更していない。
 
 証跡: docs/validation/kxnt-condrv-ifeo-vista.json（原receiptの詳細 / native-control / binding / hashes、独立解析）。機能範囲は内容profileを持つZigのlegacy console writeと通常file / pipeのnative委譲。full ConDrv namespace、任意NT handle変換、native32bit OS、UTF一般資源gate、SilentExitのVista検証、backup / restore、WNF、監査の残るnative転送は未完了。原Vista VM / 原Installer / Releasesには変更を適用していない。
+## 2026-10-04: Vista client 通常 IFEO の UTF / SilentExit を検証
+
+同じ独立Vista6.0.6002 cloneでRuntimeSuiteを実行した。直前core buildの両形式fixtureを使い、productionDLLは0dcbe68のまま。ConDrvのguest directoryは保持した。CDB / UTF resource phase marker / 追加snapshot診断を用いず、通常fixtureのnative対照と反復gateを維持した。
+
+- native ProductType1 / AMD64 / driver未注入 / elevated / fresh、未登録4imageのc0000139、実install8copy byte一致、4profile実登録、各main26slot静的binding / early KexDllを確認。
+- UTFのstatus / output length / 全buffer / LastError / LastStatus / guard / pointer / overlap / malformed / surrogate / all scalarを含む4893行が、両形式それぞれ現行hostのnative UTF関数の出力と完全一致した。all scalar1112064のroundtripも含む。native比較資料はhostであり、Vistaに存在しないnative UTF関数を呼んだとは主張しない。
+- 4thread / 各phase16000conversion callはErrors0。cold phaseのhandle delta1は同じfixtureの8000lookup native controlのdelta1と一致し、warmはadapter / controlともdelta0。このVista runでは従来gateを緩めずに両形式PASS。以前のServer uninstrumented cold0 / warm1等の失敗をこの成功で上書きしない。資源割当て元の一般証明や全環境での再現解消はまだ未完了。
+- SilentExitは9caseの無効handle / thread / event / self等の結果をhost nativeと比較。self相当のみVistaのSTATUS_NOT_SUPPORTEDに差し替える既存方針を検証し、ReportingSupported0 / 1000repeat delta0 / Failures0。実WER reporting、process終了レポート生成、NEXTの成功stubを再現したという意味ではない。
+- 詳細4組すべてPassed、driverFailures0 / exit0、runnerPassed。owned profile4key解除・不在、実uninstallとfresh復帰を確認した。analyze_kxnt_vista_runtime.ps1はClientVistaの通常RuntimeSuiteだけを受け付け、4893行完全比較・cold native対照・warm0、Silent9caseのunsupported方針、bindingsとnegative / byte / teardownを要求する。
+
+証跡: docs/validation/kxnt-runtime-ifeo-vista.json（原receipt、raw詳細 / native reference / lookup control / static binding / source・fixture・packagehash、独立解析）。これによりVista client通常IFEOでcore12種、限定ConDrv、UTFとSilentExitの既存方針を実行確認した。元Serverの資源失敗、native32bit OS、full ConDrv、registry backup/restore等、WNFと実利用に必要な未解決native forwarderは残っている。原ユーザーVM / 原Installer / Releasesは変更していない。
