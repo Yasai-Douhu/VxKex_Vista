@@ -1,0 +1,90 @@
+{
+  "State": "PrePublicationCompletionAudit",
+  "ProductionSourceCommit": "463af9dc370efcd54f5a3ac353757598bea4fe5c",
+  "Requirements": [
+    {
+      "Requirement": "Audit scope",
+      "EvidenceAndLimits": "12 NEXT-only exports implemented, Vista-only 7 preserved; WNF2 upstream nonfunctional/deferred"
+    },
+    {
+      "Requirement": "Normal/error/boundary/safety",
+      "EvidenceAndLimits": "Feature details plus current Vista30 IFEO pairs; Failed diagnostics retained, bounded resource differences TODO"
+    },
+    {
+      "Requirement": "Architectures",
+      "EvidenceAndLimits": "Current x64/WOW64; native32bit OS unverified"
+    },
+    {
+      "Requirement": "OS differences",
+      "EvidenceAndLimits": "Earlier Server details/current Vista; runtime C/shared headers unchanged since 0dcbe68 except metadata; no full new-candidate Server rerun"
+    },
+    {
+      "Requirement": "Integration",
+      "EvidenceAndLimits": "Real install/KexCfg/AVRF/static26 bindings, actual Zig, complete cleanup"
+    },
+    {
+      "Requirement": "Priority",
+      "EvidenceAndLimits": "182/166 native gaps; actual3 app main and earlier Java DLL sample no concrete import intersection; full subsystems deferred"
+    },
+    {
+      "Requirement": "Progress/automation",
+      "EvidenceAndLimits": "Walkthrough mirrored, phases pushed, build/VM/import/analyzers/staging/ZIP scripted"
+    },
+    {
+      "Requirement": "Package",
+      "EvidenceAndLimits": "35 fresh replacements,34 version resources match,58 files and ZIP hashes match; third-party/versionless VistaRun explicit"
+    },
+    {
+      "Requirement": "Publication",
+      "EvidenceAndLimits": "Pending tag target/latest/non-draft/asset sizes and digests"
+    }
+  ],
+  "CurrentEvidence": [
+    "kxnt-release2233-major-status.json",
+    "kxnt-release2233-vista-core.json",
+    "kxnt-release2233-vista-runtime.json",
+    "kxnt-release2233-vista-condrv.json",
+    "kxnt-release2233-candidate.json",
+    "kxnt-release2233-import-priority.json"
+  ],
+  "FrozenTrackedSources": 581,
+  "MatchedTrackedSources": 578,
+  "PostBuildHarnessChanges": [
+    {
+      "Path": "tests/capture_kxnt_vista_clone_baseline.ps1",
+      "BuildTimeSHA256": "24401CD8F3CBDE4E69CC1F7DA65DE441DA5201932A5BEF346CDF17AF72677026",
+      "CurrentSHA256": "84FA71B8D7AF5B9389A16ADAA23B20A307567E9929685DF5ACB6D7DA88F55E9C",
+      "Reason": "Post-build explicit Vista-reclone guard or release-evidence selection; actual VM receipts record execution-time runner hashes"
+    },
+    {
+      "Path": "tests/run_kxnt_ifeo_vm.ps1",
+      "BuildTimeSHA256": "F8D88D0A624C4B2E66757D3AF05688C678B7557EE0CDF4084EB581E2CD7A1A65",
+      "CurrentSHA256": "1F12C148189C5814A91852DCAC13BA32B65AB4F1CAD9993B9BB8EEFC55B26C2B",
+      "Reason": "Post-build explicit Vista-reclone guard or release-evidence selection; actual VM receipts record execution-time runner hashes"
+    },
+    {
+      "Path": "tests/summarize_kxnt_parity.ps1",
+      "BuildTimeSHA256": "EDBC051C071F122AEA4045B51552B3C8ED08E54CD48F65182F1D9B9E3D6D6F87",
+      "CurrentSHA256": "58DBEA4961629BF21C7386F315FAA3042D136586B2133F28C7855E4174EBD0DB",
+      "Reason": "Post-build explicit Vista-reclone guard or release-evidence selection; actual VM receipts record execution-time runner hashes"
+    }
+  ],
+  "Package": {
+    "State": "PackagedRoundTripVerified",
+    "Version": "2.0.0.2233",
+    "ManifestSHA256": "03305ED28C5E3F7B8D4DA1112E612976E778C885E0545D5AC76F5DC7906ABDFA",
+    "Files": 58,
+    "ZIP": {
+      "Path": "C:\\Users\\YamaR\\Desktop\\AI_Datas\\VxKex_Vista_KxNt\\audit\\KxNtRelease-2.0.0.2233-publication\\VxKex_Vista-2.0.0.2233.zip",
+      "Bytes": 2715226,
+      "SHA256": "AD5E4648003BCC888C25CB2C1EAEF2B1B472EB02DE80222F46030AFC15306D60"
+    },
+    "Checksum": {
+      "Path": "C:\\Users\\YamaR\\Desktop\\AI_Datas\\VxKex_Vista_KxNt\\audit\\KxNtRelease-2.0.0.2233-publication\\VxKex_Vista-2.0.0.2233-SHA256.txt",
+      "Bytes": 94,
+      "SHA256": "DD61CEB7A3DAAACFD4CFC589C15B5E4EC4E34CDF4EA30CBC6F0D4EAAF4F58E3B"
+    },
+    "Scope": "Every candidate and current Installer file matches staging manifest; every ZIP file verifies by entry size and decompressed SHA256. Runtime verification and external upload must be verified separately."
+  },
+  "RemainingRequiredWork": "Publish/verify v2.0.0.2233 and push final walkthrough"
+}

@@ -1150,3 +1150,8 @@ docs/validation/kxnt-release2233-{candidate,vista-core,vista-runtime,vista-condr
 主要完了判定は元portability audit全項目と更新user基準に照合。RTL/SID/membership/compare/拡張file/alert/limitedConDrvを主要完了、既存native転送のUTF/performance/SRW/openも主要完了。WNF2名はNEXT自身に実働基盤がないためP3保留、AppContainer/fullConDrv/UMS/追加registry/WERは独立subsystem/unsupported制限、残りnative forwardersは実callが出た場合の条件付き優先度とする。bounded native Event/observer差を全資源不存在の証明とせずTODOへ維持。native32bit OSは未検証。新候補の回帰はVista x64/WOW64、Server差と競合/境界の詳細は以前の機能別source/major証跡を参照し、今回new candidateでServer全試験を再実施したとは主張しない。
 
 release-notes-v2.0.0.2233.mdを作成。次の公開工程はcurrent candidate全58fileのZIP round-tripとchecksum、branch push、同じ版tag/commitへのReleases upload、GitHub asset digest一致確認。公開の成功とgoal completionは外部状態の確認後に判定する。
+### 2.0.0.2233 公開直前の完了監査とZIP確認
+
+配布source commit463af9dをpush済み。compiled candidate manifestのtracked581sourceのうち578hashがcurrentと一致。残る3件はbuild後のbaseline capture / VM runnerの固定VistaReclone許可とinventoryの新証跡選択であり、product source差ではない。execution-time runner hashesは新VM receiptsへ保存している。last functional fix0dcbe68からKexDll/KxNt/KxBase/shared headersの差はvautogen版情報のみとgit diffで確認。Serverの以前の実装/OS差証拠と現在のVista30pairのscopeを分離する。docs/validation/kxnt-release2233-completion-audit.jsonに元監査/安全・境界/architecture/OS/通常経路/保留の優先度/進捗/配布/公開の要件別証拠と制限を記録。
+
+tools/Package-KxNtRelease.ps1でcurrent Installerと候補全58fileのbytes/hash一致を確認しfresh ZIPを作成。全ZIP entryの個数・path・length・展開stream SHA256がmanifestと一致。ZIPは2715226bytes、SHA256 AD5E4648003BCC888C25CB2C1EAEF2B1B472EB02DE80222F46030AFC15306D60。checksumも作成しaudit/KxNtRelease-2.0.0.2233-publication/receipt.jsonへ保存。remote v2.0.0.2233 tag未存在を確認。残る必須作業はReleases公開・external digest/tag/latest statusの確認と記録。
