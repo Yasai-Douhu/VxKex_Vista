@@ -977,3 +977,18 @@ clone exit0、source VMX hash変化なし、clone diskのbounded sparse descript
 - 詳細4組すべてPassed、driverFailures0 / exit0、runnerPassed。owned profile4key解除・不在、実uninstallとfresh復帰を確認した。analyze_kxnt_vista_runtime.ps1はClientVistaの通常RuntimeSuiteだけを受け付け、4893行完全比較・cold native対照・warm0、Silent9caseのunsupported方針、bindingsとnegative / byte / teardownを要求する。
 
 証跡: docs/validation/kxnt-runtime-ifeo-vista.json（原receipt、raw詳細 / native reference / lookup control / static binding / source・fixture・packagehash、独立解析）。これによりVista client通常IFEOでcore12種、限定ConDrv、UTFとSilentExitの既存方針を実行確認した。元Serverの資源失敗、native32bit OS、full ConDrv、registry backup/restore等、WNFと実利用に必要な未解決native forwarderは残っている。原ユーザーVM / 原Installer / Releasesは変更していない。
+## 2026-10-04: 未解決native転送を実アプリのimportから優先づけるスクリプトを追加
+
+元監査section3の静的未解決転送を、現在の作業ブランチKxNtと実アプリから再確認した。NtQuerySystemInformationExは現在もnative転送で、NEXT2463にも移植元となる本体はなく同じnative転送。KxBase側には既存GetLogicalProcessorInformationEx adapterがあるが、Win32 APIの対応をNt APIの全class対応と混同しない。
+
+- Server2008原ユーザーVMから、native System32 / SysWOW64 ntdll、Java25のjava.exe / bin\server\jvm.dll、C:\vscode\Code.exeを読み取り専用copyした。guest pathとSHA256を記録。実行、設定変更、system DLL置換はしなかった。
+- tests/audit_kxnt_application_imports.pyはPE header / file-backed RVA / names / thunks / export boundsを読み、x86 / x64を独立に照合。通常importとRVA型delay importを取得し、ordinal名とnamed名を分ける。native不在のnamed ntdll転送と実ntdll / kxnt importとのintersectionを出す。VA型delay descriptorや不正境界は黙って省略せず拒否する。
+- 現行KxNtのnamed exportsはx64=2027 / x86=2067、未解決native転送は182 / 166。元監査の2015 / 2055と191 / 175の履歴は変更しない。この差分はAPI追加と転送変更の静的結果であり、全残件の実行失敗を示さない。
+- JVMの291import（named289）とjava.exeの54named importには直接ntdll / kxnt名が0。Code.exeは1274import（named1218）、ntdllのnamed10で、未解決転送に該当0。Codeのnative10はLdrLock / Unlock、NtDeleteKey、NtQueryInformationProcess / Thread / Object / SystemInformation、NtWriteFile、RtlInitUnicodeString、RtlNtStatusToDosError。この結果を動的lookupや依存DLLの不在証明には使わない。
+- null終端した未解決API名の文字列候補も別欄へ記録。JVMにstrnlen / strtok_sが見つかったが、同名の既存import先はapi-ms-win-crt-string-l1-1-0.dllであり、ntdll lookupの証拠ではない。指定watch名NtQuerySystemInformationEx / NtQueryWnfStateData / ZwQueryWnfStateData / RtlUnsubscribeWnfNotificationWaitForCompletionの文字列は今回3fileでは検出0。WNF全利用の否定、暗号化された名前や他DLLの呼出しを否定する意味ではない。
+- SDK dumpbin /importsと全named import名を独立比較し、289 / 54 / 1218全て一致。ordinalはこのname比較の対象外。初回dumpbinはCommon7/IDE runtime不足で失敗、SDK照合の初回regexはdelay欄のaddressを扱えず拒否した。PATHとregexを修正しrawを別ファイルに保存した。モジュール選択やruntime semanticsの独立検証とは主張しない。
+- build_kxnt_import_audit_fixture.ps1は両形式でNtQuerySystemInformationExを静的importするowned fixtureを生成する。API呼出しもguest実行も行わず、正の検出対照として両形式で1missing hitを確認した。空のintersectionを返すだけの壊れた検出器ではないことを検査した。通常 / delay構造の実Code入力とx86 / x64正対照を保存。
+
+証跡: docs/validation/kxnt-native-import-priority.jsonにnative table / actual import全件・候補、guest copyhash、SDKname照合、positive fixtures / buildlog / script hashを収録。archiveはaudit/KxNtParity/imports-priority-20261004、初回 / 第二回 / 最終結果を上書きしていない。再実行は--native-x86 / x64、--kxnt-x86 / x64、複数--app、任意--watch-name、未使用--outputを指定する。Scannerはfileを書き換えない。
+
+今回、NtQuerySystemInformationExを単に旧NtQuerySystemInformationへ全class委譲する実装は追加しなかった。入力groupやarchitecture selectorを無視すると結果の意味が変わるため、今後は実call siteと要求classを確認して対応範囲を決める。WNFの状態 / subscription / ACL / process scope設計、既存Server UTF resource失敗の原因確定、native32bit OSなど元監査と進捗の残項目は継続中。これは調査ツールの実装・静的検証であり、production APIの完成数を増やした段階ではない。
