@@ -7,12 +7,14 @@ param(
  [switch]$EventTrace,
  [switch]$RuntimeSuite,
  [switch]$Utf8Trace,
+ [switch]$Utf8ResourceSnapshot,
  [switch]$ConDrvSuite,
  [switch]$ConDrvTrace,
  [switch]$ClientVista,
  [string]$VMRun='C:\Program Files\VMware\VMware Workstation\vmrun.exe'
 )
 $ErrorActionPreference='Stop'
+if($Utf8ResourceSnapshot){if($EventTrace -or $Utf8Trace -or $ConDrvSuite -or $ConDrvTrace -or $ClientVista){throw 'Private PEB snapshot diagnosis is guarded for the Server clone without CDB only'};$RuntimeSuite=$true}
 if($Utf8Trace){$RuntimeSuite=$true;$EventTrace=$true}
 if($ConDrvTrace){$ConDrvSuite=$true}
 if($ConDrvSuite){if($RuntimeSuite -or $EventTrace -or $Utf8Trace){throw 'Select one integration mode'};$Suite=$true}
@@ -33,9 +35,18 @@ $kinds=@('processor-feature','domain','device-family','persisted-state','sid-pac
 if($RuntimeSuite){$kinds=@('utf8','silent-exit')}
 if($Utf8Trace){$kinds=@('utf8')}
 if($ConDrvSuite){$kinds=@('condrv')}
+if($RuntimeSuite){foreach($arch in @('x86','x64')){
+ $utfFixture="$root\audit\KxNtParity\IfeoSuite\$arch\KxNtIfeo-utf8-$arch.exe"
+ $snapshotMarker=[Text.Encoding]::ASCII.GetString([IO.File]::ReadAllBytes($utfFixture)).Contains('PrivateLayout=NT6-diagnostic')
+ if($snapshotMarker -ne [bool]$Utf8ResourceSnapshot){throw 'UTF fixture snapshot instrumentation must match explicit runner mode; rebuild normal fixtures before ordinary runs'}
+}}
 function Guest([string[]]$Arguments){& $VMRun -T ws -gu $GuestUser -gp $GuestPassword @Arguments;if($LASTEXITCODE){throw "VMware failed: $($Arguments[0])"}}
 try {
  foreach($source in @('tests/kxnt_open_key_adapter_probe.c','tests/kxnt_ifeo_deployment_probe.c','tests/kxnt_ifeo_imports.def','tests/build_kxnt_ifeo_probe.ps1','tests/run_kxnt_ifeo_vm.ps1')){$sources[$source]=(Get-FileHash "$root\$source").Hash}
+ if($Utf8ResourceSnapshot){foreach($file in @(@('C:\Windows\SysWOW64\ntdll.dll','native-ntdll-x86.dll'),@('C:\Windows\System32\ntdll.dll','native-ntdll-x64.dll'))){
+  Guest @('copyFileFromGuestToHost',$VMX,$file[0],"$archive\$($file[1])")
+  $debuggerFiles+=[pscustomobject]@{Name=$file[1];GuestPath=$file[0];SHA256=(Get-FileHash "$archive\$($file[1])").Hash}
+ }}
  if($Suite){
   if($ConDrvTrace){$sources['tests/kxnt_ifeo_zig_write.cdb']=(Get-FileHash "$PSScriptRoot\kxnt_ifeo_zig_write.cdb").Hash}
   if($ConDrvSuite){foreach($source in @('00-Common-Headers/ZigNtIoProfile.h','KexDll/ntcondrv.c','tests/kxnt_zig_console_smoke.zig')){$sources[$source]=(Get-FileHash "$root\$source").Hash}}
@@ -191,7 +202,7 @@ try {
  }
  if($Suite -and !$EventTrace -and !$ConDrvTrace -and ($suiteResults.Count -ne $(if($ConDrvSuite){2}elseif($RuntimeSuite){4}else{24}) -or ($suiteResults|Where-Object {!$_.Passed}))){throw 'Detailed suite failed; preserve actual output, bindings and teardown'}
  if($driverExit -ne 0 -or $driver -match '(?m)^FAIL ' -or $driver -notmatch 'Failures=0 Result=PASS' -or (!$EventTrace -and !$RuntimeSuite -and !$ConDrvSuite -and ($results.Count -ne 2 -or ($results|Where-Object {!$_.Passed})))){throw 'IFEO integration or deployment cleanup failed; preserve raw logs'}
- if($EventTrace){if($eventResults.Count -ne $(if($Utf8Trace){1}else{2}) -or ($eventResults|Where-Object {!$_.Measured})){throw 'Incomplete event trace'};$state='Measured'}elseif(!$ConDrvTrace){$state='Passed'}
+ if($EventTrace){if($eventResults.Count -ne $(if($Utf8Trace){1}else{2}) -or ($eventResults|Where-Object {!$_.Measured})){throw 'Incomplete event trace'};$state='Measured'}elseif($Utf8ResourceSnapshot){$state='Measured'}elseif(!$ConDrvTrace){$state='Passed'}
 } finally {
- [pscustomobject]@{State=$state;ClientVista=[bool]$ClientVista;VMX=$VMX;GuestUser=$GuestUser;RunName=$RunName;SourceSHA256=$sources;PackageFiles=$files;DriverSHA256=(Get-FileHash "$root\audit\KxNtParity\x64\ifeo-deployment.exe").Hash;DriverExit=$driverExit;DriverOutput=$driver;Results=$results;SuiteIncluded=[bool]$Suite;RuntimeSuite=[bool]$RuntimeSuite;Utf8Trace=[bool]$Utf8Trace;ConDrvSuite=[bool]$ConDrvSuite;ConDrvTrace=[bool]$ConDrvTrace;ZigWriteTraces=$zigTraces;SuiteResults=$suiteResults;EventTrace=[bool]$EventTrace;EventResults=$eventResults;DebuggerFiles=$debuggerFiles;Scope='Disposable NT6 clone (ClientVista identifies Vista client; otherwise Server 2008), native x64 and WOW64; real install/KexCfg/AVRF/static ntdll import rewrite/ordinary-open comparison and optional detailed suite with exact import-slot equality; event trace is observation under CDB and never replaces failed resource gates; no native x86 OS or general UTF resource completion; Vista client IFEO is proven only by a ClientVista receipt with passed executed probes; binding an API is not proof of its behavior unless covered by the executed detailed probe'}|ConvertTo-Json -Depth 8|Set-Content -Encoding UTF8 "$archive\receipt.json"
+ [pscustomobject]@{State=$state;ClientVista=[bool]$ClientVista;Utf8ResourceSnapshot=[bool]$Utf8ResourceSnapshot;VMX=$VMX;GuestUser=$GuestUser;RunName=$RunName;SourceSHA256=$sources;PackageFiles=$files;DriverSHA256=(Get-FileHash "$root\audit\KxNtParity\x64\ifeo-deployment.exe").Hash;DriverExit=$driverExit;DriverOutput=$driver;Results=$results;SuiteIncluded=[bool]$Suite;RuntimeSuite=[bool]$RuntimeSuite;Utf8Trace=[bool]$Utf8Trace;ConDrvSuite=[bool]$ConDrvSuite;ConDrvTrace=[bool]$ConDrvTrace;ZigWriteTraces=$zigTraces;SuiteResults=$suiteResults;EventTrace=[bool]$EventTrace;EventResults=$eventResults;DebuggerFiles=$debuggerFiles;Scope='Disposable NT6 clone (ClientVista identifies Vista client; otherwise Server 2008), native x64 and WOW64; real install/KexCfg/AVRF/static ntdll import rewrite/ordinary-open comparison and optional detailed suite with exact import-slot equality; event trace and optional private-PEB resource snapshots are diagnostic observation and never replace failed resource gates; no native x86 OS or general UTF resource completion; Vista client IFEO is proven only by a ClientVista receipt with passed executed probes; binding an API is not proof of its behavior unless covered by the executed detailed probe'}|ConvertTo-Json -Depth 8|Set-Content -Encoding UTF8 "$archive\receipt.json"
 }

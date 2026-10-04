@@ -11,6 +11,27 @@ static void utf8_snapshot(const char *phase) {
     QUERY query=(QUERY)GetProcAddress(native,"NtQuerySystemInformation");
     OBJECT object=(OBJECT)GetProcAddress(native,"NtQueryObject");
     ULONG capacity=4*1024*1024,needed=0;TABLE *table=NULL;LONG s;ULONG_PTR i,count=0;DWORD measured;
+    /* NT6 Server-clone diagnostic only, never a production layout dependency.
+       Read the real PEB LoaderLock pointer, then the published critical-section
+       fields. Verify ownership before calling this a native cached semaphore. */
+    {
+        typedef LONG (WINAPI *BASIC)(HANDLE,ULONG,PVOID,ULONG,PULONG);
+        BASIC basic=(BASIC)GetProcAddress(native,"NtQueryInformationProcess");
+        PVOID info[6]={0},lock=NULL;SIZE_T read=0;RTL_CRITICAL_SECTION cs;
+        HMODULE owner=NULL;char path[MAX_PATH]={0};
+#ifdef _WIN64
+        const ULONG loaderOffset=0x110;
+#else
+        const ULONG loaderOffset=0xa0;
+#endif
+        if(basic && basic(GetCurrentProcess(),0,info,sizeof(info),NULL)>=0 &&
+           ReadProcessMemory(GetCurrentProcess(),(BYTE*)info[1]+loaderOffset,&lock,sizeof(lock),&read) && read==sizeof(lock) && lock &&
+           ReadProcessMemory(GetCurrentProcess(),lock,&cs,sizeof(cs),&read) && read==sizeof(cs) &&
+           GetModuleHandleExA(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS|GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT,(PCSTR)lock,&owner) && owner==native &&
+           GetModuleFileNameA(owner,path,sizeof(path))) {
+            fprintf(out,"LoaderLockSnapshot=%s PEB=%p Lock=%p Semaphore=%p LockCount=%ld Recursion=%ld Owner=%s Offset=%Ix PrivateLayout=NT6-diagnostic\n",phase,info[1],lock,cs.LockSemaphore,cs.LockCount,cs.RecursionCount,path,(ULONG_PTR)lock-(ULONG_PTR)owner);
+        } else fprintf(out,"LoaderLockSnapshot=%s Verified=0 Error=%lu PrivateLayout=NT6-diagnostic\n",phase,GetLastError());
+    }
     if(!query || !object){++failures;return;}
     do {
         table=(TABLE*)malloc(capacity);if(!table){++failures;return;}

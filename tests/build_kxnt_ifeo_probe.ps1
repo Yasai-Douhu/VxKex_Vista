@@ -1,5 +1,6 @@
-param([ValidateSet('x86','x64')][string]$Architecture='x64',[switch]$Suite,[switch]$UninstrumentedSrw,[switch]$EventPhaseTrace,[switch]$RuntimeSuite)
+param([ValidateSet('x86','x64')][string]$Architecture='x64',[switch]$Suite,[switch]$UninstrumentedSrw,[switch]$EventPhaseTrace,[switch]$RuntimeSuite,[switch]$Utf8ResourceSnapshot)
 $ErrorActionPreference='Stop'
+if($Utf8ResourceSnapshot -and !($Suite -or $RuntimeSuite)){throw 'UTF snapshots require suite fixtures'}
 $root=Split-Path $PSScriptRoot
 $vc='C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC'
 $sdk='C:\Program Files\Microsoft SDKs\Windows\v7.1'
@@ -26,6 +27,7 @@ if($Suite -or $RuntimeSuite){
   [string[]]$libs=@(if($kind -eq 'membership'){'advapi32.lib'})
   [string[]]$trace=@(if($kind -eq 'srw' -and !$UninstrumentedSrw){'/DKXNT_IFEO_SRW_RESOURCE_TRACE'})
   if($EventPhaseTrace -and $kind -in @('compare','srw','utf8')){$trace+='/DKXNT_IFEO_RESOURCE_PHASES'}
+  if($Utf8ResourceSnapshot -and $kind -eq 'utf8'){$trace+='/DKXNT_UTF8_RESOURCE_TRACE'}
   $image="$suiteOut\KxNtIfeo-$kind-$Architecture.exe"
   & cl.exe /nologo /MT /O1 /W4 /D_WIN32_WINNT=0x0600 /D_CRT_SECURE_NO_WARNINGS @trace "/FI$PSScriptRoot\kxnt_ifeo_suite_provider.h" "/Fo$suiteOut\$kind.obj" "/Fe$image" "$PSScriptRoot\kxnt_${source}_probe.c" /link /SUBSYSTEM:CONSOLE,6.0 "$suiteOut\suite-imports.lib" @libs
   if($LASTEXITCODE){throw "Detailed IFEO suite build failed: $kind"}
